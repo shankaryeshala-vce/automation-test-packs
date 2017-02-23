@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.dell.cpsd</groupId>
+        <artifactId>root-parent</artifactId>
+        <version>0.1</version>
+    </parent>
+
+    <groupId>com.dell.cpsd.automation</groupId>
+    <artifactId>automation-framework</artifactId>
+    <version>1.0</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <dockerImage.org>cpsd-test</dockerImage.org>
+        <dockerImage.tag>latest</dockerImage.tag>
+
+        <!-- Build properties -->
+        <remove-local-docker-image>false</remove-local-docker-image>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Dependency Verisons -->
+
+        <!-- Plugin Versions --> 
+        <maven-exec-plugin.version>1.4.0</maven-exec-plugin.version>
+        <docker-maven-plugin.version>0.4.13</docker-maven-plugin.version>
+    </properties>
+
+    <!-- Unless the docker.registry value is set docker images will not be tagged or pushed. -->
+    <profiles>
+        <profile>
+            <id>docker-push-toggle</id>
+            <activation>
+                <property>
+                    <name>!docker.registry</name>
+                </property>
+            </activation>
+            <properties>
+                <skipDockerTag>true</skipDockerTag>
+                <skipDockerPush>true</skipDockerPush>
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker-maven-plugin.version}</version>
+                <configuration>
+                    <!-- Location of the Docker file.
+                         Change if it is not in the same directory as the pom file. -->
+                    <dockerDirectory>${project.basedir}</dockerDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>build-image</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <configuration>
+                            <imageName>${dockerImage.org}-${project.artifactId}:${dockerImage.tag}</imageName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>tag-image</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>tag</goal>
+                        </goals>
+                        <configuration>
+                            <image>${dockerImage.org}-${project.artifactId}:${dockerImage.tag}</image>
+                            <newName>${docker.registry}/${dockerImage.org}-${project.artifactId}:${dockerImage.tag}</newName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>push-image</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <imageName>${docker.registry}/${dockerImage.org}-${project.artifactId}:${dockerImage.tag}</imageName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${maven-exec-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>Remove Remote Tagged Docker Images</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipDockerPush}</skip>
+                            <executable>docker</executable>
+                            <arguments>
+                                <argument>rmi</argument>
+                                <argument>${docker.registry}/${dockerImage.org}-${project.artifactId}:${dockerImage.tag}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>Remove Original Docker Image</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${dockerKeepLocalImage}</skip>
+                            <executable>docker</executable>
+                            <arguments>
+                                <argument>rmi</argument>
+                                <argument>${dockerImage.org}-${project.artifactId}:${dockerImage.tag}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
