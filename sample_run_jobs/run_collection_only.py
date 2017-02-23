@@ -1,0 +1,3 @@
+import os
+os.system('py.test $AF_TEST_SUITE_PATH/ --collect-only > $AF_BASE_PATH/collection_only.txt')
+os.system('py.test $AF_TEST_SUITE_PATH/sample/test_collection_only.py --html $AF_REPORTS_PATH/sample_test_suite/collection_only_report.html --self-contained-html --json $AF_REPORTS_PATH/sample_test_suite/collection_only_report.json --junit-xml $AF_REPORTS_PATH/sample_test_suite/collection_only_report.xml')

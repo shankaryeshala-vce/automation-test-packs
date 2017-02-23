@@ -1,0 +1,7 @@
+version: '2'
+services:
+  automation-framework:
+    image: docker-dev-local.art.local/cpsd-test-automation-framework:latest
+    #build: .
+    ports:
+      - "2222:22"
