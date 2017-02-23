@@ -1,0 +1,2 @@
+import os
+os.system('py.test $AF_TEST_SUITE_PATH/ -m "log_collection_mvp" --html $AF_REPORTS_PATH/all/log_collection_mvp_test_suite_report.html --self-contained-html --json $AF_REPORTS_PATH/all/log_collection_mvp_test_suite_report.json --junit-xml $AF_REPORTS_PATH/all/log_collection_mvp_test_suite_report.xml')
