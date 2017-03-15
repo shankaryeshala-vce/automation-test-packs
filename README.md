@@ -3,10 +3,12 @@
 ## Description
 This repository contains shell scripts and matching python scripts used to run test suites within pytest.
 ## Documentation
-## Prerequisites
-## Compilation: How to Compile
-## Packaging: How to Package
-## Automated Testing
-## How to Contribute
-## Community and Support
+## Before you begin
+## API overview
+## Building
+## Packaging
+## Deploying
+## Testing
+## Contributing
+## Community 
 ## Licensing
