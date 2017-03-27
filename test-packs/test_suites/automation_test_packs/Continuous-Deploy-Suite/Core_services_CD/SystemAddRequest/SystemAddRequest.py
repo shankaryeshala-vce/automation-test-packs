@@ -11,7 +11,7 @@ import time
 import paramiko
 
 try:
-    payload_file = 'rcm_fitness/symphony-sds.ini'
+    payload_file = 'rcm_fitness_CD/symphony-sds.ini'
     payload_header = 'payload'
     payload_property_sys = 'sys_payload'
     payload_property_req = 'sys_request_payload'
