@@ -252,8 +252,6 @@ def test_chkStatus_yml(service_name, pid):
     print("Successful stop and start performed on: %s" % service_name)
 
 
-
-
 ########################################################################################################################
 
 @pytest.mark.core_services_mvp
