@@ -22,9 +22,9 @@ try:
     payload_property_neg4 = 'cs_invalid_msg_prop'
     payload_property_neg5 = 'cs_req_invalid_uuid'
 
-    config_file = 'config.ini'
-    config_header = 'test_system'
-    config_property = 'ipaddress'
+    env_file = 'env.ini'
+    ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+
 except:
     print('Possible configuration error')
 
@@ -35,14 +35,30 @@ rmq_password = 'test'
 cli_username = 'root'
 cli_password = 'V1rtu@1c3!'
 
-ipaddress = '10.3.8.52'
+#ipaddress = '10.3.8.52'
 
 #  ipaddress = af_support_tools.get_config_file_property(config_file=config_file, heading=config_header,
 #                                                       property=config_property)
 
+# Add & verify component credentials
+@pytest.mark.core_services_mvp
+def test_CS_ComponentCredentials_CI():
+    print('\nRunning mvp test on system: ', ipaddress)
+    cleanup()
+
+    bindQueues()
+
+    # Create the payload messages using valid values to be used in the individual tests.
+    createCSPayload()
+
+    print('************************************************')
+
+    CS_CredAdd_CredReq()
+
+######################################################################################################################
 
 # Add & verify component credentials
-@pytest.mark.credential_service_test_packs_regression
+@pytest.mark.core_services_cd
 def test_CS_ComponentCredentials():
     print('\nRunning test on system: ', ipaddress)
     cleanup()
@@ -54,7 +70,7 @@ def test_CS_ComponentCredentials():
 
     print('************************************************')
 
-    CS_CredAdd_CredReq()
+    #CS_CredAdd_CredReq()
     CS_CredAdd_duplicateComponents()
     CS_CredAdd_duplicateEndpoints()
     CS_CredAdd_noCompUuid()
@@ -696,5 +712,5 @@ def createCSPayload():
                                               property=payload_property_neg5,
                                               value=request_component_invalid_uuid_payload)
 
-
-# test_CS_ComponentCredentials()
+#test_CS_ComponentCredentials_CI()
+#test_CS_ComponentCredentials()

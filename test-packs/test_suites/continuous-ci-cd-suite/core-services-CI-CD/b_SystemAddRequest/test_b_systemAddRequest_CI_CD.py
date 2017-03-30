@@ -11,7 +11,7 @@ import time
 import paramiko
 
 try:
-    payload_file = 'rcm-fitness-cd/symphony-sds.ini'
+    payload_file = 'test_suites/symphony-sds.ini'
     payload_header = 'payload'
     payload_property_sys = 'sys_payload'
     payload_property_req = 'sys_request_payload'
@@ -36,6 +36,7 @@ port = 5672
 #######################################################################################################################
 
 # *** THIS IS THE MAIN TEST *** Add a system
+@pytest.mark.core_services_mvp
 def test_SystemAdditionRequested():
     print('Running Sanity on system: ', ipaddress)
 
@@ -95,6 +96,7 @@ def test_SystemAdditionRequested():
 
 
 # *** Kick of the collectComponentVersion Msg
+@pytest.mark.core_services_mvp
 def test_HAL_CollectComponentVersion():
 
     bindHALQueus()
