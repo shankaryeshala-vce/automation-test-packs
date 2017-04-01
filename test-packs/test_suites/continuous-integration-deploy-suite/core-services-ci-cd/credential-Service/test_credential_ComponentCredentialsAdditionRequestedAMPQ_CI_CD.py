@@ -10,9 +10,9 @@ import pytest
 import json
 import time
 
-# Payloads from symphony-sds.ini:- location: /test_suites/config_files/symphony-sds.ini
+# Payloads from symphony-sds.ini:- location: /test_suites/config_files/continuous-integration-deploy-suite/symphony-sds.ini
 try:
-    payload_file = 'symphony-sds.ini'
+    payload_file = 'continuous-integration-deploy-suite/symphony-sds.ini'
     payload_heading = 'credential_tests'
     payload_property_add = 'cs_cred_addition'
     payload_property_req = 'cs_cred_request'

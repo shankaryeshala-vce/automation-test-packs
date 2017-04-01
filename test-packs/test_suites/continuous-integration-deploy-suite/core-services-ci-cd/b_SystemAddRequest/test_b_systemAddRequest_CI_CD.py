@@ -11,7 +11,7 @@ import time
 import paramiko
 
 try:
-    payload_file = 'test_suites/symphony-sds.ini'
+    payload_file = 'continuous-integration-deploy-suite/symphony-sds.ini'
     payload_header = 'payload'
     payload_property_sys = 'sys_payload'
     payload_property_req = 'sys_request_payload'
