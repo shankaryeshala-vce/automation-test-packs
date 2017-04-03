@@ -28,6 +28,8 @@ except:
 #@pytest.mark.rcm_fitness_mvp
 @pytest.mark.core_services_mvp
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
+@pytest.mark.core_services_cd
 @pytest.mark.parametrize("service_name" , [
     "symphony-credential-service",
     "symphony-system-definition-service",
