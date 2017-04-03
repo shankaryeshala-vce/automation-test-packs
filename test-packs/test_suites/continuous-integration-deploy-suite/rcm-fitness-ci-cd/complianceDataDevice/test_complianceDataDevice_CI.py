@@ -297,9 +297,11 @@ def getComplianceData_NULL():
 
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice1():
+    pytest.skip('Disable for harness stability')
     getComplianceDataNEXUS("NEXUS", "N5K", "C5548", 7, "SWITCH", "FIXEDMODULE", path + "complianceDataDeviceNEXUS5k.json")
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice2():
+    pytest.skip('Disable for harness stability')
     getComplianceDataNEXUS("NEXUS", "N3K", "C3048", 3, "SWITCH", "FIXEDMODULE", path + "complianceDataDeviceNEXUS3k.json")
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice3():
