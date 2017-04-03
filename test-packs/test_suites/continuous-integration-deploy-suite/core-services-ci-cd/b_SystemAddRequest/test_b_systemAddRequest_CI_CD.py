@@ -104,7 +104,7 @@ def test_SystemAdditionRequested():
 @pytest.mark.core_services_cd
 @pytest.mark.rcm_fitness_cd
 def test_HAL_CollectComponentVersion():
-
+    pytest.skip('Disable for harness stability')
     bindHALQueus()
 
     print('\n*******************************************************')
