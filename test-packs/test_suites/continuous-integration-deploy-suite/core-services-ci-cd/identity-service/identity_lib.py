@@ -2,14 +2,6 @@ import af_support_tools
 import json
 import time
 
-try:
-    env_file = '<name of .ini file>'
-    ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-except:
-    print('Possible configuration error.')
-
-# Use this to by-pass the config.ini file
-#ipaddress = '10.3.60.129'
 
 payload_file = 'identity_service/payload.ini'
 payload_header = 'identity_service'
@@ -21,7 +13,7 @@ rmq_password = 'test'
 port = 5672
 
 
-def get_element_uuids():
+def get_element_uuids(ipaddress):
     print("Building list of ElementUuids...")
     elementuuids = []
     the_payload = af_support_tools.get_config_file_property(config_file=payload_file,
@@ -36,7 +28,7 @@ def get_element_uuids():
                                          payload=the_payload,
                                          payload_type='json')
 
-    waitForMsg('test.identity.response')
+    waitForMsg('test.identity.response', ipaddress)
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -51,7 +43,7 @@ def get_element_uuids():
 
 
 # Delete the test queue
-def cleanup():
+def cleanup(ipaddress):
     print('Cleaning up...')
 
     af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
@@ -62,7 +54,7 @@ def cleanup():
 
 
 # Create & bind the test queues
-def bind_queues():
+def bind_queues(ipaddress):
     print('Creating the test EIDS Queues')
     af_support_tools.rmq_bind_queue(host=ipaddress,
                                     port=port, rmq_username=rmq_username, rmq_password=rmq_password,
@@ -149,7 +141,7 @@ def create_describe_message(uuidTest):
                                               value=my_payload)
 
 
-def waitForMsg(queue):
+def waitForMsg(queue, ipaddress):
     print("Waiting for message on queue:" + queue)
     # This function keeps looping until a message is in the specified queue. We do need it to timeout and throw an error
     # if a message never arrives. Once a message appears in the queue the function is complete and main continues.
@@ -174,5 +166,5 @@ def waitForMsg(queue):
 
         if timeout > max_timeout:
             print('ERROR: Message took too long to return. Something is wrong')
-            cleanup()
+            cleanup(ipaddress)
             break
