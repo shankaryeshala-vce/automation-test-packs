@@ -12,14 +12,14 @@ import pytest
 import json
 import identity_lib
 
-try:
-    env_file = '<name of .ini file>'
-    ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-except:
-    print('Possible configuration error.')
+# try:
+#     env_file = '<name of .ini file>'
+#     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+# except:
+#     print('Possible configuration error.')
 
 # Use this to by-pass the config.ini file
-#ipaddress = '10.3.60.129'
+ipaddress = '10.3.60.129'
 
 payload_file = 'identity_service/payload.ini'
 payload_header = 'identity_service'
@@ -41,9 +41,9 @@ cli_password = 'V1rtu@1c3!'
 port = 5672
 
 # Cleanup Any old Queues Before testing starts
-identity_lib.cleanup()
+identity_lib.cleanup(ipaddress)
 print("Binding Test Queses & Creating Payload Messages")
-identity_lib.bind_queues()
+identity_lib.bind_queues(ipaddress)
 identity_lib.create_messages()
 
 
@@ -59,8 +59,8 @@ def test_ident_status():
 
 @pytest.mark.core_services_mvp
 def test_identify_element():
-    identity_lib.cleanup()
-    identity_lib.bind_queues()
+    identity_lib.cleanup(ipaddress)
+    identity_lib.bind_queues(ipaddress)
     identified_errors = []
 
     # Get the payload from the .ini file that will be used in the Published message
@@ -79,7 +79,7 @@ def test_identify_element():
                                          payload=the_payload,
                                          payload_type='json')
 
-    identity_lib.waitForMsg('test.identity.request')
+    identity_lib.waitForMsg('test.identity.request', ipaddress)
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -95,7 +95,7 @@ def test_identify_element():
     print('\nConsuming Response Message...')
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    identity_lib.waitForMsg('test.identity.response')
+    identity_lib.waitForMsg('test.identity.response', ipaddress)
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -122,10 +122,10 @@ def test_identify_element():
 
 
 @pytest.mark.core_services_mvp
-@pytest.mark.parametrize("elementuuid", identity_lib.get_element_uuids())
+@pytest.mark.parametrize("elementuuid", identity_lib.get_element_uuids(ipaddress))
 def test_describe_element(elementuuid):
-    identity_lib.cleanup()
-    identity_lib.bind_queues()
+    identity_lib.cleanup(ipaddress)
+    identity_lib.bind_queues(ipaddress)
     identity_lib.create_describe_message(elementuuid)
     describe_errors = []
 
@@ -149,7 +149,7 @@ def test_describe_element(elementuuid):
                                          payload=the_payload,
                                          payload_type='json')
 
-    identity_lib.waitForMsg('test.identity.request')
+    identity_lib.waitForMsg('test.identity.request', ipaddress)
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -165,7 +165,7 @@ def test_describe_element(elementuuid):
     print('\nConsuming Response Message...')
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    identity_lib.waitForMsg('test.identity.response')
+    identity_lib.waitForMsg('test.identity.response', ipaddress)
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -197,8 +197,8 @@ def test_describe_element(elementuuid):
 
 @pytest.mark.core_services_mvp
 def test_key_accuracy_abc():
-    identity_lib.cleanup()
-    identity_lib.bind_queues()
+    identity_lib.cleanup(ipaddress)
+    identity_lib.bind_queues(ipaddress)
     accuracy_errors = []
     global assigned_uuid
     # An element that is identifiable by 3 business keys and the key accuracy was set at 2
@@ -219,7 +219,7 @@ def test_key_accuracy_abc():
                                          payload=the_payload,
                                          payload_type='json')
 
-    identity_lib.waitForMsg('test.identity.request')
+    identity_lib.waitForMsg('test.identity.request', ipaddress)
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -233,7 +233,7 @@ def test_key_accuracy_abc():
     print('Published Message Received.')
 
     print('\nConsuming Response Message...')
-    identity_lib.waitForMsg('test.identity.response')
+    identity_lib.waitForMsg('test.identity.response', ipaddress)
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -262,8 +262,8 @@ def test_key_accuracy_abc():
 @pytest.mark.core_services_mvp
 @pytest.mark.parametrize("payload_property", payload_property_keyaccuracy_ab_ac_neg)
 def test_key_accuracy_ab_ac_neg(payload_property):
-    identity_lib.cleanup()
-    identity_lib.bind_queues()
+    identity_lib.cleanup(ipaddress)
+    identity_lib.bind_queues(ipaddress)
     accuracy_errors = []
 
     # ******************************************************************************************************************
@@ -282,7 +282,7 @@ def test_key_accuracy_ab_ac_neg(payload_property):
                                          payload=the_payload,
                                          payload_type='json')
 
-    identity_lib.waitForMsg('test.identity.request')
+    identity_lib.waitForMsg('test.identity.request', ipaddress)
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -299,7 +299,7 @@ def test_key_accuracy_ab_ac_neg(payload_property):
 
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    identity_lib.waitForMsg('test.identity.response')
+    identity_lib.waitForMsg('test.identity.response', ipaddress)
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -335,8 +335,8 @@ def test_key_accuracy_ab_ac_neg(payload_property):
 @pytest.mark.core_services_mvp
 @pytest.mark.parametrize("payload_property", payload_property_negative_messages)
 def test_negative_messages(payload_property):
-    identity_lib.cleanup()
-    identity_lib.bind_queues()
+    identity_lib.cleanup(ipaddress)
+    identity_lib.bind_queues(ipaddress)
     negative_errors = []
 
     if payload_property == 'describe_no_element':
@@ -360,7 +360,7 @@ def test_negative_messages(payload_property):
                                          payload=the_payload,
                                          payload_type='json')
 
-    identity_lib.waitForMsg('test.identity.request')
+    identity_lib.waitForMsg('test.identity.request', ipaddress)
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -375,7 +375,7 @@ def test_negative_messages(payload_property):
     print('\nConsuming Response Message...')
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    identity_lib.waitForMsg('test.identity.response')
+    identity_lib.waitForMsg('test.identity.response', ipaddress)
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -403,4 +403,3 @@ def test_negative_messages(payload_property):
     print("Negative Message Test Passed")
 
 #######################################################################################################################
-
