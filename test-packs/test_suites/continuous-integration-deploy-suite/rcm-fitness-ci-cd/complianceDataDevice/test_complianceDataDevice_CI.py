@@ -312,6 +312,7 @@ def test_getComplianceDataDevice4():
     getComplianceDataNEXUS("NEXUS", "N9K", "C9396", 5, "SWITCH", "FIXEDMODULE", path + "complianceDataDeviceNEXUS9k.json")
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice5():
+    pytest.skip('Disable for harness stability')
     getComplianceData_INVALID(compUUID[:8])
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice6():

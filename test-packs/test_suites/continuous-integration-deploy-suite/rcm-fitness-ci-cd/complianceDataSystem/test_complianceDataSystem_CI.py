@@ -270,6 +270,7 @@ def test_getComplianceDataSystem5():
     getComplianceDataSystemSWITCH("NEXUS", "N9K", "SWITCH", "NETWORKCHASSIS", "9396", path + "rcmSystemDefinition.json", path + "complianceDataSystemNEXUS9K.json")
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataSystem6():
+    pytest.skip('Disable for harness stability')
     getComplianceDataSystem_INVALID(systemUUID[:8])
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataSystem7():
