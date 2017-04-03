@@ -12,14 +12,15 @@ import pytest
 import json
 import identity_lib
 
-# try:
-#     env_file = '<name of .ini file>'
-#     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-# except:
-#     print('Possible configuration error.')
+try:
+    env_file = 'env.ini'
+    ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+
+except:
+    print('Possible configuration error')
 
 # Use this to by-pass the config.ini file
-ipaddress = '10.3.60.129'
+#ipaddress = '10.3.60.129'
 
 payload_file = 'identity_service/payload.ini'
 payload_header = 'identity_service'
