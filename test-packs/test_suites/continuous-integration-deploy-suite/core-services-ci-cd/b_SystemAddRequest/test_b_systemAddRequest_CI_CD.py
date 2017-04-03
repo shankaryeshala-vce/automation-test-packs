@@ -37,6 +37,9 @@ port = 5672
 
 # *** THIS IS THE MAIN TEST *** Add a system
 @pytest.mark.core_services_mvp
+@pytest.mark.rcm_fitness_mvp
+@pytest.mark.core_services_cd
+@pytest.mark.rcm_fitness_cd
 def test_SystemAdditionRequested():
     print('Running Sanity on system: ', ipaddress)
 
@@ -97,6 +100,9 @@ def test_SystemAdditionRequested():
 
 # *** Kick of the collectComponentVersion Msg
 @pytest.mark.core_services_mvp
+@pytest.mark.rcm_fitness_mvp
+@pytest.mark.core_services_cd
+@pytest.mark.rcm_fitness_cd
 def test_HAL_CollectComponentVersion():
 
     bindHALQueus()
