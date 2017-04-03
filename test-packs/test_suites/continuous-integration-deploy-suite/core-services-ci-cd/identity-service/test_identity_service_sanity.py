@@ -48,7 +48,7 @@ identity_lib.bind_queues(ipaddress)
 identity_lib.create_messages()
 
 
-@pytest.mark.core_services_mvp
+#@pytest.mark.core_services_mvp
 def test_ident_status():
     print('\nRunning Identity Status test on system: ', ipaddress)
     status_command = 'docker ps | grep identity-service'
@@ -58,7 +58,7 @@ def test_ident_status():
     print("Identity Service Running")
 
 
-@pytest.mark.core_services_mvp
+#@pytest.mark.core_services_mvp
 def test_identify_element():
     identity_lib.cleanup(ipaddress)
     identity_lib.bind_queues(ipaddress)
@@ -122,7 +122,7 @@ def test_identify_element():
     print('\n*******************************************************')
 
 
-@pytest.mark.core_services_mvp
+#@pytest.mark.core_services_mvp
 @pytest.mark.parametrize("elementuuid", identity_lib.get_element_uuids(ipaddress))
 def test_describe_element(elementuuid):
     identity_lib.cleanup(ipaddress)
@@ -196,7 +196,7 @@ def test_describe_element(elementuuid):
     print('\n*******************************************************')
 
 
-@pytest.mark.core_services_mvp
+#@pytest.mark.core_services_mvp
 def test_key_accuracy_abc():
     identity_lib.cleanup(ipaddress)
     identity_lib.bind_queues(ipaddress)
@@ -260,7 +260,7 @@ def test_key_accuracy_abc():
     print('TEST: KeyAccuracy ABC, CorrelationUuid have had elementuuid values returned: PASSED')
     print('\n*******************************************************')
 
-@pytest.mark.core_services_mvp
+#@pytest.mark.core_services_mvp
 @pytest.mark.parametrize("payload_property", payload_property_keyaccuracy_ab_ac_neg)
 def test_key_accuracy_ab_ac_neg(payload_property):
     identity_lib.cleanup(ipaddress)
@@ -333,7 +333,7 @@ def test_key_accuracy_ab_ac_neg(payload_property):
     print('TEST: KeyAccuracy, CorrelationUuid have had elementuuid values returned: PASSED')
     print('\n*******************************************************')
 
-@pytest.mark.core_services_mvp
+#@pytest.mark.core_services_mvp
 @pytest.mark.parametrize("payload_property", payload_property_negative_messages)
 def test_negative_messages(payload_property):
     identity_lib.cleanup(ipaddress)
