@@ -104,8 +104,7 @@ def test_SystemAdditionRequested():
 @pytest.mark.core_services_cd
 @pytest.mark.rcm_fitness_cd
 def test_HAL_CollectComponentVersion():
-    #pytest.skip('Disable for harness stability')
-    print('Known Issue, Defect Number: DE12419')
+    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer')
     bindHALQueus()
 
     print('\n*******************************************************')
