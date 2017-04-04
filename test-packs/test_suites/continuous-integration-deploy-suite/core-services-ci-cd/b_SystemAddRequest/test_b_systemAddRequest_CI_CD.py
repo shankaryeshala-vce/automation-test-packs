@@ -105,7 +105,7 @@ def test_SystemAdditionRequested():
 @pytest.mark.rcm_fitness_cd
 def test_HAL_CollectComponentVersion():
     #pytest.skip('Disable for harness stability')
-    print(‘Known Issue, Defect Number: DE12419 ’)
+    print('Known Issue, Defect Number: DE12419')
     bindHALQueus()
 
     print('\n*******************************************************')
