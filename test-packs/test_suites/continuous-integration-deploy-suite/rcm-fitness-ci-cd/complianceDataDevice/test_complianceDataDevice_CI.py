@@ -297,22 +297,22 @@ def getComplianceData_NULL():
 
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice1():
-    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
+    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataNEXUS("NEXUS", "N5K", "C5548", 7, "SWITCH", "FIXEDMODULE", path + "complianceDataDeviceNEXUS5k.json")
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice2():
-    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
+    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataNEXUS("NEXUS", "N3K", "C3048", 3, "SWITCH", "FIXEDMODULE", path + "complianceDataDeviceNEXUS3k.json")
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice3():
     getComplianceDataMDS("MDS", "MDS9K", "C9148", 3, "SWITCH", "FIXEDMODULE", path + "complianceDataDeviceMDS.json")
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice4():
-    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
+    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataNEXUS("NEXUS", "N9K", "C9396", 5, "SWITCH", "FIXEDMODULE", path + "complianceDataDeviceNEXUS9k.json")
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice5():
-    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
+    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceData_INVALID(compUUID[:8])
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice6():
