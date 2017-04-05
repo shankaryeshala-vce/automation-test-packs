@@ -297,26 +297,22 @@ def getComplianceData_NULL():
 
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice1():
-    #pytest.skip('Disable for harness stability')
-    print('Known Issue, Possible Failure because of Defect Number: DE12419')
+    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer')
     getComplianceDataNEXUS("NEXUS", "N5K", "C5548", 7, "SWITCH", "FIXEDMODULE", path + "complianceDataDeviceNEXUS5k.json")
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice2():
-    #pytest.skip('Disable for harness stability')
-    print('Known Issue, Possible Failure because of Defect Number: DE12419')
+    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer')
     getComplianceDataNEXUS("NEXUS", "N3K", "C3048", 3, "SWITCH", "FIXEDMODULE", path + "complianceDataDeviceNEXUS3k.json")
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice3():
     getComplianceDataMDS("MDS", "MDS9K", "C9148", 3, "SWITCH", "FIXEDMODULE", path + "complianceDataDeviceMDS.json")
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice4():
-    #pytest.skip('Disable for harness stability')
-    print('Known Issue, Possible Failure because of Defect Number: DE12419')
+    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer')
     getComplianceDataNEXUS("NEXUS", "N9K", "C9396", 5, "SWITCH", "FIXEDMODULE", path + "complianceDataDeviceNEXUS9k.json")
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice5():
-    #pytest.skip('Disable for harness stability')
-    print('Known Issue, Possible Failure because of Defect Number: DE12419')
+    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer')
     getComplianceData_INVALID(compUUID[:8])
 @pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice6():
