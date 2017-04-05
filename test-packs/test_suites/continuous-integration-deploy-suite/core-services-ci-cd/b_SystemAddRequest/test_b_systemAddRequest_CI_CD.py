@@ -104,7 +104,7 @@ def test_SystemAdditionRequested():
 @pytest.mark.core_services_cd
 @pytest.mark.rcm_fitness_cd
 def test_HAL_CollectComponentVersion():
-    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
+    #af_support_tools.mark_defect(defect_id='', user_id='', comments='', date_marked='')
     bindHALQueus()
 
     print('\n*******************************************************')
