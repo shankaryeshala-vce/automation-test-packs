@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # Author:cullia
 # Updated by: olearj10
-# Date: 3 April 2017
-# Revision:2.1
+# Date: 5 April 2017
+# Revision:2.2
 # Code Reviewed by:
 # Description: Standalone testing of the Identity Service. No other services are used. No system needs to be defined
 # to run this test.
@@ -10,29 +10,28 @@
 import af_support_tools
 import pytest
 import json
-import identity_lib
+import random
+import time
 
 try:
     env_file = 'env.ini'
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-
 except:
-    print('Possible configuration error')
+    print('Possible configuration error.')
 
 # Use this to by-pass the config.ini file
-#ipaddress = '10.3.60.129'
+#ipaddress = '10.3.60.127'
 
 payload_file = 'identity_service/payload.ini'
 payload_header = 'identity_service'
 payload_property_identifyelement = 'identifyelement'
 payload_property_describeelement = 'describeelement'
-payload_property_keyaccuracy = 'keyaccuracy'
-payload_property_keyaccuracy_ab_ac_neg = ['keyaccuracyid_ab', 'keyaccuracyid_ac', 'keyaccuracyid_neg']
+payload_property_keyaccuracy = ['keyaccuracyid_abc','keyaccuracyid_ab', 'keyaccuracyid_ac', 'keyaccuracyid_neg']
 payload_property_negative_messages = ['ident_no_element_type', 'describe_no_element']
-
+# Global defined string to hold described element uuid
+elementUuid = ''
 
 #payload_property_negative_messages = ['ident_no_element_type', 'ident_no_class', 'ident_no_context', 'describe_no_element']
-
 
 # Always specify user names & password here at the start. Makes changing them later much easier,
 rmq_username = 'test'
@@ -41,14 +40,8 @@ cli_username = 'root'
 cli_password = 'V1rtu@1c3!'
 port = 5672
 
-# Cleanup Any old Queues Before testing starts
-identity_lib.cleanup(ipaddress)
-print("Binding Test Queses & Creating Payload Messages")
-identity_lib.bind_queues(ipaddress)
-identity_lib.create_messages()
 
-
-#@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp
 def test_ident_status():
     print('\nRunning Identity Status test on system: ', ipaddress)
     status_command = 'docker ps | grep identity-service'
@@ -56,13 +49,17 @@ def test_ident_status():
                                                command=status_command, return_output=True)
     assert "Up" in status, "Identity Service not Running"
     print("Identity Service Running")
+    # Cleanup Any old Queues Before main testing starts
+    cleanup()
+    create_messages()
 
 
-#@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp
 def test_identify_element():
-    identity_lib.cleanup(ipaddress)
-    identity_lib.bind_queues(ipaddress)
+    cleanup()
+    bind_queues()
     identified_errors = []
+    global elementUuid
 
     # Get the payload from the .ini file that will be used in the Published message
     the_payload = af_support_tools.get_config_file_property(config_file=payload_file,
@@ -80,7 +77,7 @@ def test_identify_element():
                                          payload=the_payload,
                                          payload_type='json')
 
-    identity_lib.waitForMsg('test.identity.request', ipaddress)
+    assert waitForMsg('test.identity.request'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -96,7 +93,7 @@ def test_identify_element():
     print('\nConsuming Response Message...')
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    identity_lib.waitForMsg('test.identity.response', ipaddress)
+    assert waitForMsg('test.identity.response'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -111,10 +108,15 @@ def test_identify_element():
     if return_json['correlationId'] not in the_payload:
         identified_errors.append("correlationId error")
 
-    for _ in range(len(return_json['elementIdentifications'])):
+    # Get number of element identifications in response
+    total_ele_idents = len(return_json['elementIdentifications'])
+    for _ in range(total_ele_idents):
         if return_json['elementIdentifications'][_]['correlationUuid'] not in the_payload:
             identified_errors.append("correlationUuid error")
         assert return_json['elementIdentifications'][_]['elementUuid']
+
+    # Collect random element uuid for describe, from the total number of identified elements
+    elementUuid = return_json['elementIdentifications'][random.randint(0, total_ele_idents)]['elementUuid']
 
     assert not identified_errors
 
@@ -122,12 +124,11 @@ def test_identify_element():
     print('\n*******************************************************')
 
 
-#@pytest.mark.core_services_mvp
-@pytest.mark.parametrize("elementuuid", identity_lib.get_element_uuids(ipaddress))
-def test_describe_element(elementuuid):
-    identity_lib.cleanup(ipaddress)
-    identity_lib.bind_queues(ipaddress)
-    identity_lib.create_describe_message(elementuuid)
+@pytest.mark.core_services_mvp
+def test_describe_element():
+    cleanup()
+    bind_queues()
+    create_describe_message(elementUuid)
     describe_errors = []
 
     # Get identify elements payload from the .ini file that will be used to verify elements described
@@ -139,7 +140,7 @@ def test_describe_element(elementuuid):
                                                             heading=payload_header,
                                                             property=payload_property_describeelement)
 
-    print('Sending Describe Element...\n')
+    print("Sending Describe Element for elementUUID: {}...".format(elementUuid))
 
     # Publish the message
     af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
@@ -150,7 +151,7 @@ def test_describe_element(elementuuid):
                                          payload=the_payload,
                                          payload_type='json')
 
-    identity_lib.waitForMsg('test.identity.request', ipaddress)
+    assert waitForMsg('test.identity.request'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -166,7 +167,7 @@ def test_describe_element(elementuuid):
     print('\nConsuming Response Message...')
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    identity_lib.waitForMsg('test.identity.response', ipaddress)
+    assert waitForMsg('test.identity.response'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -196,76 +197,13 @@ def test_describe_element(elementuuid):
     print('\n*******************************************************')
 
 
-#@pytest.mark.core_services_mvp
-def test_key_accuracy_abc():
-    identity_lib.cleanup(ipaddress)
-    identity_lib.bind_queues(ipaddress)
+@pytest.mark.core_services_mvp
+@pytest.mark.parametrize("payload_property", payload_property_keyaccuracy)
+def test_key_accuracy_ab_ac_neg(payload_property):
+    cleanup()
+    bind_queues()
     accuracy_errors = []
     global assigned_uuid
-    # An element that is identifiable by 3 business keys and the key accuracy was set at 2
-    # User should be later able to identify that same element by any combinations of two business keys
-
-    # Get the payload from the .ini file that will be used in the Published message
-    the_payload = af_support_tools.get_config_file_property(config_file=payload_file,
-                                                            heading=payload_header,
-                                                            property=payload_property_keyaccuracy)
-
-    print('Sending Identify Element Key Accuracy Message ABC\n')
-    # Publish the message
-    af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
-                                         rmq_password=rmq_password,
-                                         exchange='exchange.dell.cpsd.eids.identity.request',
-                                         routing_key='dell.cpsd.eids.identity.request',
-                                         headers={'__TypeId__': 'com.dell.cpsd.identity.service.api.IdentifyElements'},
-                                         payload=the_payload,
-                                         payload_type='json')
-
-    identity_lib.waitForMsg('test.identity.request', ipaddress)
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.identity.request')
-
-    published_json = json.loads(the_payload, encoding='utf-8')
-    return_json = json.loads(return_message, encoding='utf-8')
-
-    # Compare the 2 files. If they match the message was successfully published & received.
-    print("Verifying Message sent to RabbitMQ...")
-    assert published_json == return_json
-    print('Published Message Received.')
-
-    print('\nConsuming Response Message...')
-    identity_lib.waitForMsg('test.identity.response', ipaddress)
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.identity.response')
-
-    # Convert the returned message to json format and run asserts on the expected output.
-    return_json = json.loads(return_message, encoding='utf-8')
-
-    # Verify the response message has the expected format & parameters
-    print("Checking Response Message attributes...")
-    if not return_json['timestamp']:
-        accuracy_errors.append("No timestamp in message")
-    if return_json['correlationId'] not in the_payload:
-        accuracy_errors.append("correlationId error")
-
-    for _ in range(len(return_json['elementIdentifications'])):
-        if return_json['elementIdentifications'][_]['correlationUuid'] not in the_payload:
-            accuracy_errors.append("correlationUuid error")
-        assert return_json['elementIdentifications'][_]['elementUuid']
-        assigned_uuid = return_json['elementIdentifications'][_]['elementUuid']
-
-    assert not accuracy_errors
-    print('Response UUID Generated: ', assigned_uuid)
-    print('TEST: KeyAccuracy ABC, CorrelationUuid have had elementuuid values returned: PASSED')
-    print('\n*******************************************************')
-
-#@pytest.mark.core_services_mvp
-@pytest.mark.parametrize("payload_property", payload_property_keyaccuracy_ab_ac_neg)
-def test_key_accuracy_ab_ac_neg(payload_property):
-    identity_lib.cleanup(ipaddress)
-    identity_lib.bind_queues(ipaddress)
-    accuracy_errors = []
 
     # ******************************************************************************************************************
     # Get the payload from the .ini file that will be used in the Published message
@@ -283,7 +221,7 @@ def test_key_accuracy_ab_ac_neg(payload_property):
                                          payload=the_payload,
                                          payload_type='json')
 
-    identity_lib.waitForMsg('test.identity.request', ipaddress)
+    assert waitForMsg('test.identity.request'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -300,7 +238,7 @@ def test_key_accuracy_ab_ac_neg(payload_property):
 
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    identity_lib.waitForMsg('test.identity.response', ipaddress)
+    assert waitForMsg('test.identity.response'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -319,25 +257,30 @@ def test_key_accuracy_ab_ac_neg(payload_property):
         if return_json['elementIdentifications'][_]['correlationUuid'] not in the_payload:
             accuracy_errors.append("correlationUuid error")
         assert return_json['elementIdentifications'][_]['elementUuid']
-        identified_uuid = return_json['elementIdentifications'][_]['elementUuid']
-        print('Identified UUID: ', identified_uuid)
+
+        if payload_property == 'keyaccuracyid_abc':
+            assigned_uuid = return_json['elementIdentifications'][_]['elementUuid']
+            print('Response UUID Generated: ', assigned_uuid)
+        else:
+            identified_uuid = return_json['elementIdentifications'][_]['elementUuid']
+            print('Identified UUID: ', identified_uuid)
 
         if payload_property == 'keyaccuracyid_neg':
             if identified_uuid == assigned_uuid:
                 accuracy_errors.append("Error: ElementUuid match for Key Accuracy negative")
-        else:
+        elif payload_property != 'keyaccuracyid_abc':
             if identified_uuid != assigned_uuid:
                 accuracy_errors.append("ElementUuid Mismatch for Key Accuracy")
 
     assert not accuracy_errors
-    print('TEST: KeyAccuracy, CorrelationUuid have had elementuuid values returned: PASSED')
+    print('TEST: KeyAccuracy test pass.')
     print('\n*******************************************************')
 
-#@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp
 @pytest.mark.parametrize("payload_property", payload_property_negative_messages)
 def test_negative_messages(payload_property):
-    identity_lib.cleanup(ipaddress)
-    identity_lib.bind_queues(ipaddress)
+    cleanup()
+    bind_queues()
     negative_errors = []
 
     if payload_property == 'describe_no_element':
@@ -361,7 +304,7 @@ def test_negative_messages(payload_property):
                                          payload=the_payload,
                                          payload_type='json')
 
-    identity_lib.waitForMsg('test.identity.request', ipaddress)
+    assert waitForMsg('test.identity.request'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -376,7 +319,7 @@ def test_negative_messages(payload_property):
     print('\nConsuming Response Message...')
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    identity_lib.waitForMsg('test.identity.response', ipaddress)
+    assert waitForMsg('test.identity.response'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -404,3 +347,131 @@ def test_negative_messages(payload_property):
     print("Negative Message Test Passed")
 
 #######################################################################################################################
+
+# Delete the test queue
+def cleanup():
+    print('Cleaning up...')
+
+    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                      queue='test.identity.request')
+
+    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                      queue='test.identity.response')
+
+
+# Create & bind the test queues
+def bind_queues():
+    print('Creating the test EIDS Queues')
+    af_support_tools.rmq_bind_queue(host=ipaddress,
+                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                    queue='test.identity.request',
+                                    exchange='exchange.dell.cpsd.eids.identity.request',
+                                    routing_key='#')
+
+    af_support_tools.rmq_bind_queue(host=ipaddress,
+                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                    queue='test.identity.response',
+                                    exchange='exchange.dell.cpsd.eids.identity.response',
+                                    routing_key='#')
+
+
+# Create the payloads used in the test
+def create_messages():
+    print('Creating payload files')
+
+    # Create the payload and set it in the specified file.  my_payload is whatever you need to use. Hint: the correllationId field can be used as a description which makes it easier to locate in the Trace log.
+    my_payload = '{"timestamp":"2017-01-27T14:18:51Z","correlationId":"c92b8be9-a892-4a76-a8d3-933c85ead7bb","reply-to":"dell.cpsd.eids.identity.request.sds.gouldc-mint","elementIdentities":[{"correlationUuid":"fb4e839d-aba1-409e-82d7-7e4632d6b647","identity":{"elementType":"group","classification":"GROUP","parents":[{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"SystemNetwork"}]}},{"correlationUuid":"d4964090-76b8-4d4a-8068-4cd8ff258462","identity":{"elementType":"SWITCH","classification":"DEVICE","parents":[{"elementType":"group","classification":"GROUP","parents":[{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"SystemNetwork"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"COMPONENT_TAG","value":"MGMT-N3A"}]}},{"correlationUuid":"93eb24fd-b8b0-49fa-8911-17f1cba72034","identity":{"elementType":"SWITCH","classification":"DEVICE","parents":[{"elementType":"group","classification":"GROUP","parents":[{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"SystemNetwork"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"COMPONENT_TAG","value":"MGMT-N3B"}]}},{"correlationUuid":"0c180853-bff6-4813-9099-3f80816ce450","identity":{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}}]}'
+    af_support_tools.set_config_file_property(config_file=payload_file,
+                                              heading=payload_header,
+                                              property="identifyelement",
+                                              value=my_payload)
+
+    # Create the payload and set it in the specified file.  my_payload is whatever you need to use. Hint: the correllationId field can be used as a description which makes it easier to locate in the Trace log.
+    my_payload = '{"timestamp":"2017-03-15T09:40:17Z","correlationId":"key-accuracy-0000-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"},{"businessKeyType":"CONTEXTUAL","key":"DESCRIPTION","value":"THE_DESCRIPTION"},{"businessKeyType":"CONTEXTUAL","key":"IPADDRESS","value":"THE_IPADDRESS"}],"contextualKeyAccuracy":2}}]}'
+    af_support_tools.set_config_file_property(config_file=payload_file,
+                                              heading=payload_header,
+                                              property='keyaccuracyid_abc',
+                                              value=my_payload)
+
+    my_payload = '{"timestamp":"2017-01-27T14:18:51Z","correlationId":"key-accuracy-identify-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"},{"businessKeyType":"CONTEXTUAL","key":"DESCRIPTION","value":"THE_DESCRIPTION"}]}}]}'
+    af_support_tools.set_config_file_property(config_file=payload_file,
+                                              heading=payload_header,
+                                              property='keyaccuracyid_ab',
+                                              value=my_payload)
+
+    my_payload = '{"timestamp":"2017-01-27T14:18:51Z","correlationId":"key-accuracy-identify-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"},{"businessKeyType":"CONTEXTUAL","key":"IPADDRESS","value":"THE_IPADDRESS"}]}}]}'
+    af_support_tools.set_config_file_property(config_file=payload_file,
+                                              heading=payload_header,
+                                              property='keyaccuracyid_ac',
+                                              value=my_payload)
+
+    my_payload = '{"timestamp":"2017-01-27T14:18:51Z","correlationId":"key-accuracy-identify-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"}]}}]}'
+    af_support_tools.set_config_file_property(config_file=payload_file,
+                                              heading=payload_header,
+                                              property='keyaccuracyid_neg',
+                                              value=my_payload)
+
+    my_payload = '{"timestamp":"2017-01-27T14:18:51Z","correlationId":"c92b8be9-a892-4a76-a8d3-933c85ead7bb","reply-to":"dell.cpsd.eids.identity.request.sds.gouldc-mint","elementIdentities":[{"correlationUuid":"0c180853-bff6-4813-9099-3f80816ce450","identity":{"elementType":"","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}}]}'
+    af_support_tools.set_config_file_property(config_file=payload_file,
+                                              heading=payload_header,
+                                              property='ident_no_element_type',
+                                              value=my_payload)
+
+    my_payload = '{"timestamp":"2017-01-27T14:51:57Z","correlationId":"5d7f6d34-4271-4593-9bad-1b95589e5189","reply-to":"dell.cpsd.eids.identity.request.hal.gouldc-mint","elementUuids":[]}'
+    af_support_tools.set_config_file_property(config_file=payload_file,
+                                              heading=payload_header,
+                                              property='describe_no_element',
+                                              value=my_payload)
+
+    # my_payload = '{"timestamp":"2017-01-27T14:18:51Z","correlationId":"c92b8be9-a892-4a76-a8d3-933c85ead7bb","reply-to":"dell.cpsd.eids.identity.request.sds.gouldc-mint","elementIdentities":[{"correlationUuid":"0c180853-bff6-4813-9099-3f80816ce450","identity":{"elementType":"VCESYSTEM","classification":,"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}}]}'
+    # af_support_tools.set_config_file_property(config_file=payload_file,
+    #                                           heading=payload_header,
+    #                                           property='ident_no_class',
+    #                                           value=my_payload)
+    #
+    # my_payload = '{"timestamp":"2017-01-27T14:18:51Z","correlationId":"c92b8be9-a892-4a76-a8d3-933c85ead7bb","reply-to":"dell.cpsd.eids.identity.request.sds.gouldc-mint","elementIdentities":[{"correlationUuid":"0c180853-bff6-4813-9099-3f80816ce450","identity":{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":,"key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}}]}'
+    # af_support_tools.set_config_file_property(config_file=payload_file,
+    #                                           heading=payload_header,
+    #                                           property='ident_no_context',
+    #                                           value=my_payload)
+
+
+# This create payload is seperate as it needs to be called later
+def create_describe_message(uuidTest):
+    print("Building Describe Element Message...")
+    # Create the payload and set it in the specified file.  my_payload is whatever you need to use. Hint: the correllationId field can be used as a description which makes it easier to locate in the Trace log.
+    my_payload = '{"timestamp":"2017-01-27T14:51:57Z","correlationId":"5d7f6d34-4271-4593-9bad-1b95589e5189","reply-to":"dell.cpsd.eids.identity.request.hal.gouldc-mint","elementUuids":["' + uuidTest + '"]}'
+    af_support_tools.set_config_file_property(config_file=payload_file,
+                                              heading=payload_header,
+                                              property='describeelement',
+                                              value=my_payload)
+
+
+def waitForMsg(queue):
+    print("Waiting for message on queue:" + queue)
+    # This function keeps looping until a message is in the specified queue. We do need it to timeout and throw an error
+    # if a message never arrives. Once a message appears in the queue the function is complete and main continues.
+    # The length of the queue, it will start at 0 but as soon as we get a response it will increase
+    q_len = 0
+    # Represents the number of seconds that have gone by since the method started
+    timeout = 0
+    # Max number of seconds to wait
+    max_timeout = 10
+    # Amount of time in seconds that the loop is going to wait on each iteration
+    sleeptime = 1
+
+    while q_len < 1:
+        time.sleep(sleeptime)
+        timeout += sleeptime
+
+        q_len = af_support_tools.rmq_message_count(host=ipaddress,
+                                                   port=port,
+                                                   rmq_username=rmq_username,
+                                                   rmq_password=rmq_password,
+                                                   queue=queue)
+
+        if timeout > max_timeout:
+            print('ERROR: Message took too long to return. Something is wrong')
+            cleanup()
+            return False
+    return True

@@ -1,4 +1,6 @@
 #!/usr/bin/python
+# Copyright © [date] Dell Inc. or its subsidiaries.  All Rights Reserved.
+#
 # Author: russed5
 # Revision: 1.0
 # Code Reviewed by:
@@ -17,11 +19,12 @@ try:
 except:
     print('Possible configuration error')
 
-#ipaddress = "10.3.62.137"
+#ipaddress = "10.3.62.88"
 
 new_service_name = "testService"
 new_service_id = "testService1"
 new_service_host = ipaddress
+new_service_port = 200
 new_service_tag_1 = "testTag1"
 new_service_tag_2 = "testTag2"
 
@@ -41,18 +44,96 @@ port = 5672
 # *******************************************************************************************
 # the payload data used to register services with consul
 
-regData = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, \
-             "Tags": [ new_service_tag_1 ] }
+regData = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, "Port": new_service_port, \
+           "Tags": [ new_service_tag_1 ], "Check": { "HTTP": rabbiturl, "Interval": "5s" } }
+
+regDataNoAddress = {"ID": new_service_id, "Name": new_service_name, \
+                    "Tags": [ new_service_tag_1 ], "Check": { "HTTP": rabbiturl, "Interval": "5s" }  }
+
+regDataNoPort = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, \
+                    "Tags": [ new_service_tag_1 ], "Check": { "HTTP": rabbiturl, "Interval": "5s" }  }
+
+regDataNoHealthCheck = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, "Port": new_service_port, \
+                    "Tags": [ new_service_tag_1 ]}
+
+regDataWithCheckFailure = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, \
+                           "Tags": [ new_service_tag_1 ], \
+                           "Check": { "DeregisterCriticalServiceAfter": "20s", "HTTP": "http://3.3.3.3:15672", "Interval": "5s" } }
 
 # *******************************************************************************************
+#
+@pytest.mark.core_services_cd
+def test_registerServiceWithNoAddress():
+    # Testing that even tho Consul accepts a registration with no Address field, the Endpoint Registry
+    # does not advertise its existence
+
+    # setup, delete any lingering AMQP testQueue and create a new one before any messaging starts
+    cleanup(new_service_id)
+    ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
+
+    status_code = execRegisterService(regDataNoAddress)
+    assert status_code == 200, "The Register Service task was unsuccessful"
+
+    # check on the AMQP bus that a discovered endpoint event was NOT raised for thsi service
+    event = verifyEventOnBus(rabbitHost, endpointExchange, "dell.cpsd.endpoint.discovered")
+    assert not event, 'An event was raised when it should not have been'
+
+    #cleanup(new_service_id)
+    time.sleep(10)     # allow time between service status change
+# # *******************************************************************************************
+#
+@pytest.mark.core_services_cd
+def test_registerServiceWithNoPort():
+    # Testing that even tho Consul accepts a registration with no Address field, the Endpoint Registry
+    # does not advertise its existence
+
+    # setup, delete any lingering AMQP testQueue and create a new one before any messaging starts
+    cleanup(new_service_id)
+    ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
+
+    status_code = execRegisterService(regDataNoPort)
+    assert status_code == 200, "The Register Service task was unsuccessful"
+
+    # check on the AMQP bus that a discovered endpoint event was NOT raised for thsi service
+    event = verifyEventOnBus(rabbitHost, endpointExchange, "dell.cpsd.endpoint.discovered")
+    assert not event, 'An event was raised when it should not have been'
+
+    #cleanup(new_service_id)
+    time.sleep(10)     # allow time between service status change
+
+# # *******************************************************************************************
+
+@pytest.mark.core_services_cd
+def test_registerServiceWithNoHealthCheck():
+    # Testing that even tho Consul accepts a registration with no Address field, the Endpoint Registry
+    # does not advertise its existence
+
+    # setup, delete any lingering AMQP testQueue and create a new one before any messaging starts
+    cleanup(new_service_id)
+    ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
+
+    status_code = execRegisterService(regDataNoHealthCheck)
+    assert status_code == 200, "The Register Service task was unsuccessful"
+
+    # check on the AMQP bus that a discovered endpoint event was NOT raised for thsi service
+    event = verifyEventOnBus(rabbitHost, endpointExchange, "dell.cpsd.endpoint.discovered")
+    assert not event, 'An event was raised when it should not have been'
+
+    #cleanup(new_service_id)
+    time.sleep(10)     # allow time between service status change
+
+# # **************************************************************************************
+
 @pytest.mark.core_services_mvp
 def test_registerServiceSuccess():
-    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer')
     # This test verifies that a succful service register in Consul prompts the Endpoint Registry
     # to publish an endpoint.discovered event to the AMQP bus
 
+    errors_list = []
     # setup, delete any lingering AMQP testQueue and create a new one before any messaging starts
+    cleanup(new_service_id)
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
+
 
     status_code = execRegisterService(regData)
     assert status_code == 200, "The Register Service task was unsuccessful"
@@ -63,23 +144,97 @@ def test_registerServiceSuccess():
 
     # check on the AMQP bus that a discovered endpoint event was raised with correct payload
     event = verifyEventOnBus(rabbitHost, endpointExchange, "dell.cpsd.endpoint.discovered")
+    #cleanup(new_service_id)
+
+    if new_service_name not in event['endpoint']['type']:
+        errors_list.append("Service Name on the AMQP Bus is incorrect")
+    if new_service_host not in event['endpoint']['instances'][0]['url']:
+        errors_list.append("Service Address on the AMQP Bus is incorrect")
+    if new_service_tag_1 not in event['endpoint']['instances'][0]['tags'][0]:
+        errors_list.append("Service Tag on the AMQP Bus is incorrect")
+
+    assert not errors_list
+
+    time.sleep(10)     # allow time between service status change
+#
+# # **************************************************************************************
+
+@pytest.mark.core_services_cd
+def test_registerTwoServicesSameName():
+    # this test verifies that the same service can be registered twice, but with differing endpoints
+
+    errors_list = []
+    cleanup("duplicateService1")
+    cleanup("duplicateService2")
+    ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
+
+    # perform initial registration
+    regData1 = {"ID": "duplicateService1", "Name": "duplicateService","Address": "3.3.3.3", "Port": 300, \
+                "Tags": ["duplicate1"], "Check": { "HTTP": rabbiturl, "Interval": "5s" } }
+    status_code = execRegisterService(regData1)
+    assert status_code == 200, "The Register Service task was unsuccessful"
+
+    data_check = verifyRegisterServiceSuccess("duplicateService", "duplicateService1", "3.3.3.3", "duplicate1")
+    assert data_check == "Success", "The new Service is not correctly registered in Consul"
+
+    event = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
+
+    if 'duplicateService' not in event['endpoint']['type']:
+        errors_list.append("Service Name on the AMQP Bus is incorrect")
+    if '3.3.3.3' not in event['endpoint']['instances'][0]['url']:
+        errors_list.append("Service Address on the AMQP Bus is incorrect")
+    if 'duplicate1' not in event['endpoint']['instances'][0]['tags'][0]:
+        errors_list.append("Service Tag on the AMQP Bus is incorrect")
+
+    assert not errors_list
+
+    time.sleep(10)    # necessary whilst ER uses pollinginstead of 'watch'
+
+    errors_list = []
+
+    # add a second service, duplicate name
+    ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
+    regData2 = {"ID": "duplicateService2", "Name": "duplicateService","Address": "4.4.4.4", "Port": 301, \
+                "Tags": ["duplicate2"], "Check": { "HTTP": rabbiturl, "Interval": "5s" }}
+    status_code = execRegisterService(regData2)
+    assert status_code == 200, "The Register Service task was unsuccessful"
+
+    data_check = verifyRegisterServiceSuccess("duplicateService", "duplicateService2", "4.4.4.4", "duplicate2")
+    assert data_check == "Success", "The new Service is not correctly registered in Consul"
+
+    # april 4th - 2 events are recieved when second service added. The first indicates a change to first service
+    # we don't examine the first.
+    # the second details the second service added, that is the one that we check
+    skipFirstevent = RMQVerifyEventTest()
+    event = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
 
 
-    assert new_service_name in event['endpoint']['type'],                     "Service Name on the AMQP Bus is incorrect"
-    assert new_service_host in event['endpoint']['instances'][0]['url'],      "Service Address on the AMQP Bus is incorrect"
-    assert new_service_tag_1 in event['endpoint']['instances'][0]['tags'][0], "Service Tag on the AMQP Bus is incorrect"
+    if 'duplicateService' not in event['endpoint']['type']:
+        errors_list.append("Service Name on the AMQP Bus is incorrect")
+    if '3.3.3.3' not in event['endpoint']['instances'][0]['url']:
+        errors_list.append("Service Address on the AMQP Bus is incorrect")
+    if '4.4.4.4' not in event['endpoint']['instances'][1]['url']:
+        errors_list.append("Service Address on the AMQP Bus is incorrect")
+    if 'duplicate1' not in event['endpoint']['instances'][0]['tags'][0]:
+        errors_list.append("Service Tag on the AMQP Bus is incorrect")
+    if 'duplicate2' not in event['endpoint']['instances'][1]['tags'][0]:
+        errors_list.append("Service Tag on the AMQP Bus is incorrect")
 
-    cleanup(new_service_id)
-    time.sleep(30)      # necessary whilst ER uses polling instead of 'watch'
+    assert not errors_list
 
-# **************************************************************************************
+    cleanup("duplicateService1")
+    cleanup("duplicateService2")
+    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
+
+# # **************************************************************************************
+
 @pytest.mark.core_services_mvp
 def test_deRegisterServiceSuccess():
-    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer')
     # This test verifies that deregistering a service at Consul prompts the Endpoint Registry to publish
     # an endpoint.unavailable event
-
+    cleanup(new_service_id)
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
+
     # perform initial registration so we have a service to deregister
     status_code = execRegisterService(regData)
     event_check = verifyEventOnBus(rabbitHost, endpointExchange, "dell.cpsd.endpoint.discovered")
@@ -97,20 +252,136 @@ def test_deRegisterServiceSuccess():
     assert new_service_name in event['type'],        "Service Name on the AMQP Bus is incorrect"
 
     cleanup(new_service_id)
-    time.sleep(30)      # necessary whilst ER uses pollinginstead of 'watch'
+    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
+
+#  **************************************************************************************
+
+@pytest.mark.core_services_cd
+def test_deregisterOneOfTwoSameServices():
+    # This test verifies what happens if there is a service with 2 instances registered and
+    # one of those services deregisters. An 'endpoint.discovered' event is published listing just details of the remaining
+    # instance
+
+    errors_list = []
+    cleanup("duplicateService1")
+    cleanup("duplicateService2")
+    ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
 
 
+    # perform initial registration
+    regData1 = {"ID": "duplicateService1", "Name": "duplicateService","Address": "3.3.3.3", "Port": 300, \
+                "Tags": ["duplicate1"], "Check": { "HTTP": rabbiturl, "Interval": "5s" }}
+    status_code = execRegisterService(regData1)
+    event_check = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
+
+    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
+
+    # add a second service, duplicate name
+    ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
+    regData2 = {"ID": "duplicateService2", "Name": "duplicateService","Address": "4.4.4.4", "Port": 402, \
+                "Tags": ["duplicate2"], "Check": { "HTTP": rabbiturl, "Interval": "5s" }}
+    status_code = execRegisterService(regData2)
+    event_check = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
+
+    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
+
+    # deregister one of the services
+    ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
+    status_code = execDeRegisterService("duplicateService1")
+    assert status_code == 200, "The deRegister Service task was unsuccessful"
+
+    data_check = verifyServiceNotRegistered("duplicateService1")
+    assert data_check == "True", "The Service is incorrectly still registered in Consul"
+
+    event = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
+
+    if 'duplicateService' not in event['endpoint']['type']:
+        errors_list.append("Service Name on the AMQP Bus is incorrect")
+    if '4.4.4.4' not in event['endpoint']['instances'][0]['url']:
+        errors_list.append("Service Address on the AMQP Bus is incorrect")
+    if 'duplicate2' not in event['endpoint']['instances'][0]['tags'][0]:
+        errors_list.append("Service Tag on the AMQP Bus is incorrect")
+
+    assert not errors_list
+
+    data_check = verifyRegisterServiceSuccess("duplicateService", "duplicateService2", "4.4.4.4", "duplicate2")
+    assert data_check == "Success", "The remaining Service, duplicate2, should still be registered in Consul"
+
+    cleanup("duplicateService1")
+    cleanup("duplicateService2")
+
+    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
+
+# # *****************************************************************************************************
+
+@pytest.mark.core_services_cd
+def test_deregisterTwoOfTwoSameServices():
+    # This test verifies what happens when all instances of a service (in this case 2) are deregistered
+    # An 'endpoint.unavailable' event is expected listing the service.
+
+    errors_list = []
+    cleanup("duplicateService1")
+    cleanup("duplicateService2")
+    ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
+
+
+    # perform initial registration to setup the first instance
+    regData1 = {"ID": "duplicateService1", "Name": "duplicateService","Address": "3.3.3.3", "Port": 300, \
+                "Tags": ["duplicate1"], "Check": { "HTTP": rabbiturl, "Interval": "5s" }}
+    status_code = execRegisterService(regData1)
+    event_check = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
+
+    # add a second instance, duplicate name
+    ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
+    regData2 = {"ID": "duplicateService2", "Name": "duplicateService","Address": "4.4.4.4", "Port": 403, \
+                "Tags": ["duplicate2"], "Check": { "HTTP": rabbiturl, "Interval": "5s" }}
+    status_code = execRegisterService(regData2)
+    event_check = verifyEventOnBus(rabbitHost, endpointExchange, 'edell.cpsd.endpoint.discovered')
+
+    # deregister instance 1
+    ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
+    status_code = execDeRegisterService("duplicateService1")
+    assert status_code == 200, "The deRegister Service task was unsuccessful for duplicateService1"
+    data_check = verifyServiceNotRegistered("duplicateService1")
+    assert data_check == "True", "The Service is incorrectly still registered in Consul"
+    event = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
+
+    if 'duplicateService' not in event['endpoint']['type']:
+        errors_list.append("Service Name on the AMQP Bus is incorrect")
+    if '4.4.4.4' not in event['endpoint']['instances'][0]['url']:
+        errors_list.append("Service Address on the AMQP Bus is incorrect")
+    if 'duplicate2' not in event['endpoint']['instances'][0]['tags'][0]:
+        errors_list.append("Service Tag on the AMQP Bus is incorrect")
+
+    assert not errors_list
+
+
+    # deregisterinstance 2
+    ssetup(endpointExchange, 'dell.cpsd.endpoint.unavailable')
+    status_code = execDeRegisterService("duplicateService2")
+    assert status_code == 200, "The deRegister Service task was unsuccessful for duplicateService2"
+    data_check = verifyServiceNotRegistered("duplicateService2")
+    assert data_check == "True", "The Service is incorrectly still registered in Consul"
+    event = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.unavailable')
+    assert "duplicateService" in event['type'],        "Service Name on the AMQP Bus is incorrect"
+
+    cleanup("duplicateService1")
+    cleanup("duplicateService2")
+    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
+#
 # *****************************************************************************************************
 #  Helper functions
 
 def ssetup(e,r):
     # clean system required .. delete any lingering testQueue and bind a new testQueue
     af_support_tools.rmq_delete_queue(rabbitHost,"5672", "test", "test", "testQueue")
+    time.sleep(3)
     af_support_tools.rmq_bind_queue(rabbitHost,
                                     port="5672", rmq_username="test", rmq_password="test",
                                     queue='testQueue',
                                     exchange=e,
                                     routing_key=r)
+    time.sleep(3)
     return None
 
 def execRegisterService(apidata):
@@ -163,6 +434,7 @@ def execDeRegisterService(serviceID):
 def cleanup(service_id):
     # deregister the service at Consul ?
     execDeRegisterService(service_id)
+    time.sleep(10)
 
 def verifyEventOnBus(rmqaddress, exchange, route):
     global ipaddress
@@ -187,19 +459,22 @@ def verifyEventOnBus(rmqaddress, exchange, route):
 
 def RMQVerifyEventTest():
     # Consume the RMQ Event message (if one is expected)
+    return_message = ""
     waitForMsg()
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='testQueue')
-
-    # Convert the returned message to json format and run asserts on the expected output.
-    return_json = json.loads(return_message, encoding='utf-8')
+    if return_message :
+        # Convert the returned message to json format and run asserts on the expected output.
+        return_event = json.loads(return_message, encoding='utf-8')
+    else :
+        return_event = ""
 
     # check that the payload is not empty
-    assert return_json
+
     time.sleep(1)
 
-    return return_json
+    return return_event
 
 def bindQueues(exchangeName, routeName):
     # Create & bind the test queues
@@ -226,7 +501,7 @@ def waitForMsg():
     timeout = 0
 
     # Max number of seconds to wait
-    max_timeout = 100
+    max_timeout = 40
 
     # Amount of time in seconds that the loop is going to wait on each iteration
     sleeptime = 1
@@ -243,7 +518,5 @@ def waitForMsg():
 
         if timeout > max_timeout:
             print('ERROR: Message took too long to return. Something is wrong')
-            cleanup()
+            #Qcleanup()
             break
-
-

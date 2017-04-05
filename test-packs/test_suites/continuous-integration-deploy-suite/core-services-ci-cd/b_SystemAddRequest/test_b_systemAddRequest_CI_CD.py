@@ -104,7 +104,7 @@ def test_SystemAdditionRequested():
 @pytest.mark.core_services_cd
 @pytest.mark.rcm_fitness_cd
 def test_HAL_CollectComponentVersion():
-    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer')
+    #af_support_tools.mark_defect(defect_id='', user_id='', comments='', date_marked='')
     bindHALQueus()
 
     print('\n*******************************************************')
@@ -183,9 +183,6 @@ def test_HAL_CollectComponentVersion():
 
     print('\nPlease wait. This next process can take a few minutes...\n')
 
-    # 4, Verify the EIDS message
-    verifyHALEidsMessage()
-
     ####################################################################################################################
     #
     # We need to wait until the queue gets the response message and timeout if it never arrives
@@ -222,15 +219,25 @@ def test_HAL_CollectComponentVersion():
     assert return_json['messageProperties']['replyTo']
     assert return_json['systems'][0]['uuid']
     assert return_json['groups']
-    assert return_json['devices']
+
+    devices =  return_json['devices']
+    #print(devices)
+    if devices == None:
+        print("No devices returned")
+        assert return_json['devices']
     assert return_json['subComponents']
 
     assert return_json['groups'][0]['parentSystemUuids']
     assert return_json['devices'][0]['uuid']
 
+    print("Step 5d: HAL has returned a valid response\n")
+
     verifyHalContent()
 
-    print('\nTEST: HAL CollectComponentVersions Completed: PASSED')
+     # 4, Verify the EIDS message
+    verifyHALEidsMessage()
+
+    print('TEST: HAL CollectComponentVersions Completed: PASSED')
     print('\n*******************************************************')
 
     cleanup()
@@ -455,67 +462,6 @@ def verifySDSEidsMessage():
     time.sleep(1)
 
 
-def verifyHALEidsMessage():
-    # We need to verify that the triggered eids.identity.request is valid.
-    # Check the EIDS request messages
-    waitForMsg('test.eids.identity.request')
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.eids.identity.request')
-
-    return_json = json.loads(return_message, encoding='utf-8')
-
-    assert return_json['correlationId']
-    # assert return_json['replyTo']
-    assert return_json['timestamp']
-    assert return_json['elementUuids'][0]
-
-    # Test the 2nd message
-    waitForMsg('test.eids.identity.request')
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.eids.identity.request')
-
-    return_json = json.loads(return_message, encoding='utf-8')
-
-    assert return_json['correlationId']
-    # assert return_json['replyTo']
-    assert return_json['timestamp']
-    assert return_json['elementIdentities'][0]['correlationUuid']
-    assert return_json['elementIdentities'][0]['identity']['elementType']
-    assert return_json['elementIdentities'][0]['identity']['contextualKeyAccuracy']
-
-    # Check the EIDS response message
-    waitForMsg('test.eids.identity.response')
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.eids.identity.response')
-
-    return_json = json.loads(return_message, encoding='utf-8')
-
-    assert return_json['correlationId']
-    # assert return_json['replyTo']
-    assert return_json['timestamp']
-    assert return_json['elementDescriptions'][0]['elementUuid']
-
-    # Test the 2nd message
-    waitForMsg('test.eids.identity.response')
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.eids.identity.response')
-
-    return_json = json.loads(return_message, encoding='utf-8')
-
-    assert return_json['correlationId']
-    # assert return_json['replyTo']
-    assert return_json['timestamp']
-    assert return_json['elementIdentifications'][0]['correlationUuid']
-    assert return_json['elementIdentifications'][0]['elementUuid']
-
-    print('Step 5d: EIDS requests & receives messages for subcomponents \n')
-    time.sleep(1)
-
-
 def verifySystemExists():
     # Check that the system exists
     print('\n*******************************************************')
@@ -716,6 +662,24 @@ def checkForErrorMsg():
         print('\nRMQ Error Message:: ', error_msg)
         assert False
 
+    msg_count = af_support_tools.rmq_message_count(host=ipaddress,
+                                                   port=port,
+                                                   rmq_username=rmq_username,
+                                                   rmq_password=rmq_password,
+                                                   queue='test.system.definition.response')
+
+    if msg_count == 1:
+        return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                              rmq_password=rmq_password,
+                                                              queue='test.system.definition.response')
+
+        return_json = json.loads(return_message, encoding='utf-8')
+
+        error_msg = return_json['errors'][0]['message']
+        print('\nRMQ Error Message:: ', error_msg)
+        assert False
+
+
     else:
         print('No specific error looked for.')
         assert False
@@ -723,6 +687,7 @@ def checkForErrorMsg():
 
 def verifyHalContent():
 
+    print('Verifying content of the HAL response message...')
     # Get the payload data from the config symphony-sds.ini file.
     originalSys = af_support_tools.get_config_file_property(config_file=payload_file,
                                                             heading=payload_header,
@@ -752,9 +717,69 @@ def verifyHalContent():
         print('ERROR: Not all components have returned values. Possible h/w or credential issue.')
         assert orignumComponents == returnnumDevices
 
-    print('Step 5d: All devices have been returned ')
+    print('Step 5e: All devices have been returned\n')
 
 
+def verifyHALEidsMessage():
+    # We need to verify that the triggered eids.identity.request is valid.
+    # Check the EIDS request messages
+    print('Verifying EIDS returns UIDS for all discovered subcomponents')
+    waitForMsg('test.eids.identity.request')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.eids.identity.request')
+
+    return_json = json.loads(return_message, encoding='utf-8')
+
+    assert return_json['correlationId']
+    # assert return_json['replyTo']
+    assert return_json['timestamp']
+    assert return_json['elementUuids'][0]
+
+    # Test the 2nd message
+    waitForMsg('test.eids.identity.request')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.eids.identity.request')
+
+    return_json = json.loads(return_message, encoding='utf-8')
+
+    assert return_json['correlationId']
+    # assert return_json['replyTo']
+    assert return_json['timestamp']
+    assert return_json['elementIdentities'][0]['correlationUuid']
+    assert return_json['elementIdentities'][0]['identity']['elementType']
+    assert return_json['elementIdentities'][0]['identity']['contextualKeyAccuracy']
+
+    # Check the EIDS response message
+    waitForMsg('test.eids.identity.response')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.eids.identity.response')
+
+    return_json = json.loads(return_message, encoding='utf-8')
+
+    assert return_json['correlationId']
+    # assert return_json['replyTo']
+    assert return_json['timestamp']
+    assert return_json['elementDescriptions'][0]['elementUuid']
+
+    # Test the 2nd message
+    waitForMsg('test.eids.identity.response')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.eids.identity.response')
+
+    return_json = json.loads(return_message, encoding='utf-8')
+
+    assert return_json['correlationId']
+    # assert return_json['replyTo']
+    assert return_json['timestamp']
+    assert return_json['elementIdentifications'][0]['correlationUuid']
+    assert return_json['elementIdentifications'][0]['elementUuid']
+
+    print('Step 5f: EIDS requests & receives messages for all discovered subcomponents \n')
+    time.sleep(1)
 
 #######################################################################################################################
 
