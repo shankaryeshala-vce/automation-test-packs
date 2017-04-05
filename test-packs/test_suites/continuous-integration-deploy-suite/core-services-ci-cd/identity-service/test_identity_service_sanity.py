@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # Author:cullia
 # Updated by: olearj10
-# Date: 3 April 2017
-# Revision:2.1
+# Date: 5 April 2017
+# Revision:2.2
 # Code Reviewed by:
 # Description: Standalone testing of the Identity Service. No other services are used. No system needs to be defined
 # to run this test.
@@ -20,7 +20,7 @@ except:
     print('Possible configuration error.')
 
 # Use this to by-pass the config.ini file
-#ipaddress = '10.3.60.129'
+#ipaddress = '10.3.60.127'
 
 payload_file = 'identity_service/payload.ini'
 payload_header = 'identity_service'
@@ -77,7 +77,7 @@ def test_identify_element():
                                          payload=the_payload,
                                          payload_type='json')
 
-    waitForMsg('test.identity.request')
+    assert waitForMsg('test.identity.request'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -93,7 +93,7 @@ def test_identify_element():
     print('\nConsuming Response Message...')
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    waitForMsg('test.identity.response')
+    assert waitForMsg('test.identity.response'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -151,7 +151,7 @@ def test_describe_element():
                                          payload=the_payload,
                                          payload_type='json')
 
-    waitForMsg('test.identity.request')
+    assert waitForMsg('test.identity.request'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -167,7 +167,7 @@ def test_describe_element():
     print('\nConsuming Response Message...')
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    waitForMsg('test.identity.response')
+    assert waitForMsg('test.identity.response'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -221,7 +221,7 @@ def test_key_accuracy_ab_ac_neg(payload_property):
                                          payload=the_payload,
                                          payload_type='json')
 
-    waitForMsg('test.identity.request')
+    assert waitForMsg('test.identity.request'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -238,7 +238,7 @@ def test_key_accuracy_ab_ac_neg(payload_property):
 
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    waitForMsg('test.identity.response')
+    assert waitForMsg('test.identity.response'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -304,7 +304,7 @@ def test_negative_messages(payload_property):
                                          payload=the_payload,
                                          payload_type='json')
 
-    waitForMsg('test.identity.request')
+    assert waitForMsg('test.identity.request'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
@@ -319,7 +319,7 @@ def test_negative_messages(payload_property):
     print('\nConsuming Response Message...')
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    waitForMsg('test.identity.response')
+    assert waitForMsg('test.identity.response'), "Message took too long to return"
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
@@ -456,7 +456,7 @@ def waitForMsg(queue):
     # Represents the number of seconds that have gone by since the method started
     timeout = 0
     # Max number of seconds to wait
-    max_timeout = 100
+    max_timeout = 10
     # Amount of time in seconds that the loop is going to wait on each iteration
     sleeptime = 1
 
@@ -473,4 +473,5 @@ def waitForMsg(queue):
         if timeout > max_timeout:
             print('ERROR: Message took too long to return. Something is wrong')
             cleanup()
-            break
+            return False
+    return True
