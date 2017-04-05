@@ -14,7 +14,7 @@ import random
 import time
 
 try:
-    env_file = '<name of .ini file>'
+    env_file = 'env.ini'
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
 except:
     print('Possible configuration error.')
