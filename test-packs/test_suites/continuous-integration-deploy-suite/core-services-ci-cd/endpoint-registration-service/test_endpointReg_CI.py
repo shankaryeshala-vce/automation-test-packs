@@ -47,7 +47,7 @@ regData = {"ID": new_service_id, "Name": new_service_name, "Address": new_servic
 # *******************************************************************************************
 @pytest.mark.core_services_mvp
 def test_registerServiceSuccess():
-    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer')
+    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     # This test verifies that a succful service register in Consul prompts the Endpoint Registry
     # to publish an endpoint.discovered event to the AMQP bus
 
@@ -75,7 +75,7 @@ def test_registerServiceSuccess():
 # **************************************************************************************
 @pytest.mark.core_services_mvp
 def test_deRegisterServiceSuccess():
-    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer')
+    af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     # This test verifies that deregistering a service at Consul prompts the Endpoint Registry to publish
     # an endpoint.unavailable event
 
