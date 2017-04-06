@@ -18,8 +18,9 @@ except:
 @pytest.mark.performance
 def test_deploy_docker_container():
     # Wait for port 22 on perf machine
-    wait_for_port(host=perf_hostname, port=22, wait_time=300, check_interval=15)
+    my_return_value = wait_for_port(host=perf_hostname, port=22, wait_time=300, check_interval=15)
     # Copy over docker compose file
+    af_support_tools.file_copy_put(host=perf_hostname, port=22, username=perf_username, password=perf_password, source_file='docker-compose-influx-grafana.yml', destination_file='docker-compose-influx-grafana.yml')
     # Run Docker Compose file
     
 
