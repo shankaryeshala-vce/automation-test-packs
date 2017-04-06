@@ -13,14 +13,14 @@ import json
 import random
 import time
 
-# try:
-#     env_file = 'env.ini'
-#     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-# except:
-#     print('Possible configuration error.')
+try:
+    env_file = 'env.ini'
+    ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+except:
+    print('Possible configuration error.')
 
 # Use this to by-pass the env.ini file
-ipaddress = '10.3.60.128'
+#ipaddress = '10.3.60.128'
 
 # Create the payload messages.
 # Hint: the correllationId field can be used as a description which makes it easier to locate in the Trace log.
