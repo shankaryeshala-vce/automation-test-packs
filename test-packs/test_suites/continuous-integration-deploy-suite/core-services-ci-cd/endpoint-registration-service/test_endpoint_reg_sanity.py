@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# Copyright © [date] Dell Inc. or its subsidiaries.  All Rights Reserved.
+# Copyright © 01 April 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
 #
 # Author: russed5
 # Revision: 1.0
-# Code Reviewed by:
+# Code Reviewed by: olearj10
 # Description: see https://wiki.ent.vce.com/display/VSE/Endpoint+Registry+Testing
 
 import pytest
@@ -15,11 +15,11 @@ import af_support_tools
 try:
     env_file = 'env.ini'
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-
 except:
-    print('Possible configuration error')
+    print('Possible configuration error.')
 
-#ipaddress = "10.3.62.88"
+#Use this to by-pass the env.ini file
+# ipaddress = '10.3.60.128'
 
 new_service_name = "testService"
 new_service_id = "testService1"
@@ -44,21 +44,21 @@ port = 5672
 # *******************************************************************************************
 # the payload data used to register services with consul
 
-regData = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, "Port": new_service_port, \
-           "Tags": [ new_service_tag_1 ], "Check": { "HTTP": rabbiturl, "Interval": "5s" } }
+regData = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, "Port": new_service_port,
+           "Tags": [new_service_tag_1], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
 
-regDataNoAddress = {"ID": new_service_id, "Name": new_service_name, \
-                    "Tags": [ new_service_tag_1 ], "Check": { "HTTP": rabbiturl, "Interval": "5s" }  }
+regDataNoAddress = {"ID": new_service_id, "Name": new_service_name,
+                    "Tags": [new_service_tag_1], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
 
-regDataNoPort = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, \
-                    "Tags": [ new_service_tag_1 ], "Check": { "HTTP": rabbiturl, "Interval": "5s" }  }
+regDataNoPort = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host,
+                 "Tags": [new_service_tag_1], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
 
-regDataNoHealthCheck = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, "Port": new_service_port, \
-                    "Tags": [ new_service_tag_1 ]}
+regDataNoHealthCheck = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, "Port": new_service_port,
+                        "Tags": [new_service_tag_1]}
 
-regDataWithCheckFailure = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, \
-                           "Tags": [ new_service_tag_1 ], \
-                           "Check": { "DeregisterCriticalServiceAfter": "20s", "HTTP": "http://3.3.3.3:15672", "Interval": "5s" } }
+regDataWithCheckFailure = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host,
+                           "Tags": [new_service_tag_1],
+                           "Check": {"DeregisterCriticalServiceAfter": "20s", "HTTP": "http://3.3.3.3:15672", "Interval": "5s"}}
 
 # *******************************************************************************************
 #
@@ -98,7 +98,7 @@ def test_registerServiceWithNoPort():
     event = verifyEventOnBus(rabbitHost, endpointExchange, "dell.cpsd.endpoint.discovered")
     assert not event, 'An event was raised when it should not have been'
 
-    #cleanup(new_service_id)
+    # cleanup(new_service_id)
     time.sleep(10)     # allow time between service status change
 
 # # *******************************************************************************************
@@ -119,7 +119,7 @@ def test_registerServiceWithNoHealthCheck():
     event = verifyEventOnBus(rabbitHost, endpointExchange, "dell.cpsd.endpoint.discovered")
     assert not event, 'An event was raised when it should not have been'
 
-    #cleanup(new_service_id)
+    # cleanup(new_service_id)
     time.sleep(10)     # allow time between service status change
 
 # # **************************************************************************************
@@ -133,7 +133,6 @@ def test_registerServiceSuccess():
     # setup, delete any lingering AMQP testQueue and create a new one before any messaging starts
     cleanup(new_service_id)
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
-
 
     status_code = execRegisterService(regData)
     assert status_code == 200, "The Register Service task was unsuccessful"
@@ -169,8 +168,8 @@ def test_registerTwoServicesSameName():
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
 
     # perform initial registration
-    regData1 = {"ID": "duplicateService1", "Name": "duplicateService","Address": "3.3.3.3", "Port": 300, \
-                "Tags": ["duplicate1"], "Check": { "HTTP": rabbiturl, "Interval": "5s" } }
+    regData1 = {"ID": "duplicateService1", "Name": "duplicateService","Address": "3.3.3.3", "Port": 300,
+                "Tags": ["duplicate1"], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
     status_code = execRegisterService(regData1)
     assert status_code == 200, "The Register Service task was unsuccessful"
 
@@ -194,8 +193,8 @@ def test_registerTwoServicesSameName():
 
     # add a second service, duplicate name
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
-    regData2 = {"ID": "duplicateService2", "Name": "duplicateService","Address": "4.4.4.4", "Port": 301, \
-                "Tags": ["duplicate2"], "Check": { "HTTP": rabbiturl, "Interval": "5s" }}
+    regData2 = {"ID": "duplicateService2", "Name": "duplicateService","Address": "4.4.4.4", "Port": 301,
+                "Tags": ["duplicate2"], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
     status_code = execRegisterService(regData2)
     assert status_code == 200, "The Register Service task was unsuccessful"
 
@@ -205,7 +204,7 @@ def test_registerTwoServicesSameName():
     # april 4th - 2 events are recieved when second service added. The first indicates a change to first service
     # we don't examine the first.
     # the second details the second service added, that is the one that we check
-    skipFirstevent = RMQVerifyEventTest()
+    RMQVerifyEventTest()
     event = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
 
 
@@ -238,6 +237,7 @@ def test_deRegisterServiceSuccess():
     # perform initial registration so we have a service to deregister
     status_code = execRegisterService(regData)
     event_check = verifyEventOnBus(rabbitHost, endpointExchange, "dell.cpsd.endpoint.discovered")
+    assert status_code == 200, "The Register Service task was unsuccessful"
 
     # setup a test queue for endpoint.unavailable
     ssetup(endpointExchange, 'dell.cpsd.endpoint.unavailable')
@@ -259,29 +259,30 @@ def test_deRegisterServiceSuccess():
 @pytest.mark.core_services_cd
 def test_deregisterOneOfTwoSameServices():
     # This test verifies what happens if there is a service with 2 instances registered and
-    # one of those services deregisters. An 'endpoint.discovered' event is published listing just details of the remaining
-    # instance
+    # one of those services deregisters. An 'endpoint.discovered' event is published listing just details of the 
+    # remaining instance
 
     errors_list = []
     cleanup("duplicateService1")
     cleanup("duplicateService2")
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
 
-
     # perform initial registration
-    regData1 = {"ID": "duplicateService1", "Name": "duplicateService","Address": "3.3.3.3", "Port": 300, \
-                "Tags": ["duplicate1"], "Check": { "HTTP": rabbiturl, "Interval": "5s" }}
+    regData1 = {"ID": "duplicateService1", "Name": "duplicateService","Address": "3.3.3.3", "Port": 300,
+                "Tags": ["duplicate1"], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
     status_code = execRegisterService(regData1)
     event_check = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
+    assert status_code == 200, "The Register Service task was unsuccessful"
 
     time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
 
     # add a second service, duplicate name
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
-    regData2 = {"ID": "duplicateService2", "Name": "duplicateService","Address": "4.4.4.4", "Port": 402, \
-                "Tags": ["duplicate2"], "Check": { "HTTP": rabbiturl, "Interval": "5s" }}
+    regData2 = {"ID": "duplicateService2", "Name": "duplicateService","Address": "4.4.4.4", "Port": 402,
+                "Tags": ["duplicate2"], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
     status_code = execRegisterService(regData2)
     event_check = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
+    assert status_code == 200, "The Register Service task was unsuccessful"
 
     time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
 
@@ -324,19 +325,20 @@ def test_deregisterTwoOfTwoSameServices():
     cleanup("duplicateService2")
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
 
-
     # perform initial registration to setup the first instance
-    regData1 = {"ID": "duplicateService1", "Name": "duplicateService","Address": "3.3.3.3", "Port": 300, \
-                "Tags": ["duplicate1"], "Check": { "HTTP": rabbiturl, "Interval": "5s" }}
+    regData1 = {"ID": "duplicateService1", "Name": "duplicateService", "Address": "3.3.3.3", "Port": 300,
+                "Tags": ["duplicate1"], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
     status_code = execRegisterService(regData1)
     event_check = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
+    assert status_code == 200, "The Register Service task was unsuccessful"
 
     # add a second instance, duplicate name
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
-    regData2 = {"ID": "duplicateService2", "Name": "duplicateService","Address": "4.4.4.4", "Port": 403, \
-                "Tags": ["duplicate2"], "Check": { "HTTP": rabbiturl, "Interval": "5s" }}
+    regData2 = {"ID": "duplicateService2", "Name": "duplicateService","Address": "4.4.4.4", "Port": 403,
+                "Tags": ["duplicate2"], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
     status_code = execRegisterService(regData2)
     event_check = verifyEventOnBus(rabbitHost, endpointExchange, 'edell.cpsd.endpoint.discovered')
+    assert status_code == 200, "The Register Service task was unsuccessful"
 
     # deregister instance 1
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
@@ -355,7 +357,6 @@ def test_deregisterTwoOfTwoSameServices():
 
     assert not errors_list
 
-
     # deregisterinstance 2
     ssetup(endpointExchange, 'dell.cpsd.endpoint.unavailable')
     status_code = execDeRegisterService("duplicateService2")
@@ -372,6 +373,7 @@ def test_deregisterTwoOfTwoSameServices():
 # *****************************************************************************************************
 #  Helper functions
 
+
 def ssetup(e,r):
     # clean system required .. delete any lingering testQueue and bind a new testQueue
     af_support_tools.rmq_delete_queue(rabbitHost,"5672", "test", "test", "testQueue")
@@ -384,6 +386,7 @@ def ssetup(e,r):
     time.sleep(3)
     return None
 
+
 def execRegisterService(apidata):
     # request Consul to register a new service
     apipath = "/v1/agent/service/register"
@@ -391,6 +394,7 @@ def execRegisterService(apidata):
     url = 'http://' + cohost + ':8500' + apipath
     resp = requests.put(url, data=json.dumps(apidata), headers = apiheaders)
     return resp.status_code
+
 
 def verifyRegisterServiceSuccess(service_name, service_id, service_host, service_tag_1):
     # check the contents stored for the service in Consul
@@ -404,6 +408,7 @@ def verifyRegisterServiceSuccess(service_name, service_id, service_host, service
     assert service_tag_1 in data[service_id]['Tags']
     return "Success"
 
+
 def verifyServiceNotRegistered(service_id):
     # check the contents stored for the service in Consul
     apipath = "/v1/agent/services"
@@ -412,6 +417,7 @@ def verifyServiceNotRegistered(service_id):
     data = json.loads(resp.text)
     assert service_id not in data, "The Service should not be registered at this time"
     return "True"
+
 
 def verifyHealthCheckSuccess(service_name):
     # check the contents stored for the health check associated with new service
@@ -424,6 +430,7 @@ def verifyHealthCheckSuccess(service_name):
     assert "200 OK" in data[0]['Output']
     return "Success"
 
+
 def execDeRegisterService(serviceID):
     # deregister the service at consul
     apipath = "/v1/agent/service/deregister/" + serviceID
@@ -431,10 +438,12 @@ def execDeRegisterService(serviceID):
     resp = requests.put(url)
     return resp.status_code
 
+
 def cleanup(service_id):
     # deregister the service at Consul ?
     execDeRegisterService(service_id)
     time.sleep(10)
+
 
 def verifyEventOnBus(rmqaddress, exchange, route):
     global ipaddress
@@ -452,10 +461,11 @@ def verifyEventOnBus(rmqaddress, exchange, route):
     # now consume the event
     event = RMQVerifyEventTest()
 
-    #teardown the queue
+    # teardown the queue
     Qcleanup()
 
     return event
+
 
 def RMQVerifyEventTest():
     # Consume the RMQ Event message (if one is expected)
@@ -476,6 +486,7 @@ def RMQVerifyEventTest():
 
     return return_event
 
+
 def bindQueues(exchangeName, routeName):
     # Create & bind the test queues
     af_support_tools.rmq_bind_queue(host=ipaddress,
@@ -484,14 +495,16 @@ def bindQueues(exchangeName, routeName):
                                     exchange=exchangeName,
                                     routing_key=routeName)
 
+
 def Qcleanup():
     # Delete the test queues
     print('Cleaning up...')
     af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
                                       queue='testQueue')
 
+
 def waitForMsg():
-    # This function keeps looping untill a message is in the specified queue. We do need it to timeout and throw an error
+    # This function keeps looping until a message is in the specified queue. We do need it to timeout and throw an error
     # if a message never arrives. Once a message appears in the queue the function is complete and main continues.
 
     # The length of the queue, it will start at 0 but as soon as we get a response it will increase
