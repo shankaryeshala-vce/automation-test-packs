@@ -4,12 +4,12 @@ import af_vapi
 import af_support_tools
     
 try:
-    config_file = 'performance_test_packs/selenium_config.ini'
+    config_file = 'performance/selenium_config.ini'
     env_file = 'env.ini'
 except:
     print('Possible Configuration Error')
     
-@pytest.mark.performance_test_packs
+@pytest.mark.performance
 def test_sample_selenium():
     """
     This sample test is designed to demonstrate a simple selenium test.
