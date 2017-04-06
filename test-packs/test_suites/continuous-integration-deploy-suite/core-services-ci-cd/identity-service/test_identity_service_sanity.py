@@ -115,7 +115,6 @@ def test_identify_element():
 
     # Get number of element identifications in response
     total_ele_idents = len(return_json['elementIdentifications'])
-    print(total_ele_idents)
     for _ in range(total_ele_idents):
         if return_json['elementIdentifications'][_]['correlationUuid'] not in identifyelement:
             identified_errors.append("correlationUuid error")
