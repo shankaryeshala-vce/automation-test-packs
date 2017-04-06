@@ -9,7 +9,7 @@ try:
 except:
     print('Possible Configuration Error')
     
-@pytest.mark.performance
+@pytest.mark.performance1
 def test_sample_selenium():
     """
     This sample test is designed to demonstrate a simple selenium test.

@@ -9,7 +9,7 @@ try:
 except:
     print('Possible Configuration Error')
     
-@pytest.mark.performance
+@pytest.mark.performance1
 def test_sample_fixture(sample_local_fixture, sample_af_fixture):
     """
     This sample test is designed to demonstrate py test fixtures.
@@ -37,7 +37,7 @@ def test_sample_fixture(sample_local_fixture, sample_af_fixture):
     # Sample 'assert'
     assert 5 == 5
     
-@pytest.mark.performance
+@pytest.mark.performance1
 def test_sample_read_config_file_pass():
     """
     This sample test is designed to demonstrate a data driven test by reading properties from a configuration file.
@@ -56,7 +56,7 @@ def test_sample_read_config_file_pass():
     pass_flag = af_support_tools.list_compare_all_list_one_items_found_in_list_two(mock_data_attributes_list,widget_attributes_list)
     assert pass_flag == True
     
-@pytest.mark.performance
+@pytest.mark.performance1
 def test_sample_read_config_file_fail():
     """
     This sample test is designed to demonstrate a data driven test by reading properties from a configuration file.
@@ -75,7 +75,7 @@ def test_sample_read_config_file_fail():
     pass_flag = af_support_tools.list_compare_all_list_one_items_found_in_list_two(mock_data_attributes_list,widget_attributes_list)
     assert pass_flag == True
     
-@pytest.mark.performance
+@pytest.mark.performance1
 @pytest.mark.parametrize('my_var', ['A','B','C','D','Bad Data'])
 def test_sample_parametrize_vars(my_var):
     """
