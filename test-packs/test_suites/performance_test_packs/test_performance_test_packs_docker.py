@@ -14,6 +14,10 @@ try:
     symphony_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 except:
     print('Possible Configuration Error')
+
+@pytest.mark.performance
+def test_sample():
+    assert 5 == 5
     
 @pytest.mark.performance
 def test_deploy_docker_container():
