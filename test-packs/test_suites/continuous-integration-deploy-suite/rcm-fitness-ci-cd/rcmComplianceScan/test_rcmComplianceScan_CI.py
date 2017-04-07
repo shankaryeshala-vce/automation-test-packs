@@ -8,6 +8,7 @@ import os
 import re
 import af_support_tools
 
+
 try:
     env_file = 'env.ini'
     host = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
@@ -15,8 +16,10 @@ try:
 except:
     print('Possible configuration error')
 
+
+
 #host = '10.3.8.54'
-path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuousIntegration/rcmComplianceScan/'
+path = '/home/autouser/PycharmProjects/auto-framework/test_suites/restAPItests/rcmComplianceScan/'
 
 def ensurePathExists(dir):
     if not os.path.exists(dir):
@@ -42,6 +45,7 @@ def getSystemDefinition():
 
     print("Requesting UUID from System Definition....")
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
+    assert len(data["systems"][0]) != 0, "No defined systems returned."
 
     if data != "":
         if data["systems"][0]["uuid"] != "":
@@ -74,12 +78,13 @@ def getComplianceDataNexus(model, type, filename):
     totalComponents = len(data["components"])
 
     assert data["message"] == None, "Error response returned unexpectedly."
-
+    assert len(data["components"]) > 0, "No component details returned."
 
     if data != "":
-        #print("1")
+        print("1")
 
         while compIndex < totalComponents:
+            print(data["components"][compIndex]["definition"]["modelFamily"])
             if "modelFamily" in data["components"][compIndex]["definition"] and data["components"][compIndex]["definition"]["modelFamily"] == model:
                 print(data["components"][compIndex]["definition"]["modelFamily"])
                 #print("4")
@@ -93,6 +98,8 @@ def getComplianceDataNexus(model, type, filename):
 
                 assert compResp.status_code == 200, "Request has not been acknowledged as expected."
                 assert compData["message"] is None, "Error response returned unexpectdely."
+                assert len(compData["device"]) != 0, "No device details returned."
+
                 print("Message: %s" % compData["message"])
                 with open(filename, 'a') as outfile:
                     json.dump(compData, outfile, sort_keys=True, indent=4, ensure_ascii=False)
@@ -132,7 +139,7 @@ def getComplianceDataMDS(model, type, filename):
     totalComponents = len(data["components"])
 
     assert data["message"] == None, "Error response returned unexpectedly."
-
+    assert len(data["components"]) > 0, "No component details returned."
 
     if data != "":
         #print("1")
@@ -151,6 +158,7 @@ def getComplianceDataMDS(model, type, filename):
 
                 assert compResp.status_code == 200, "Request has not been acknowledged as expected."
                 assert compData["message"] is None, "Error response returned unexpectdely."
+                assert len(compData["device"]) != 0, "No device details returned."
                 print("Message: %s" % compData["message"])
                 with open(filename, 'a') as outfile:
                     json.dump(compData, outfile, sort_keys=True, indent=4, ensure_ascii=False)
@@ -186,6 +194,8 @@ def getComplianceDataSystem():
 
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
     print("Requesting latest discovered f/w version from Compliance Data service...")
+    assert data["message"] == None, "Error response returned unexpectedly."
+    assert len(data["components"]) > 0, "No component details returned."
 
     totalComponents = len(data["components"])
 
@@ -202,6 +212,8 @@ def getComplianceDataSystem():
                     systemData = json.loads(systemResp.text)
 
                     assert systemResp.status_code == 200, "Request has not been acknowledged as expected."
+                    assert len(systemData["convergedSystem"]) != 0, "No system details returned."
+
                     with open(filename, 'a') as outfile:
                         json.dump(compData, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
@@ -235,6 +247,7 @@ def getAvailableRCMs(family, model, train, version, filename):
     data = json.loads(resp.text)
 
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
+    assert len(data["rcmInventoryItems"]) > 0, "No RCM returned for train/version combo specified."
     print("Requesting a list of available RCMs for the specific version: %s" % version)
     if data != "":
         if data["message"] == None:
@@ -243,7 +256,6 @@ def getAvailableRCMs(family, model, train, version, filename):
 
             print("\nStarting to verify a sample of the returned data....\n")
 
-            assert len(data["rcmInventoryItems"]) > 0
             assert data["rcmInventoryItems"][0]["systemModelFamily"] == model
             assert data["rcmInventoryItems"][0]["systemProductFamily"] == family
             assert data["rcmInventoryItems"][0]["rcmTrain"] == train
@@ -271,7 +283,7 @@ def getRCMDefinition(component, filename):
     data = json.loads(resp.text)
 
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
-
+    assert len(data["rcmDefinition"]) > 0, "No  defined RCM returned for specified UUID."
     print("\nStarting to verify a sample of the returned data....")
     if data != "":
         if data["message"] == None:
@@ -298,6 +310,7 @@ def getRCMEvaluation(product, model, filename):
     print("rcmUUID:" + rcmUUID)
     response = json.loads(resp.text)
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
+    assert len(response["rcmEvaluationResults"]) > 0, "No evaluation results returned."
 
     numResults = 0
     count = 0
@@ -328,81 +341,102 @@ def getRCMEvaluation(product, model, filename):
 
 #@pytest.mark.TC546466
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getSysDef1():
     getSystemDefinition()
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd7
 def test_getComplianceData1():
-    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataNexus("N3K", "FIXEDMODULE", path + "rcmComplianceData-N3k.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getAvailableRCM1():
     getAvailableRCMs("Vblock", "340", "6.0", "6.0.11", path + "rcmAvailableRCMs-N3k.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getRCMDefinition1():
     getRCMDefinition("Nexus 3048", path + "rcmRCMDefinitionDetails-N3k.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getRCMEval1():
     getRCMEvaluation("Nexus", "3048", path + "rcmEvaluationDetails-N3k.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceData2():
-    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataNexus("N5K", "FIXEDMODULE", path + "rcmComplianceData-N5k.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getAvailableRCM2():
     getAvailableRCMs("Vblock", "340", "6.0", "6.0.11", path + "rcmAvailableRCMs-N5k.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getRCMDefinition2():
     getRCMDefinition("Nexus 55xx", path + "rcmRCMDefinitionDetails-N5k.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getRCMEval2():
     getRCMEvaluation("Nexus", "55xx", path + "rcmEvaluationDetails-N5k.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceData3():
-    getComplianceDataMDS("9148", "FIXEDMODULE", path + "rcmComplianceData-MDS9k.json")
+    getComplianceDataMDS("9148S", "FIXEDMODULE", path + "rcmComplianceData-MDS9k.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getAvailableRCM3():
     getAvailableRCMs("Vblock", "340", "6.0", "6.0.10", path + "rcmAvailableRCMs-MDS9k.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getRCMDefinition3():
     getRCMDefinition("MDS 9148", path + "rcmRCMDefinitionDetails-MDS9k.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getRCMEval3():
     getRCMEvaluation("MDS", "9148", path + "rcmEvaluationDetails-MDS9k.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceData4():
-    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataNexus("N3K", "FIXEDMODULE", path + "rcmComplianceData-N3k-Mismatch.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getAvailableRCM4():
     getAvailableRCMs("Vblock", "340", "5.0", "5.0.4", path + "rcmAvailableRCMs-N3k-Mismatch.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getRCMDefinition4():
     getRCMDefinition("Nexus 3048", path + "rcmRCMDefinitionDetails-N3k-Mismatch.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getRCMEval4():
     getRCMEvaluation("Nexus", "3048", path + "rcmEvaluationDetails-N3k-Mismatch.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceData5():
-    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataNexus("N5K", "FIXEDMODULE", path + "rcmComplianceData-N5k-Mismatch.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getAvailableRCM5():
     getAvailableRCMs("Vblock", "340", "5.0", "5.0.7", path + "rcmAvailableRCMs-N5k-Mismatch.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getRCMDefinition5():
     getRCMDefinition("Nexus 55xx", path + "rcmRCMDefinitionDetails-N5k-Mismatch.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getRCMEval5():
     getRCMEvaluation("Nexus", "55xx", path + "rcmEvaluationDetails-N5k-Mismatch.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceData6():
-    getComplianceDataMDS("9148", "FIXEDMODULE", path + "rcmComplianceData-MDS9k-Mismatch.json")
+    getComplianceDataMDS("9148S", "FIXEDMODULE", path + "rcmComplianceData-MDS9k-Mismatch.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getAvailableRCM6():
     getAvailableRCMs("Vblock", "340", "6.0", "6.0.1", path + "rcmAvailableRCMs-MDS9k-Mismatch.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getRCMDefinition6():
     getRCMDefinition("MDS 9148", path + "rcmRCMDefinitionDetails-MDS9k-Mismatch.json")
-@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mv
+@pytest.mark.rcm_fitness_cd
 def test_getRCMEval6():
     getRCMEvaluation("MDS", "9148", path + "rcmEvaluationDetails-MDS9k-Mismatch.json")
