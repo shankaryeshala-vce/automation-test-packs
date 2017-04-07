@@ -13,9 +13,9 @@ try:
 except:
     print('Possible configuration error')
 
-#host = '10.3.8.54'
-path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuousIntegration/complianceDataSystem/'
 
+#host = '10.3.8.54'
+path = '/home/autouser/PycharmProjects/auto-framework/test_suites/restAPItests/complianceDataSystem/'
 def ensurePathExists(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
@@ -38,6 +38,7 @@ def getSystemDefinition():
 
     print("Requesting UUID from System Definition....")
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
+    assert len(data["systems"]) > 0, "No defined systems returned."
 
     if data != "":
         if data["systems"][0]["uuid"] != "":
@@ -68,6 +69,7 @@ def getComplianceDataSystem(filename):
     data = json.loads(resp.text)
 
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
+    assert len(data["components"]) > 0, "Expected collected components not returned."
     print("Requesting system details from Compliance Data Service.\n")
 
     totalComponents = len(data["components"])
@@ -78,12 +80,13 @@ def getComplianceDataSystem(filename):
     compData = json.loads(compResp.text)
 
     assert compResp.status_code == 200, "Request has not been acknowledged as expected."
+    assert len(compData["convergedSystem"]) > 0, "No collected device returned."
 
     with open(filename, 'a') as outfile:
         json.dump(compData, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
 
-    if len(compData["devices"]) != "":
+    if len(compData["devices"]) != 0:
 
         assert not compData["message"], "Expected message field to be NULL."
         assert compData["convergedSystem"]["systemUuid"] == systemUUID
@@ -144,6 +147,7 @@ def getComplianceDataSystemSWITCH(product, family, elementType, subType, identif
     data = json.loads(resp.text)
 
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
+    assert len(data["system"]) > 0, "Expected collected components not returned."
     print("Requesting system details from Compliance Data Service.\n")
 
     with open(sysDefFilename, 'w') as outfile:
@@ -155,6 +159,7 @@ def getComplianceDataSystemSWITCH(product, family, elementType, subType, identif
     compData = json.loads(compResp.text)
 
     assert compResp.status_code == 200, "Request has not been acknowledged as expected."
+    assert len(compData["convergedSystem"]) > 0, "No collected device returned."
 
     with open(compDataFilename, 'w') as outfile:
         json.dump(compData, outfile, sort_keys=True, indent=4, ensure_ascii=False)
@@ -163,7 +168,7 @@ def getComplianceDataSystemSWITCH(product, family, elementType, subType, identif
     assert compData["convergedSystem"]["product"] == data["system"]["definition"]["product"], "Unexpected Product returned."
     assert compData["convergedSystem"]["modelFamily"] == data["system"]["definition"]["modelFamily"], "Unexpected UUID returned."
 
-    if len(compData["devices"]) != "":
+    if len(compData["devices"]) != 0:
         totalSubComponents = len(compData["subComponents"])
         totalDevices = len(compData["devices"])
         print(totalDevices)
@@ -210,16 +215,17 @@ def getComplianceDataSystem_INVALID(sysUUID):
     versionIndex = 0
     getSystemDefinition()
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system/' + sysUUID
+    url = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system/' + sysUUID + '/'
 
     resp = requests.get(url)
     data = json.loads(resp.text)
 
     #assert resp.status_code == 200, "Request has not been acknowledged as expected."
+    assert data["convergedSystem"] is None, "Collected device returned in error."
 
     if not data["convergedSystem"]:
         if "message" in data.keys():
-            if ('RFCA1003E') in data["code"]:
+            if ('RFCA1006E') in data["code"]:
                 assert resp.status_code == 500, "Request has not been acknowledged as expected."
                 print("Message: %s" % data["message"])
                 assert ('RCDS1006E Error retrieving system compliance data') in (data["message"]), "Returned Error Message text not as expected."
@@ -249,35 +255,38 @@ def getComplianceDataSystem_NULL():
     print("\nReturned response codes are as expected.")
 
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem1():
-    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataSystem(path + "complianceDataSystem.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem2():
-    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataSystemSWITCH("NEXUS", "N3K", "SWITCH", "NETWORKCHASSIS", "3048", path + "rcmSystemDefinition.json", path + "complianceDataSystemNEXUS3K.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem3():
-    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataSystemSWITCH("NEXUS", "N5K", "SWITCH", "NETWORKCHASSIS", "5548", path + "rcmSystemDefinition.json", path + "complianceDataSystemNEXUS5K.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem4():
-    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataSystemSWITCH("MDS", "MDS9K", "SWITCH", "NETWORKCHASSIS", "9148", path + "rcmSystemDefinition.json", path + "complianceDataSystemMDS9K.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem5():
-    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataSystemSWITCH("NEXUS", "N9K", "SWITCH", "NETWORKCHASSIS", "9396", path + "rcmSystemDefinition.json", path + "complianceDataSystemNEXUS9K.json")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem6():
-    #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataSystem_INVALID(systemUUID[:8])
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem7():
     getComplianceDataSystem_INVALID("----")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem8():
     getComplianceDataSystem_INVALID(" ")
 @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem9():
     getComplianceDataSystem_NULL()
