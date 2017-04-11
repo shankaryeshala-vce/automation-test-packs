@@ -21,7 +21,6 @@ except:
 # # Only one if these ipaddress lines should be enabled at any one time
 # ipaddress = '10.3.8.54'
 # # ipaddress = sys.argv[1]
-# port = 5672
 
 ########################################################################################################################
 
