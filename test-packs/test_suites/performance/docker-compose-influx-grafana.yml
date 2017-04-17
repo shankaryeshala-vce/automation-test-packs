@@ -1,0 +1,33 @@
+version: '2'
+services:
+  Influxdb:
+    image: tutum/influxdb:latest
+    ports:
+      - "8083:8083"
+      - "8086:8086"
+      - "25826:25826/udp"     
+    environment:
+      - ADMIN_USER="root"
+      - INFLUX_INIT_PWD="root" 
+      - PRE_CREATE_DB=symphony 
+      - COLLECTD_DB=symphony
+      - COLLECTD_BINDING=:25826     
+    expose:
+      - "8090"
+      - "8099"    
+    container_name: influxsrv
+    
+  Grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - INFLUXDB_HOST=localhost
+      - INFLUXDB_PORT=8086 
+      - INFLUXDB_NAME=symphony 
+      - INFLUXDB_USER=root 
+      - INFLUXDB_PASS=root      
+    external_links:    
+      - influxsrv:influxsrv
+    container_name: grafana
+    
