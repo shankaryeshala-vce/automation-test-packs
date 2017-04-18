@@ -57,31 +57,31 @@ def cAdvisor_Setup():
 
     filename = 'cadvisor.sh'
 
-    file_text_1 = 'docker run --volume=/:/rootfs:ro  \
+    file_text_1 = 'docker run --volume=/:/rootfs:ro  \\ \n'
 
-           --volume=/var/run:/var/run:rw  \
+    file_text_1 = file_text_1 + '  --volume=/var/run:/var/run:rw  \\ \n'
 
-           --volume=/sys:/sys:ro  \
+    file_text_1 = file_text_1 + '         --volume=/sys:/sys:ro  \\ \n'
 
-           --volume=/var/lib/docker/:/var/lib/docker:ro  \
+    file_text_1 = file_text_1 + '         --volume=/var/lib/docker/:/var/lib/docker:ro  \\ \n'
 
-           --publish=9820:9820  \
+    file_text_1 = file_text_1 + '         --publish=9820:9820  \\ \n'
 
-           --detach=true  \
+    file_text_1 = file_text_1 + '         --detach=true  \\ \n'
 
-           --name=cadvisor google/cadvisor:latest  \
+    file_text_1 = file_text_1 + '         --name=cadvisor google/cadvisor:latest  \\ \n'
 
-             -port=9820 \
+    file_text_1 = file_text_1 + '           -port=9820 \\ \n'
 
-             -storage_driver=influxdb  \
+    file_text_1 = file_text_1 + '           -storage_driver=influxdb  \\ \n'
 
-             -storage_driver_db=cadvisor  \
+    file_text_1 = file_text_1 + '           -storage_driver_db=cadvisor  \\ \n'
 
-             -storage_driver_user=root \
+    file_text_1 = file_text_1 + '           -storage_driver_user=root \\ \n'
 
-             -storage_driver_password=root \
+    file_text_1 = file_text_1 + '           -storage_driver_password=root \\ \n'
 
-             -storage_driver_host='.encode('ascii')
+    file_text_1 = file_text_1 + '           -storage_driver_host='.encode('ascii')
 
 
     file_text_2 = ':8086'.encode('ascii')
