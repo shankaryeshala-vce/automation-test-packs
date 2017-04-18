@@ -59,7 +59,7 @@ def cAdvisor_Setup():
 
     file_text_1 = 'docker run --volume=/:/rootfs:ro  \\ \n'
 
-    file_text_1 = file_text_1 + '  --volume=/var/run:/var/run:rw  \\ \n'
+    file_text_1 = file_text_1 + '         --volume=/var/run:/var/run:rw  \\ \n'
 
     file_text_1 = file_text_1 + '         --volume=/sys:/sys:ro  \\ \n'
 
