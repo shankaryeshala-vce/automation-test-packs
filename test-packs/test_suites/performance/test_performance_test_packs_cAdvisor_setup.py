@@ -165,18 +165,14 @@ def cAdvisor_Setup():
 
     else:
 
-        print('cAdvisor configuration is failed')
+        print('cAdvisor configuration is failed\n')
 
 
     ssh.close()
 
-
-　
-
 #######################################################################################################################
 
-
-cAdvisor_Setup()
+#cAdvisor_Setup()
 
 
 　
