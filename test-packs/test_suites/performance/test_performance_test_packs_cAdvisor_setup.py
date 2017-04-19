@@ -168,8 +168,6 @@ def cAdvisor_Setup():
         print('cAdvisor configuration is failed')
 
 
-　
-
     ssh.close()
 
 
