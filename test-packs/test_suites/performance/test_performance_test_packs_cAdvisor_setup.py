@@ -81,9 +81,10 @@ def test_cAdvisor_Setup():
 
     file_text_1 = file_text_1 + '             -storage_driver_password=root \\ \n'
 
-    file_text_1 = file_text_1 + '             -storage_driver_host=' + perf_hostname + ':8086'
+    file_text_1 = file_text_1 + '             -storage_driver_host='
 
     file_text_1 = file_text_1.encode('ascii')
+    file_text_2 = ':8086'.encode('ascii')
     # copy cadvisor docker compose file to symphyony ova vm
 
     ssh = paramiko.SSHClient()
@@ -105,6 +106,8 @@ def test_cAdvisor_Setup():
     f = sftp.open(dirname + '/' + filename, 'w')
 
     f.write(file_text_1)
+    f.write(perf_hostname)
+    f.write(file_text_2)
 
     f.close()
 
