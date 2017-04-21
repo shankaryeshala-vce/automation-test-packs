@@ -39,8 +39,8 @@ except:
     "symphony-rcm-evaluation-service",
     "symphony-identity-service",
     "symphony-rcm-fitness-client",
-    "symphony-capability-registration-service",
-    "symphony-endpoint-registration-service",
+    "symphony-capability-registry-service",
+    "symphony-endpoint-registry-service",
     "symphony-hdp-cisco-network-service",
     "symphony-hdp-poweredge-compute",
     "symphony-dne-paqx"
@@ -85,8 +85,8 @@ def test_servicerunning(service_name):
     ("symphony-rcm-evaluation-service", "cpsd/rcm-fitness/rcm-evaluation/"),
     ("symphony-identity-service" , "/cpsd/identity-service/"),
     ("symphony-rcm-fitness-client", "rcm-fitness-client"),
-    ("symphony-capability-registration-service", "/cpsd/registration-services/capability-registry/"),
-    ("symphony-endpoint-registration-service", "/cpsd/registration-services/endpoint-registration/"),
+    ("symphony-capability-registry-service", "/cpsd/registration-services/capability-registry/"),
+    ("symphony-endpoint-registry-service", "/cpsd/registration-services/endpoint-registration/"),
     ("symphony-hdp-cisco-network-service", "/cpsd/hal/providers/hdp-cisco-network/"),
     ("symphony-hdp-poweredge-compute", "/cpsd/hal/providers/hdp-poweredge-compute/"),
     ("symphony-dne-paqx", "dne-paqx")
@@ -186,8 +186,8 @@ def test_servicestop_yml():
     "symphony-rcm-evaluation-service",
     "symphony-identity-service",
     "symphony-rcm-fitness-client",
-    "symphony-capability-registration-service",
-    "symphony-endpoint-registration-service",
+    "symphony-capability-registry-service",
+    "symphony-endpoint-registry-service",
     "symphony-hdp-cisco-network-service",
     "symphony-hdp-poweredge-compute",
     "symphony-dne-paqx"
@@ -220,8 +220,8 @@ def test_servicestart_yml():
     ("symphony-rcm-evaluation-service", "cpsd/rcm-fitness/rcm-evaluation/"),
     ("symphony-identity-service" , "/cpsd/identity-service/"),
     ("symphony-rcm-fitness-client", "rcm-fitness-client"),
-    ("symphony-capability-registration-service", "/cpsd/registration-services/capability-registry/"),
-    ("symphony-endpoint-registration-service", "/cpsd/registration-services/endpoint-registration/"),
+    ("symphony-capability-registry-service", "/cpsd/registration-services/capability-registry/"),
+    ("symphony-endpoint-registry-service", "/cpsd/registration-services/endpoint-registration/"),
     ("symphony-hdp-cisco-network-service", "/cpsd/hal/providers/hdp-cisco-network/"),
     ("symphony-hdp-poweredge-compute", "/cpsd/hal/providers/hdp-poweredge-compute/"),
     ("symphony-dne-paqx", "dne-paqx")
