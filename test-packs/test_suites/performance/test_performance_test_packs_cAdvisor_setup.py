@@ -83,8 +83,9 @@ def test_cAdvisor_Setup():
 
     file_text_1 = file_text_1 + '             -storage_driver_host='
 
-    file_text_1 = file_text_1.encode('ascii')
-    file_text_2 = ':8086'.encode('ascii')
+ #   file_text_1 = file_text_1.encode('ascii')
+#    file_text_2 = ':8086'.encode('ascii')
+    file_text_2 = ':8086\n'
     # copy cadvisor docker compose file to symphyony ova vm
 
     ssh = paramiko.SSHClient()
