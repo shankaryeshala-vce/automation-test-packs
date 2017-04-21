@@ -32,8 +32,8 @@ except:
     "symphony-system-definition-service",
     "symphony-hal-orchestrator-service",
     "symphony-identity-service",
-    "symphony-capability-registration-service",
-    "symphony-endpoint-registration-service",
+    "symphony-capability-registry-service",
+    "symphony-endpoint-registry-service",
 
 ])
 # checking if all dockter container servises are up. Assert if services are not up
