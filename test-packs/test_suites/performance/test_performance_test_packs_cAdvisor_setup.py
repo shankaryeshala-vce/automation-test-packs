@@ -61,27 +61,27 @@ def test_cAdvisor_Setup():
 
     file_text_1 = file_text_1 + '           --volume=/var/run:/var/run:rw  \\ \n'
 
-    file_text_1 = file_text_1 + '           --volume=/sys:/sys:ro  \\ \n'
+    file_text_1 = file_text_1 + '           --volume=/sys:/sys:ro  \\ \n'
 
-    file_text_1 = file_text_1 + '           --volume=/var/lib/docker/:/var/lib/docker:ro  \\ \n'
+    file_text_1 = file_text_1 + '           --volume=/var/lib/docker/:/var/lib/docker:ro  \\ \n'
 
-    file_text_1 = file_text_1 + '           --publish=9820:9820  \\ \n'
+    file_text_1 = file_text_1 + '           --publish=9820:9820  \\ \n'
 
-    file_text_1 = file_text_1 + '           --detach=true  \\ \n'
+    file_text_1 = file_text_1 + '           --detach=true  \\ \n'
 
-    file_text_1 = file_text_1 + '           --name=cadvisor google/cadvisor:latest  \\ \n'
+    file_text_1 = file_text_1 + '           --name=cadvisor google/cadvisor:latest  \\ \n'
 
-    file_text_1 = file_text_1 + '             -port=9820 \\ \n'
+    file_text_1 = file_text_1 + '             -port=9820 \\ \n'
 
-    file_text_1 = file_text_1 + '             -storage_driver=influxdb  \\ \n'
+    file_text_1 = file_text_1 + '             -storage_driver=influxdb  \\ \n'
 
-    file_text_1 = file_text_1 + '             -storage_driver_db=cadvisor  \\ \n'
+    file_text_1 = file_text_1 + '             -storage_driver_db=cadvisor  \\ \n'
 
-    file_text_1 = file_text_1 + '             -storage_driver_user=root \\ \n'
+    file_text_1 = file_text_1 + '             -storage_driver_user=root \\ \n'
 
-    file_text_1 = file_text_1 + '             -storage_driver_password=root \\ \n'
+    file_text_1 = file_text_1 + '             -storage_driver_password=root \\ \n'
 
-    file_text_1 = file_text_1 + '             -storage_driver_host='
+    file_text_1 = file_text_1 + '             -storage_driver_host='
 
     file_text_1 = file_text_1.encode('ascii')
     file_text_2 = ':8086'.encode('ascii')
