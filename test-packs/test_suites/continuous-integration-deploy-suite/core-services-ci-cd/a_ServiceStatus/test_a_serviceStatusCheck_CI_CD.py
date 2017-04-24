@@ -21,33 +21,63 @@ except:
 # # Only one if these ipaddress lines should be enabled at any one time
 # ipaddress = '10.3.8.54'
 # # ipaddress = sys.argv[1]
-# port = 5672
 
 ########################################################################################################################
 
 #@pytest.mark.rcm_fitness_mvp
 @pytest.mark.core_services_mvp
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
 @pytest.mark.core_services_cd
 @pytest.mark.parametrize("service_name" , [
     "symphony-credential-service",
     "symphony-system-definition-service",
     "symphony-hal-orchestrator-service",
+    "symphony-identity-service",
+    "symphony-capability-registry-service",
+    "symphony-endpoint-registry-service",
+
+])
+# checking if all dockter container servises are up. Assert if services are not up
+def test_Core_servicerunning(service_name):
+    svrrun_err = []
+    global services_running
+
+    sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
+
+    if "Up" not in my_return_status:
+        svrrun_err.append(service_name + " not running")
+
+    service_name_pid = service_name.replace("symphony-","").replace("-service","").replace("-registry","")
+    sendCommand_pid = "ps -ef | grep " + service_name_pid +" |grep java | awk '{print $2}'"
+    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_pid, return_output=True)
+    pid = my_return_pid.strip('\n')
+
+    sendCommand_netstat = "netstat -ntp | grep -i \"{}/java\"".format(pid)
+    my_return_netstat = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_netstat, return_output=True)
+    if "ESTABLISHED" not in my_return_netstat:
+        svrrun_err.append(service_name + " rabbit connection not established")
+
+    assert not svrrun_err
+
+    print("Successful status check performed on: %s" % service_name)
+
+
+########################################################################################################################
+
+@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
+@pytest.mark.parametrize("service_name" , [
     "symphony-rcm-compliance-data-service",
     "symphony-rcm-definition-service",
     "symphony-rcm-evaluation-service",
-    "symphony-identity-service",
     "symphony-rcm-fitness-client",
-    "symphony-capability-registry-service",
-    "symphony-endpoint-registry-service",
     "symphony-hdp-cisco-network-service",
     "symphony-hdp-poweredge-compute",
     "symphony-dne-paqx"
 
 ])
 # checking if all dockter container servises are up. Assert if services are not up
-def test_servicerunning(service_name):
+def test_rcm_servicerunning(service_name):
     svrrun_err = []
     global services_running
 
