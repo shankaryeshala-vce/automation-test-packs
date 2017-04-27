@@ -57,23 +57,21 @@ def test_cAdvisor_Setup():
 
     filename = 'cadvisor.sh'
 
+    file_text_1 = 'docker run --volume=/:/rootfs:ro  \
+           --volume=/var/run:/var/run:rw  \
+           --volume=/sys:/sys:ro  \
+           --volume=/var/lib/docker/:/var/lib/docker:ro  \
+           --publish=9820:9820  \
+           --detach=true  \
+           --name=cadvisor google/cadvisor:latest  \
+             -port=9820 \
+             -storage_driver=influxdb  \
+             -storage_driver_db=cadvisor  \
+             -storage_driver_user=root \
+             -storage_driver_password=root \
+             -storage_driver_host='.encode('ascii')
 
 
- #   file_text_1 = file_text_1.encode('ascii')
-    file_text_1 = 'docker run --volume=/:/rootfs:ro  \\ \n'
-    file_text_1 = file_text_1 + '           --volume=/var/run:/var/run:rw  \\ \n'
-    file_text_1 = file_text_1 + '           --volume=/sys:/sys:ro  \\ \n'
-    file_text_1 = file_text_1 + '           --volume=/var/lib/docker/:/var/lib/docker:ro  \\ \n'
-    file_text_1 = file_text_1 + '           --publish=9820:9820  \\ \n'
-    file_text_1 = file_text_1 + '           --detach=true  \\ \n'
-    file_text_1 = file_text_1 + '           --name=cadvisor google/cadvisor:latest  \\ \n'
-    file_text_1 = file_text_1 + '             -port=9820 \\ \n'
-    file_text_1 = file_text_1 + '             -storage_driver=influxdb  \\ \n'
-    file_text_1 = file_text_1 + '             -storage_driver_db=cadvisor  \\ \n'
-    file_text_1 = file_text_1 + '             -storage_driver_user=root \\ \n'
-    file_text_1 = file_text_1 + '             -storage_driver_password=root \\ \n'
-    file_text_1 = file_text_1 + '             -storage_driver_host='
-    file_test_1 = file_text_1.encode('ascii')
     file_text_2 = ':8086'.encode('ascii')
 #    file_text_2 = ':8086\n'
     # copy cadvisor docker compose file to symphyony ova vm
