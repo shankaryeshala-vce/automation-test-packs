@@ -27,7 +27,7 @@ except:
 core_dir = ["system-definition", "credential", "hal-orchestrator", "identity-service", "registration-services/capability-registry", "registration-services/endpoint-registration"]
 core_list = []
 
-for service in core_dirt:
+for service in core_dir:
     sendcommand_core= "cat /opt/dell/cpsd/" + service + "/install/docker-compose.yml | grep container_name| cut -f 2 -d ':'"
     my_return_status_core = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendcommand_core, return_output=True)
     containerName= my_return_status_core.strip()
