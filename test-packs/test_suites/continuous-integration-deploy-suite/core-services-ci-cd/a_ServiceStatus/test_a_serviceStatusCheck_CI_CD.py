@@ -95,7 +95,7 @@ def test_rcm_servicerunning(service_name):
     if "Up" not in my_return_status:
         svrrun_err.append(service_name + " not running")
 
-    service_name_pid = service_name.replace("symphony-","").replace("-service","").replace("-registration","").replace("-registry","")
+    service_name_pid = service_name.replace("symphony-remediation-adapter-rackhd", "").replace("symphony-","").replace("-service","").replace("-registration","").replace("-registry","")
     sendCommand_pid = "ps -ef | grep " + service_name_pid +" |grep java | awk '{print $2}'"
     my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_pid, return_output=True)
     pid = my_return_pid.strip('\n')
@@ -108,6 +108,7 @@ def test_rcm_servicerunning(service_name):
     assert not svrrun_err
 
     print("Successful status check performed on: %s" % service_name)
+
 
 
 ########################################################################################################################
