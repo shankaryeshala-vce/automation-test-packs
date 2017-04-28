@@ -21,21 +21,35 @@ except:
 # # Only one if these ipaddress lines should be enabled at any one time
 # ipaddress = '10.3.8.54'
 # # ipaddress = sys.argv[1]
-
 ########################################################################################################################
 
-#@pytest.mark.rcm_fitness_mvp
+#getting core services conatiner names from docker compose file
+core_dir = ["system-definition", "credential", "hal-orchestrator", "identity-service", "registration-services/capability-registry", "registration-services/endpoint-registration"]
+core_list = []
+
+for service in core_dirt:
+    sendcommand_core= "cat /opt/dell/cpsd/" + service + "/install/docker-compose.yml | grep container_name| cut -f 2 -d ':'"
+    my_return_status_core = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendcommand_core, return_output=True)
+    containerName= my_return_status_core.strip()
+
+    #print (containerName)
+
+    core_list.append(containerName)
+
+#getting rcm services conatiner names from docker compose file 
+sendcommand_rcm= "cat /opt/dell/cpsd/rcm-fitness/common/install/docker-compose.yml | grep container_name | cut -f 2 -d ':' "
+my_return_status_rcm = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendcommand_rcm, return_output=True)
+
+rcm_list=[a.strip() for a in my_return_status_rcm.strip().split("\n")]
+
+########################################################################################################################
+##Checking Core Services_mvp
+########################################################################################################################
+
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_cd
-@pytest.mark.parametrize("service_name" , [
-    "symphony-credential-service",
-    "symphony-system-definition-service",
-    "symphony-hal-orchestrator-service",
-    "symphony-identity-service",
-    "symphony-capability-registry-service",
-    "symphony-endpoint-registry-service",
+@pytest.mark.parametrize("service_name", core_list)
 
-])
 # checking if all dockter container servises are up. Assert if services are not up
 def test_Core_servicerunning(service_name):
     svrrun_err = []
@@ -63,19 +77,13 @@ def test_Core_servicerunning(service_name):
 
 
 ########################################################################################################################
+##Checking rcm Services_mvp
+########################################################################################################################
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_cd
-@pytest.mark.parametrize("service_name" , [
-    "symphony-rcm-compliance-data-service",
-    "symphony-rcm-definition-service",
-    "symphony-rcm-evaluation-service",
-    "symphony-rcm-fitness-client",
-    "symphony-hdp-cisco-network-service",
-    "symphony-hdp-poweredge-compute",
-    "symphony-dne-paqx"
+@pytest.mark.parametrize("service_name", rcm_list )
 
-])
 # checking if all dockter container servises are up. Assert if services are not up
 def test_rcm_servicerunning(service_name):
     svrrun_err = []
@@ -103,31 +111,18 @@ def test_rcm_servicerunning(service_name):
 
 
 ########################################################################################################################
+#Checking Rcm_services_cd. 
+# Ths is a stop/start test for RCM services
+########################################################################################################################
+pid_lst = ["/cpsd/hal/providers/hdp-cisco-network/", "/cpsd/hal/providers/hdp-poweredge-compute/", "cpsd/rcm-fitness/rcm-definition/",
+           "/cpsd/rcm-fitness/rcm-compliance-data/", "cpsd/rcm-fitness/rcm-evaluation/", "rcm-fitness-client", "remediation-adapter",
+           "dne-paqx", "/node-discovery-paqx/"]
+
+rcm_services = list(zip(rcm_list,pid_lst))
+
 
 @pytest.mark.core_services_cd
 @pytest.mark.rcm_fitness_cd
-@pytest.mark.parametrize("service_name, pid", [
-    ("symphony-system-definition-service", "/cpsd/system-definition/"),
-    ("symphony-hal-orchestrator-service", "/cpsd/hal-orchestrator/"),
-    ("symphony-credential-service", "/cpsd/credential/"),
-    ("symphony-rcm-compliance-data-service", "/cpsd/rcm-fitness/rcm-compliance-data/"),
-    ("symphony-rcm-definition-service", "cpsd/rcm-fitness/rcm-definition/"),
-    ("symphony-rcm-evaluation-service", "cpsd/rcm-fitness/rcm-evaluation/"),
-    ("symphony-identity-service" , "/cpsd/identity-service/"),
-    ("symphony-rcm-fitness-client", "rcm-fitness-client"),
-    ("symphony-capability-registry-service", "/cpsd/registration-services/capability-registry/"),
-    ("symphony-endpoint-registry-service", "/cpsd/registration-services/endpoint-registration/"),
-    ("symphony-hdp-cisco-network-service", "/cpsd/hal/providers/hdp-cisco-network/"),
-    ("symphony-hdp-poweredge-compute", "/cpsd/hal/providers/hdp-poweredge-compute/"),
-    ("symphony-dne-paqx", "dne-paqx")
-
-
-])
-
-
-# @pytest.mark.parametrize("service_name, pid", [
-#     ("symphony-credential-service", "services/credential/")
-# ])
 
 def test_servicestopstart(service_name, pid):
     svrstpstrt_err = []
