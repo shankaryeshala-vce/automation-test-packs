@@ -24,7 +24,7 @@ except:
 ########################################################################################################################
 
 #getting core services conatiner names from docker compose file
-core_dir = ["system-definition", "credential", "hal-orchestrator", "identity-service", "registration-services/capability-registry", "registration-services/endpoint-registration"]
+core_dir = ["system-definition-service", "credential", "hal-orchestrator-service", "identity-service", "capability-registry-service", "endpoint-registration-service"]
 core_list = []
 
 for service in core_dir:
@@ -36,7 +36,7 @@ for service in core_dir:
 
     core_list.append(containerName)
 
-#getting rcm services conatiner names from docker compose file 
+#getting rcm services conatiner names from docker compose file
 sendcommand_rcm= "cat /opt/dell/cpsd/rcm-fitness/common/install/docker-compose.yml | grep container_name | cut -f 2 -d ':' "
 my_return_status_rcm = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendcommand_rcm, return_output=True)
 
@@ -52,16 +52,22 @@ rcm_list=[a.strip() for a in my_return_status_rcm.strip().split("\n")]
 
 # checking if all dockter container servises are up. Assert if services are not up
 def test_Core_servicerunning(service_name):
-    svrrun_err = []
-    global services_running
+    """
+    Verify Core services are running for mvp
 
+    """
+    print (test_Core_servicerunning.__doc__)
+
+    svrrun_err = []
+
+    print (service_name)
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
 
     if "Up" not in my_return_status:
         svrrun_err.append(service_name + " not running")
 
-    service_name_pid = service_name.replace("symphony-","").replace("-service","").replace("-registry","")
+    service_name_pid = service_name.replace("symphony-","").replace("-service","").replace("-registry","").replace("-registration","")
     sendCommand_pid = "ps -ef | grep " + service_name_pid +" |grep java | awk '{print $2}'"
     my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_pid, return_output=True)
     pid = my_return_pid.strip('\n')
