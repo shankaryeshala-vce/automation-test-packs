@@ -121,7 +121,7 @@ def test_capabilityRegistry_Control_and_Binding():
     # actual Docker ContainerID value.
     # The correlationID of the consumed message is saved and will be used in the capabilityRegistryBinding() test to
     # trace the response "pong" messages.
-
+    time.sleep(7)
     # Ensure the COontrol & Binding Queues are empty to start
     af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
                                      queue='test.capability.registry.control')
