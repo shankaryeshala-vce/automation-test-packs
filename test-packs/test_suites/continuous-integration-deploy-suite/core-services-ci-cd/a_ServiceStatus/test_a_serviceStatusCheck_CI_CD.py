@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # Author: Toqeer Akhtar
-# Updated by: Linjong Fogarty
 # Revision:2.0
-# Code Reviewed by: Joe, Trevor
+# Code Reviewed by: 
 # Description: This script will runt against newly deployed OVA and perform a sanitu check for Dockerise servecies.
 ########################################################################################################################
 
@@ -21,33 +20,57 @@ except:
 # # Only one if these ipaddress lines should be enabled at any one time
 # ipaddress = '10.3.8.54'
 # # ipaddress = sys.argv[1]
-
 ########################################################################################################################
 
-#@pytest.mark.rcm_fitness_mvp
+
+#getting core services conatiner names from docker compose file
+@pytest.fixture
+def get_core_services():
+
+    core_dir = ["system-definition-service", "credential", "hal-orchestrator-service", "identity-service", "capability-registry-service", "endpoint-registration-service"]
+    core_list = []
+    
+    for service in core_dir:
+        sendcommand_core= "cat /opt/dell/cpsd/" + service + "/install/docker-compose.yml | grep container_name| cut -f 2 -d ':'"
+        my_return_status_core = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendcommand_core, return_output=True)
+        containerName= my_return_status_core.strip()
+        core_list.append(containerName)
+    return core_list
+
+#getting rcm services conatiner names from docker compose file
+@pytest.fixture
+def get_rcm_services ():
+    sendcommand_rcm= "cat /opt/dell/cpsd/rcm-fitness/common/install/docker-compose.yml | grep container_name | cut -f 2 -d ':' "
+    my_return_status_rcm = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendcommand_rcm, return_output=True)
+    rcm_list=[a.strip() for a in my_return_status_rcm.strip().split("\n")]
+    return rcm_list
+
+########################################################################################################################
+##Checking Core Services_mvp
+########################################################################################################################
+core_list = get_core_services()
 @pytest.mark.core_services_mvp
-@pytest.mark.core_services_cd
-@pytest.mark.parametrize("service_name" , [
-    "symphony-credential-service",
-    "symphony-system-definition-service",
-    "symphony-hal-orchestrator-service",
-    "symphony-identity-service",
-    "symphony-capability-registry-service",
-    "symphony-endpoint-registry-service",
+@pytest.mark.core_services_mvp_extended
+@pytest.mark.parametrize("service_name", core_list)
 
-])
-# checking if all dockter container servises are up. Assert if services are not up
+# checking if all core servises are up. Assert if services are not up
 def test_Core_servicerunning(service_name):
-    svrrun_err = []
-    global services_running
+    """
+    Verify Core services are running for mvp
 
+    """
+    print (test_Core_servicerunning.__doc__)
+
+    svrrun_err = []
+
+    print (service_name)
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
 
     if "Up" not in my_return_status:
         svrrun_err.append(service_name + " not running")
 
-    service_name_pid = service_name.replace("symphony-","").replace("-service","").replace("-registry","")
+    service_name_pid = service_name.replace("symphony-","").replace("-service","").replace("-registry","").replace("-registration","")
     sendCommand_pid = "ps -ef | grep " + service_name_pid +" |grep java | awk '{print $2}'"
     my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_pid, return_output=True)
     pid = my_return_pid.strip('\n')
@@ -63,23 +86,17 @@ def test_Core_servicerunning(service_name):
 
 
 ########################################################################################################################
-
+##Checking rcm Services_mvp
+########################################################################################################################
+rcm_list = get_rcm_services()
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
-@pytest.mark.parametrize("service_name" , [
-    "symphony-rcm-compliance-data-service",
-    "symphony-rcm-definition-service",
-    "symphony-rcm-evaluation-service",
-    "symphony-rcm-fitness-client",
-    "symphony-hdp-cisco-network-service",
-    "symphony-hdp-poweredge-compute",
-    "symphony-dne-paqx"
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.parametrize("service_name", rcm_list)
 
-])
 # checking if all dockter container servises are up. Assert if services are not up
 def test_rcm_servicerunning(service_name):
     svrrun_err = []
-    global services_running
+    print (service_name)
 
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
@@ -87,7 +104,7 @@ def test_rcm_servicerunning(service_name):
     if "Up" not in my_return_status:
         svrrun_err.append(service_name + " not running")
 
-    service_name_pid = service_name.replace("symphony-","").replace("-service","").replace("-registration","").replace("-registry","")
+    service_name_pid = service_name.replace("symphony-remediation-adapter-rackhd", "").replace("symphony-","").replace("-service","").replace("-registration","").replace("-registry","")
     sendCommand_pid = "ps -ef | grep " + service_name_pid +" |grep java | awk '{print $2}'"
     my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_pid, return_output=True)
     pid = my_return_pid.strip('\n')
@@ -102,35 +119,90 @@ def test_rcm_servicerunning(service_name):
     print("Successful status check performed on: %s" % service_name)
 
 
+
+########################################################################################################################
+#Checking Core_services_cd.
+# Ths is a stop/start test for core services
 ########################################################################################################################
 
-@pytest.mark.core_services_cd
-@pytest.mark.rcm_fitness_cd
-@pytest.mark.parametrize("service_name, pid", [
-    ("symphony-system-definition-service", "/cpsd/system-definition/"),
-    ("symphony-hal-orchestrator-service", "/cpsd/hal-orchestrator/"),
-    ("symphony-credential-service", "/cpsd/credential/"),
-    ("symphony-rcm-compliance-data-service", "/cpsd/rcm-fitness/rcm-compliance-data/"),
-    ("symphony-rcm-definition-service", "cpsd/rcm-fitness/rcm-definition/"),
-    ("symphony-rcm-evaluation-service", "cpsd/rcm-fitness/rcm-evaluation/"),
-    ("symphony-identity-service" , "/cpsd/identity-service/"),
-    ("symphony-rcm-fitness-client", "rcm-fitness-client"),
-    ("symphony-capability-registry-service", "/cpsd/registration-services/capability-registry/"),
-    ("symphony-endpoint-registry-service", "/cpsd/registration-services/endpoint-registration/"),
-    ("symphony-hdp-cisco-network-service", "/cpsd/hal/providers/hdp-cisco-network/"),
-    ("symphony-hdp-poweredge-compute", "/cpsd/hal/providers/hdp-poweredge-compute/"),
-    ("symphony-dne-paqx", "dne-paqx")
+
+core_pid_list = ["/cpsd/system-definition/", "/cpsd/credential/", "/cpsd/hal-orchestrator/", "/cpsd/identity-service/",
+                 "/cpsd/registration-services/capability-registry/", "/cpsd/registration-services/endpoint-registration/" ]
+
+core_services = list(zip(core_list, core_pid_list))
 
 
-])
-
-
-# @pytest.mark.parametrize("service_name, pid", [
-#     ("symphony-credential-service", "services/credential/")
-# ])
-
-def test_servicestopstart(service_name, pid):
+@pytest.mark.core_services_mvp_extended
+@pytest.mark.parametrize("service_name, pid", core_services)
+def test_servicestopstart_core(service_name, pid):
     svrstpstrt_err = []
+
+
+    sendCommand_pid = "ps -ef | grep -i " + pid + "| grep -v grep |grep java | awk \'FNR == 1 {print$2}\'"
+    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_pid, return_output=True)
+    initial_pid = my_return_pid.rstrip('\n')
+    print ("ps pid " +initial_pid)
+
+    get_pid = "netstat -ntp | grep -i \":5672.*ESTABLISHED.*{}/java\"".format(initial_pid)
+    sendCommand_netstat = ""+ get_pid +" | awk \'{print $7}\'"
+    return_netstat_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_netstat, return_output=True)
+    return_netstat_pid = return_netstat_pid.replace("/java", "") .split("\n")[0]
+    print ("netstat pid " +return_netstat_pid)
+
+
+    service_name_1 = service_name.replace('symphony', 'dell')
+    service_name_2 = service_name_1.replace ('registry', 'registration')
+    service_name_3 = service_name_2.replace ('identity', 'element-identity')
+    dell_core = service_name_3.replace('-service', '')
+
+
+    #Stoppping service individually
+    if initial_pid == return_netstat_pid:
+        print ("core services")
+        sendCommand_stop = "systemctl stop " + dell_core
+        return_stop = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_stop, return_output=True)
+
+        sendcommand_status = "systemctl status " + dell_core
+        return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendcommand_status, return_output=True)
+        if "active (running)" in return_status:
+            svrstpstrt_err.append(service_name + " still running")
+
+        sendCommand_start = "systemctl start " + dell_core
+        return_start = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_start, return_output=True)
+
+        sendcommand_status = "systemctl status " + dell_core
+        return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendcommand_status, return_output=True)
+
+    if "active (running)" not in return_status:
+            svrstpstrt_err.append(service_name + " not running")
+
+
+    assert not svrstpstrt_err
+
+    print("Successful stop and start performed on: %s" % service_name)
+########################################################################################################################
+#Checking Rcm_services_cd.
+# Ths is a stop/start test for RCM services
+########################################################################################################################
+rcm_pid_lst = ["/cpsd/hal/providers/hdp-cisco-network/", "/cpsd/hal/providers/hdp-poweredge-compute/", "cpsd/rcm-fitness/rcm-definition/",
+           "/cpsd/rcm-fitness/rcm-compliance-data/", "cpsd/rcm-fitness/rcm-evaluation/", "rcm-fitness-client", "remediation-adapter",
+           "dne-paqx", "/node-discovery-paqx/"]
+
+rcm_pid_test = ["/cpsd/rcm-fitness/rcm-compliance-data/", "cpsd/rcm-fitness/rcm-evaluation/"]
+rcm_list_test = ['symphony-rcm-compliance-data-service', 'symphony-rcm-evaluation-service']
+
+rcm_pid_lst.remove("remediation-adapter")
+
+rcm_services = list(zip(rcm_list,rcm_pid_lst))
+
+
+
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.parametrize("service_name, pid", rcm_services)
+
+def test_servicestopstart_rcm(service_name, pid):
+    svrstpstrt_err = []
+    print (service_name)
 
 
     #sendCommand_pid = "ps -ef | grep " + service_name_pid +" |grep java | awk '{print $2}'"
@@ -150,6 +222,7 @@ def test_servicestopstart(service_name, pid):
     sendCommand_ContainerID = "docker ps --filter name=" + service_name + "  --format '{{.ID}}'"
     return_ContainerID = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_ContainerID, return_output=True)
     Container_id = return_ContainerID
+    print ("Container id" + Container_id)
 
     #Stoppping service individually
     if initial_pid == return_netstat_pid:
@@ -159,16 +232,17 @@ def test_servicestopstart(service_name, pid):
 
         sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
         my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
-
+        print ("docker status "+ my_return_status)
 
         if "Up" in my_return_status:
             svrstpstrt_err.append(service_name + " still running")
 
+        print ("Container id" + Container_id)
         print ("starting docker container")
         sendCommand_start = "docker start " + Container_id
         return_start = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_start, return_output=True)
 
-    #time.sleep(60)
+
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
     print ("docker Status " +my_return_status )
@@ -198,30 +272,17 @@ def test_servicestopstart(service_name, pid):
             assert not svrstpstrt_err
 
 ########################################################################################################################
+#test_servicestopstart
 
-def test_servicestop_yml():
+def test_servicestop_rcm_yml():
     #stop/start docker containers using yml file
     print ("stopping docker container using yml")
     sendCommand_yml_down = "docker-compose -f /opt/dell/rcm-fitness/common/install/docker-compose.yml down"
     my_return_down = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_yml_down, return_output=True)
 
-@pytest.mark.core_services_cd
-@pytest.mark.rcm_fitness_cd
-@pytest.mark.parametrize("service_name" , [
-    "symphony-credential-service",
-    "symphony-system-definition-service",
-    "symphony-hal-orchestrator-service",
-    "symphony-rcm-compliance-data-service",
-    "symphony-rcm-definition-service",
-    "symphony-rcm-evaluation-service",
-    "symphony-identity-service",
-    "symphony-rcm-fitness-client",
-    "symphony-capability-registry-service",
-    "symphony-endpoint-registry-service",
-    "symphony-hdp-cisco-network-service",
-    "symphony-hdp-poweredge-compute",
-    "symphony-dne-paqx"
-])
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.parametrize("service_name" ,rcm_list)
+
 def test_chkupStatus_yml(service_name):
     chkup_err = []
 
@@ -233,31 +294,16 @@ def test_chkupStatus_yml(service_name):
         chkup_err.append(service_name + " still running")
 
 
-def test_servicestart_yml():
+def test_servicestart_rcm_yml():
     print ("starting docker container using yml")
     sendCommand_yml_up = "docker-compose -f /opt/dell/rcm-fitness/common/install/docker-compose.yml up -d"
     my_return_up = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_yml_up, return_output=True)
     time.sleep(60)
 
-@pytest.mark.core_services_cd
-@pytest.mark.rcm_fitness_cd
-@pytest.mark.parametrize("service_name, pid", [
-    ("symphony-system-definition-service", "/cpsd/system-definition/"),
-    ("symphony-hal-orchestrator-service", "/cpsd/hal-orchestrator/"),
-    ("symphony-credential-service", "/cpsd/credential/"),
-    ("symphony-rcm-compliance-data-service", "/cpsd/rcm-fitness/rcm-compliance-data/"),
-    ("symphony-rcm-definition-service", "cpsd/rcm-fitness/rcm-definition/"),
-    ("symphony-rcm-evaluation-service", "cpsd/rcm-fitness/rcm-evaluation/"),
-    ("symphony-identity-service" , "/cpsd/identity-service/"),
-    ("symphony-rcm-fitness-client", "rcm-fitness-client"),
-    ("symphony-capability-registry-service", "/cpsd/registration-services/capability-registry/"),
-    ("symphony-endpoint-registry-service", "/cpsd/registration-services/endpoint-registration/"),
-    ("symphony-hdp-cisco-network-service", "/cpsd/hal/providers/hdp-cisco-network/"),
-    ("symphony-hdp-poweredge-compute", "/cpsd/hal/providers/hdp-poweredge-compute/"),
-    ("symphony-dne-paqx", "dne-paqx")
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.parametrize("service_name, pid", rcm_services)
 
-])
-def test_chkStatus_yml(service_name, pid):
+def test_chkStatus_rcm_yml(service_name, pid):
     svrstpstrt_yml_err = []
 
 
@@ -285,11 +331,11 @@ def test_chkStatus_yml(service_name, pid):
 
 
 ########################################################################################################################
-
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.core_services_cd
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rabbitrunning
 def test_rabbitrunning():
     rab_err = []
 
