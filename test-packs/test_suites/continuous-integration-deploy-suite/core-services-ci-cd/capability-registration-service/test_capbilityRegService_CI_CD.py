@@ -15,7 +15,7 @@ port = 5672
 try:
     env_file = 'env.ini'
 
-    capreg_config_file = 'config_capreg.ini'
+    capreg_config_file = 'continuous-integration-deploy-suite/config_capreg.ini'
     capreg_config_header = 'config_details'
 
     capreg_config_property_rmq_user = 'rmq_user'
