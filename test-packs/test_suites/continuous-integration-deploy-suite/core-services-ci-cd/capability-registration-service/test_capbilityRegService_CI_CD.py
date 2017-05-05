@@ -98,7 +98,7 @@ except:
 #######################################################################################################################
 
 @pytest.mark.core_services_mvp
-@pytest.mark.skip
+#@pytest.mark.skip
 def test_capabilityRegistry_Control_and_Binding():
     # Every 7 seconds the Capability Registery sends out a message asking "who's out there?" This is a "ping" message.
     # Each service that is alive will respond with a "pong" message.  The correlationID value will be the same on all
@@ -121,7 +121,7 @@ def test_capabilityRegistry_Control_and_Binding():
     # actual Docker ContainerID value.
     # The correlationID of the consumed message is saved and will be used in the capabilityRegistryBinding() test to
     # trace the response "pong" messages.
-
+    time.sleep(7)
     # Ensure the COontrol & Binding Queues are empty to start
     af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
                                      queue='test.capability.registry.control')
@@ -288,7 +288,7 @@ def test_capabilityRegistry_Control_and_Binding():
 
 
 @pytest.mark.core_services_mvp
-@pytest.mark.skip
+#@pytest.mark.skip
 def test_capabilityRegistry_ListCapabilities():
     # We are testing that all expected capabilites are returned when a capability Registry Request Message is sent.
     # All providers and their capabilities should be listed
@@ -425,7 +425,7 @@ def test_capabilityRegistry_ListCapabilities():
 
 
 @pytest.mark.core_services_mvp
-@pytest.mark.skip
+#@pytest.mark.skip
 def test_capabilityRegistry_Exchanges():
 
     # Verify the capability.registry Exchanges are bound to the correct queues
