@@ -13,6 +13,7 @@ import time
 # Payloads from symphony-sds.ini:- location: continuous-integration-deploy-suite/symphony-sds.ini
 try:
     payload_file = 'continuous-integration-deploy-suite/symphony-sds.ini'
+#    payload_file = 'symphony-sds.ini'
     payload_heading = 'credential_tests'
     payload_property_add = 'cs_cred_addition'
     payload_property_req = 'cs_cred_request'
@@ -42,6 +43,7 @@ cli_password = 'V1rtu@1c3!'
 
 # Add & verify component credentials
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_CS_ComponentCredentials_CI():
     print('\nRunning mvp test on system: ', ipaddress)
     cleanup()
