@@ -71,7 +71,7 @@ try:
     startPoweredgeProvider = 'docker run --net=host -v /opt/dell/cpsd/rcm-fitness/conf/:/opt/dell/rcm-fitness/conf/ -td cpsd-hal-data-provider-poweredge'
     startRackHDAdapter = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/rackhd-adapter-service/keystore/:/opt/dell/cpsd/rackhd-adapter-service/keystore/ -td cpsd-rackhd-adapter-service'
     startNodeDiscoverPaqx = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/node-discovery-paqx/keystore/:/opt/dell/cpsd/node-discovery-paqx/keystore/ -td cpsd-node-discovery-paqx'
-    startEndpointRegisteryService = 'docker-compose -f /opt/dell/cpsd/registration-services/endpoint-registration/install/docker-compose.yml up -d'
+    startEndpointRegisteryService = 'systemctl start dell-endpoint-registration'
     startVcenterAdapter = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/vcenter-adapter-service/keystore/:/opt/dell/cpsd/vcenter-adapter-service/keystore/ -td cpsd-vcenter-adapter-service'
 
     # The following are the number of Capabilities Tested. If this total number does not match what is returned then the test will need to be updated.
@@ -489,7 +489,7 @@ def test_capabilityRegistry_Exchanges():
 
 
 # It's likely this test will be removed as the functionality to stop & start containers is being removed
-@pytest.mark.core_services_cd
+@pytest.mark.core_services_mvp_extended
 def test_capaabilityRegistery_StopProvider():
     # When a provider/adapter becomes unavailable it is expected that a "Unregister" message is received
     # In this test we  1. verify the status of the docker container, 2. Stop the docker Container. 3. We verify that a
@@ -506,16 +506,16 @@ def test_capaabilityRegistery_StopProvider():
 
     capabilityRegistryStopProvider('cpsd-hal-data-provider-cisco-network', 'cisco-network-data-provider', 'device-data-discovery', 'device-endpoint-validation')
     capabilityRegistryStopProvider('cpsd-hal-data-provider-poweredge', 'poweredge-compute-data-provider', 'device-data-discovery', 'device-endpoint-validation')
-    # capabilityRegistryStopProvider('cpsd-rackhd-adapter-service', 'rackhd-adapter', 'rackhd-consul-register', 'rackhd-list-nodes', 'rackhd-upgrade-firmware-dellr730-server', 'rackhd-upgrade-firmware-dell-idrac', 'node-discovered-event', 'rackhd-install-esxi', 'rackhd-list-node-catalogs')
-    #capabilityRegistryStopProvider('cpsd-node-discovery-paqx', 'node-discovery-paqx', 'list-discovered-nodes')
-    # capabilityRegistryStopProvider('cpsd-core-endpoint-registry-service', 'endpoint-registry', 'endpoint-registry-lookup')
-    # capabilityRegistryStopProvider('cpsd-vcenter-adapter-service', 'vcenter-adapter', 'vcenter-consul-register', 'vcenter-discover', 'vcenter-enterMaintenance')
+    # Not Reregistering capabilityRegistryStopProvider('cpsd-rackhd-adapter-service', 'rackhd-adapter', 'rackhd-consul-register', 'rackhd-list-nodes', 'rackhd-upgrade-firmware-dellr730-server', 'rackhd-upgrade-firmware-dell-idrac', 'node-discovered-event', 'rackhd-install-esxi', 'rackhd-list-node-catalogs')
+    # Not Reregistering capabilityRegistryStopProvider('cpsd-node-discovery-paqx', 'node-discovery-paqx', 'list-discovered-nodes')
+    # No Container to restart capabilityRegistryStopProvider('cpsd-core-endpoint-registry-service', 'endpoint-registry', 'endpoint-registry-lookup')
+    # Not Reregistering capabilityRegistryStopProvider('cpsd-vcenter-adapter-service', 'vcenter-adapter', 'vcenter-consul-register', 'vcenter-discover', 'vcenter-enterMaintenance')
 
 
     cleanup()
 
 
-@pytest.mark.core_services_cd
+@pytest.mark.core_services_mvp_extended
 def test_capaabilityRegistery_KillProvider():
     cleanup()
     bindQueues()
@@ -532,10 +532,10 @@ def test_capaabilityRegistery_KillProvider():
 
     capabilityRegistryKillProvider('cpsd-hal-data-provider-cisco-network', 'cisco-network-data-provider', startCiscoProvider, 'device-data-discovery', 'device-endpoint-validation')
     capabilityRegistryKillProvider('cpsd-hal-data-provider-poweredge', 'poweredge-compute-data-provider', startPoweredgeProvider, 'device-data-discovery', 'device-endpoint-validation')
-    # capabilityRegistryKillProvider('cpsd-rackhd-adapter-service', 'rackhd-adapter', startRackHDAdapter, 'rackhd-consul-register', 'rackhd-list-nodes', 'rackhd-upgrade-firmware-dellr730-server', 'rackhd-upgrade-firmware-dell-idrac', 'node-discovered-event', 'rackhd-install-esxi', 'rackhd-list-node-catalogs')
-    # capabilityRegistryKillProvider('cpsd-node-discovery-paqx', 'node-discovery-paqx', startNodeDiscoverPaqx, 'list-discovered-nodes')
-    capabilityRegistryKillProvider('cpsd-core-endpoint-registry-service', 'endpoint-registry',startEndpointRegisteryService, 'endpoint-registry-lookup')
-    # capabilityRegistryStopProvider('cpsd-vcenter-adapter-service', 'vcenter-adapter', startVcenterAdapter, 'vcenter-consul-register', 'vcenter-discover', 'vcenter-enterMaintenance', 'vcenter-destroy-virtualMachine', 'vcenter-powercommand', 'vcenter-discover-cluster')
+    # Not Reregistering capabilityRegistryKillProvider('cpsd-rackhd-adapter-service', 'rackhd-adapter', startRackHDAdapter, 'rackhd-consul-register', 'rackhd-list-nodes', 'rackhd-upgrade-firmware-dellr730-server', 'rackhd-upgrade-firmware-dell-idrac', 'node-discovered-event', 'rackhd-install-esxi', 'rackhd-list-node-catalogs')
+    # Not Reregistering capabilityRegistryKillProvider('cpsd-node-discovery-paqx', 'node-discovery-paqx', startNodeDiscoverPaqx, 'list-discovered-nodes')
+    capabilityRegistryKillProvider('cpsd-core-endpoint-registration-service', 'endpoint-registry',startEndpointRegisteryService, 'endpoint-registry-lookup')
+    # Not Reregistering capabilityRegistryStopProvider('cpsd-vcenter-adapter-service', 'vcenter-adapter', startVcenterAdapter, 'vcenter-consul-register', 'vcenter-discover', 'vcenter-enterMaintenance', 'vcenter-destroy-virtualMachine', 'vcenter-powercommand', 'vcenter-discover-cluster')
 
     cleanup()
 
