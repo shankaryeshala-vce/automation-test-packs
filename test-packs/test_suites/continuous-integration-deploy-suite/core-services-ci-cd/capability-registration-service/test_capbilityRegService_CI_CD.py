@@ -555,8 +555,7 @@ def capabilityRegistryStopProvider(container, provider, capability1, capability2
 
     print('** Test Name: Test the unregister msg with the', provider, 'stopped **\n')
 
-    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
-                                     queue='test.capability.registry.response')
+
 
     # Check the status of the service
     dockerStatus = getdockerStatus(container)
@@ -566,6 +565,10 @@ def capabilityRegistryStopProvider(container, provider, capability1, capability2
     dockerID = getdockerID(container)
     sendCommand = 'docker stop ' + dockerID
     print(sendCommand)
+
+    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                     queue='test.capability.registry.response')
+
     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                       command=sendCommand, return_output=False)
 
@@ -587,7 +590,7 @@ def capabilityRegistryStopProvider(container, provider, capability1, capability2
     headerValue = return_message[0].headers
     headerValue = json.dumps(headerValue)
     typeIDValue = '{"__TypeId__": "com.dell.cpsd.hdp.capability.registry.capability.provider.unregistered.event"}'
-    assert typeIDValue == headerValue
+    assert typeIDValue == headerValue, '__TypeId__ returned and expected do not match'
 
     # Consume the message again, (removing it from the queue this time) and verify the name that unregistered
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
@@ -749,8 +752,7 @@ def capabilityRegistryKillProvider(container, provider, docker, capability1, cap
 
     print('** Test Name: Test the unregister msg with the', provider, 'killed **\n')
 
-    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
-                                     queue='test.capability.registry.response')
+
     # Check the status of the service
     dockerStatus = getdockerStatus(container)
     print('Current ', container, ' status: ', dockerStatus)
@@ -759,6 +761,10 @@ def capabilityRegistryKillProvider(container, provider, docker, capability1, cap
     dockerID = getdockerID(container)
     sendCommand = 'docker kill ' + dockerID
     print(sendCommand)
+
+    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                     queue='test.capability.registry.response')
+
     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                       command=sendCommand, return_output=False)
 
