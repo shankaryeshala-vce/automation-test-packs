@@ -499,6 +499,7 @@ def test_capaabilityRegistery_StopProvider():
 
     cleanup()
     bindQueues()
+    time.sleep(15)
 
     # Function format: capabilityRegistryStopProvider(container, provider name, capability1, capability2(optional), capability3(optional)):
 
@@ -519,6 +520,7 @@ def test_capaabilityRegistery_StopProvider():
 def test_capaabilityRegistery_KillProvider():
     cleanup()
     bindQueues()
+    time.sleep(15)
 
     # When a provider/adapter becomes unavailable it is expected that a "Unregister" message is received
     # In this test we  1. verify the status of the docker container, 2. Kill the docker Container. 3. We verify that a
