@@ -15,16 +15,16 @@ import time
 
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
-   # Set config ini file name
+    # Set config ini file name
     global env_file
     env_file = 'env.ini'
 
     # Set Vars
-	global ipaddress
+    global ipaddress
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-	global user
+    global user
     user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
-	global password
+    global password
     password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 
     global identifyelement
