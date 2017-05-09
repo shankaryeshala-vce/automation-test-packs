@@ -232,7 +232,6 @@ def test_describe_element():
 
 @pytest.mark.core_services_mvp
 @pytest.mark.parametrize('my_test_type', ['keyaccuracyid_abc', 'keyaccuracyid_ab', 'keyaccuracyid_ac', 'keyaccuracyid_neg'])
-@pytest.mark.parametrize('my_test_type', ['keyaccuracyid_abc', 'keyaccuracyid_ab', 'keyaccuracyid_ac', 'keyaccuracyid_neg'])
 def test_key_accuracy(my_test_type):
     cleanup()
     bind_queues()
