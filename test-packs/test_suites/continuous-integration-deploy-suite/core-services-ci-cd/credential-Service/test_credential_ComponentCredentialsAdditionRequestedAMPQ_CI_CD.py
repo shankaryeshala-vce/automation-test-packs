@@ -25,6 +25,8 @@ try:
 
     env_file = 'env.ini'
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+    cli_user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 
 except:
     print('Possible configuration error')
@@ -33,13 +35,9 @@ port = 5672
 rmq_username = 'test'
 rmq_password = 'test'
 
-cli_username = 'root'
-cli_password = 'V1rtu@1c3!'
 
 #ipaddress = '10.3.8.52'
 
-#  ipaddress = af_support_tools.get_config_file_property(config_file=config_file, heading=config_header,
-#                                                       property=config_property)
 
 # Add & verify component credentials
 @pytest.mark.core_services_mvp
