@@ -16,11 +16,10 @@ import time
 try:
     env_file = 'env.ini'
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+    user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 except:
     print('Possible configuration error.')
-
-# Use this to by-pass the env.ini file
-#ipaddress = '10.3.60.128'
 
 # Create the payload messages.
 # Hint: the correllationId field can be used as a description which makes it easier to locate in the Trace log.
@@ -46,9 +45,6 @@ elementUuid = ''
 # Always specify user names & password here at the start. Makes changing them later much easier,
 rmq_username = 'test'
 rmq_password = 'test'
-cli_username = 'root'
-cli_password = 'V1rtu@1c3!'
-port = 5672
 
 ##############################################################################################
 
@@ -57,7 +53,7 @@ port = 5672
 def test_ident_status():
     print('\nRunning Identity Status test on system: ', ipaddress)
     status_command = 'docker ps | grep identity-service'
-    status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+    status = af_support_tools.send_ssh_command(host=ipaddress, username=user, password=password,
                                                command=status_command, return_output=True)
     assert "Up" in status, "Identity Service not Running"
     print("Identity Service Running")
@@ -74,7 +70,7 @@ def test_identify_element():
 
     print('Sending Identify Element Message\n')
     # Publish the message
-    af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username,
                                          rmq_password=rmq_password,
                                          exchange='exchange.dell.cpsd.eids.identity.request',
                                          routing_key='dell.cpsd.eids.identity.request',
@@ -83,7 +79,7 @@ def test_identify_element():
                                          payload_type='json')
 
     assert waitForMsg('test.identity.request'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
 
@@ -99,7 +95,7 @@ def test_identify_element():
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
     assert waitForMsg('test.identity.response'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
 
@@ -142,7 +138,7 @@ def test_describe_element():
     print("Sending Describe Element for elementUUID: {}...".format(elementUuid))
 
     # Publish the message
-    af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username,
                                          rmq_password=rmq_password,
                                          exchange='exchange.dell.cpsd.eids.identity.request',
                                          routing_key='dell.cpsd.eids.identity.request',
@@ -151,7 +147,7 @@ def test_describe_element():
                                          payload_type='json')
 
     assert waitForMsg('test.identity.request'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
 
@@ -167,7 +163,7 @@ def test_describe_element():
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
     assert waitForMsg('test.identity.response'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
 
@@ -206,7 +202,7 @@ def test_key_accuracy(payload_message):
 
     print('Sending Identify Element Key Accuracy Messages\n')
     # Publish the message
-    af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username,
                                          rmq_password=rmq_password,
                                          exchange='exchange.dell.cpsd.eids.identity.request',
                                          routing_key='dell.cpsd.eids.identity.request',
@@ -215,7 +211,7 @@ def test_key_accuracy(payload_message):
                                          payload_type='json')
 
     assert waitForMsg('test.identity.request'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
 
@@ -232,7 +228,7 @@ def test_key_accuracy(payload_message):
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
     assert waitForMsg('test.identity.response'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
 
@@ -283,7 +279,7 @@ def test_negative_messages(payload_message):
 
     # Publish the message
     print('Sending Negative test Messages\n')
-    af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username,
                                          rmq_password=rmq_password,
                                          exchange='exchange.dell.cpsd.eids.identity.request',
                                          routing_key='dell.cpsd.eids.identity.request',
@@ -292,7 +288,7 @@ def test_negative_messages(payload_message):
                                          payload_type='json')
 
     assert waitForMsg('test.identity.request'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.request')
 
@@ -307,7 +303,7 @@ def test_negative_messages(payload_message):
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
     assert waitForMsg('test.identity.response'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.identity.response')
 
@@ -339,10 +335,10 @@ def test_negative_messages(payload_message):
 def cleanup():
     print('Cleaning up...')
 
-    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+    af_support_tools.rmq_delete_queue(host=ipaddress, rmq_username=rmq_username, rmq_password=rmq_password,
                                       queue='test.identity.request')
 
-    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+    af_support_tools.rmq_delete_queue(host=ipaddress, rmq_username=rmq_username, rmq_password=rmq_password,
                                       queue='test.identity.response')
 
 
@@ -350,13 +346,13 @@ def cleanup():
 def bind_queues():
     print('Creating the test EIDS Queues')
     af_support_tools.rmq_bind_queue(host=ipaddress,
-                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                    rmq_username=rmq_username, rmq_password=rmq_password,
                                     queue='test.identity.request',
                                     exchange='exchange.dell.cpsd.eids.identity.request',
                                     routing_key='#')
 
     af_support_tools.rmq_bind_queue(host=ipaddress,
-                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                    rmq_username=rmq_username, rmq_password=rmq_password,
                                     queue='test.identity.response',
                                     exchange='exchange.dell.cpsd.eids.identity.response',
                                     routing_key='#')
