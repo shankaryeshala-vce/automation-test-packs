@@ -383,7 +383,7 @@ def test_capabilityRegistry_ListCapabilities():
     vcenterCapabilities5 = 'vcenter-powercommand'
     vcenterCapabilities6 = 'vcenter-discover-cluster'
     vcenterCapabilities7 = 'vcenter-remove-host'
-    vcenterCapabilities8 = 'vcenter-add-host'
+    vcenterCapabilities8 = 'vcenter-addhostvcenter'
     assert vcenterName in return_message, (vcenterName, 'not returned')
     assert vcenterCapabilities1 in return_message, (vcenterCapabilities1, 'capability is not available')
     assert vcenterCapabilities2 in return_message, (vcenterCapabilities2, 'capability is not available')
