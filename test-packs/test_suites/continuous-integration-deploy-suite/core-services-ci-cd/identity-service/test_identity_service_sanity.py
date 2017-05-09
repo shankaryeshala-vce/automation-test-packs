@@ -13,38 +13,74 @@ import json
 import random
 import time
 
-try:
+@pytest.fixture(scope="module", autouse=True)
+def load_test_data():
+   # Set config ini file name
+    global env_file
     env_file = 'env.ini'
+
+    # Set Vars
+	global ipaddress
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+	global user
     user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+	global password
     password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
-except:
-    print('Possible configuration error.')
+
+    global identifyelement
+    identifyelement = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"c92b8be9-a892-4a76-a8d3-933c85ead7bb","reply-to":"dell.cpsd.eids.identity.request.sds.gouldc-mint","elementIdentities":[{"correlationUuid":"fb4e839d-aba1-409e-82d7-7e4632d6b647","identity":{"elementType":"group","classification":"GROUP","parents":[{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"SystemNetwork"}]}},{"correlationUuid":"d4964090-76b8-4d4a-8068-4cd8ff258462","identity":{"elementType":"SWITCH","classification":"DEVICE","parents":[{"elementType":"group","classification":"GROUP","parents":[{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"SystemNetwork"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"COMPONENT_TAG","value":"MGMT-N3A"}]}},{"correlationUuid":"93eb24fd-b8b0-49fa-8911-17f1cba72034","identity":{"elementType":"SWITCH","classification":"DEVICE","parents":[{"elementType":"group","classification":"GROUP","parents":[{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"SystemNetwork"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"COMPONENT_TAG","value":"MGMT-N3B"}]}},{"correlationUuid":"0c180853-bff6-4813-9099-3f80816ce450","identity":{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}}]}'
+    global keyaccuracyid_abc
+    keyaccuracyid_abc = '{"timestamp":"2017-03-15T09:40:00.170Z","correlationId":"key-accuracy-0000-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"},{"businessKeyType":"CONTEXTUAL","key":"DESCRIPTION","value":"THE_DESCRIPTION"},{"businessKeyType":"CONTEXTUAL","key":"IPADDRESS","value":"THE_IPADDRESS"}],"contextualKeyAccuracy":2}}]}'
+    global keyaccuracyid_ab
+    keyaccuracyid_ab  = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"key-accuracy-identify-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"},{"businessKeyType":"CONTEXTUAL","key":"DESCRIPTION","value":"THE_DESCRIPTION"}]}}]}'
+    global keyaccuracyid_ac
+    keyaccuracyid_ac = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"key-accuracy-identify-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"},{"businessKeyType":"CONTEXTUAL","key":"IPADDRESS","value":"THE_IPADDRESS"}]}}]}'
+    global keyaccuracyid_neg
+    keyaccuracyid_neg = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"key-accuracy-identify-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"}]}}]}'
+    global ident_no_element_type
+    ident_no_element_type = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"c92b8be9-a892-4a76-a8d3-933c85ead7bb","reply-to":"dell.cpsd.eids.identity.request.sds.gouldc-mint","elementIdentities":[{"correlationUuid":"0c180853-bff6-4813-9099-3f80816ce450","identity":{"elementType":"","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}}]}'
+    global describe_no_element
+    describe_no_element = '{"timestamp":"2017-01-27T14:51:00.570Z","correlationId":"5d7f6d34-4271-4593-9bad-1b95589e5189","reply-to":"dell.cpsd.eids.identity.request.hal.gouldc-mint","elementUuids":[]}'
+
+    global elementUuid
+    elementUuid = ''
+
+    global rmq_username
+    rmq_username = 'test'
+    global rmq_password
+    rmq_password = 'test'
+
+#try:
+#    env_file = 'env.ini'
+#    ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+#    user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+#    password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
+#except:
+#    print('Possible configuration error.')
 
 # Create the payload messages.
 # Hint: the correllationId field can be used as a description which makes it easier to locate in the Trace log.
-identifyelement = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"c92b8be9-a892-4a76-a8d3-933c85ead7bb","reply-to":"dell.cpsd.eids.identity.request.sds.gouldc-mint","elementIdentities":[{"correlationUuid":"fb4e839d-aba1-409e-82d7-7e4632d6b647","identity":{"elementType":"group","classification":"GROUP","parents":[{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"SystemNetwork"}]}},{"correlationUuid":"d4964090-76b8-4d4a-8068-4cd8ff258462","identity":{"elementType":"SWITCH","classification":"DEVICE","parents":[{"elementType":"group","classification":"GROUP","parents":[{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"SystemNetwork"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"COMPONENT_TAG","value":"MGMT-N3A"}]}},{"correlationUuid":"93eb24fd-b8b0-49fa-8911-17f1cba72034","identity":{"elementType":"SWITCH","classification":"DEVICE","parents":[{"elementType":"group","classification":"GROUP","parents":[{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"SystemNetwork"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"COMPONENT_TAG","value":"MGMT-N3B"}]}},{"correlationUuid":"0c180853-bff6-4813-9099-3f80816ce450","identity":{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}}]}'
-keyaccuracyid_abc = '{"timestamp":"2017-03-15T09:40:00.170Z","correlationId":"key-accuracy-0000-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"},{"businessKeyType":"CONTEXTUAL","key":"DESCRIPTION","value":"THE_DESCRIPTION"},{"businessKeyType":"CONTEXTUAL","key":"IPADDRESS","value":"THE_IPADDRESS"}],"contextualKeyAccuracy":2}}]}'
-keyaccuracyid_ab  = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"key-accuracy-identify-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"},{"businessKeyType":"CONTEXTUAL","key":"DESCRIPTION","value":"THE_DESCRIPTION"}]}}]}'
-keyaccuracyid_ac = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"key-accuracy-identify-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"},{"businessKeyType":"CONTEXTUAL","key":"IPADDRESS","value":"THE_IPADDRESS"}]}}]}'
-keyaccuracyid_neg = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"key-accuracy-identify-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"}]}}]}'
-ident_no_element_type = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"c92b8be9-a892-4a76-a8d3-933c85ead7bb","reply-to":"dell.cpsd.eids.identity.request.sds.gouldc-mint","elementIdentities":[{"correlationUuid":"0c180853-bff6-4813-9099-3f80816ce450","identity":{"elementType":"","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}}]}'
-describe_no_element = '{"timestamp":"2017-01-27T14:51:00.570Z","correlationId":"5d7f6d34-4271-4593-9bad-1b95589e5189","reply-to":"dell.cpsd.eids.identity.request.hal.gouldc-mint","elementUuids":[]}'
+#identifyelement = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"c92b8be9-a892-4a76-a8d3-933c85ead7bb","reply-to":"dell.cpsd.eids.identity.request.sds.gouldc-mint","elementIdentities":[{"correlationUuid":"fb4e839d-aba1-409e-82d7-7e4632d6b647","identity":{"elementType":"group","classification":"GROUP","parents":[{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"SystemNetwork"}]}},{"correlationUuid":"d4964090-76b8-4d4a-8068-4cd8ff258462","identity":{"elementType":"SWITCH","classification":"DEVICE","parents":[{"elementType":"group","classification":"GROUP","parents":[{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"SystemNetwork"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"COMPONENT_TAG","value":"MGMT-N3A"}]}},{"correlationUuid":"93eb24fd-b8b0-49fa-8911-17f1cba72034","identity":{"elementType":"SWITCH","classification":"DEVICE","parents":[{"elementType":"group","classification":"GROUP","parents":[{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"SystemNetwork"}]}],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"COMPONENT_TAG","value":"MGMT-N3B"}]}},{"correlationUuid":"0c180853-bff6-4813-9099-3f80816ce450","identity":{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}}]}'
+#keyaccuracyid_abc = '{"timestamp":"2017-03-15T09:40:00.170Z","correlationId":"key-accuracy-0000-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"},{"businessKeyType":"CONTEXTUAL","key":"DESCRIPTION","value":"THE_DESCRIPTION"},{"businessKeyType":"CONTEXTUAL","key":"IPADDRESS","value":"THE_IPADDRESS"}],"contextualKeyAccuracy":2}}]}'
+#keyaccuracyid_ab  = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"key-accuracy-identify-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"},{"businessKeyType":"CONTEXTUAL","key":"DESCRIPTION","value":"THE_DESCRIPTION"}]}}]}'
+#keyaccuracyid_ac = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"key-accuracy-identify-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"},{"businessKeyType":"CONTEXTUAL","key":"IPADDRESS","value":"THE_IPADDRESS"}]}}]}'
+#keyaccuracyid_neg = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"key-accuracy-identify-0000-0000","reply-to":"dell.cpsd.eids.identity.request.sds.test","elementIdentities":[{"correlationUuid":"12345-abcdef-54321-fedcba","identity":{"elementType":"TESTELEMENT","classification":"DEVICE","parents":[],"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"NAME","value":"THE_NAME"}]}}]}'
+#ident_no_element_type = '{"timestamp":"2017-01-27T14:18:00.510Z","correlationId":"c92b8be9-a892-4a76-a8d3-933c85ead7bb","reply-to":"dell.cpsd.eids.identity.request.sds.gouldc-mint","elementIdentities":[{"correlationUuid":"0c180853-bff6-4813-9099-3f80816ce450","identity":{"elementType":"","classification":"SYSTEM","businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}}]}'
+#describe_no_element = '{"timestamp":"2017-01-27T14:51:00.570Z","correlationId":"5d7f6d34-4271-4593-9bad-1b95589e5189","reply-to":"dell.cpsd.eids.identity.request.hal.gouldc-mint","elementUuids":[]}'
 
 # ident_no_class = '{"timestamp":"2017-01-27T14:18:51Z","correlationId":"c92b8be9-a892-4a76-a8d3-933c85ead7bb","reply-to":"dell.cpsd.eids.identity.request.sds.gouldc-mint","elementIdentities":[{"correlationUuid":"0c180853-bff6-4813-9099-3f80816ce450","identity":{"elementType":"VCESYSTEM","classification":,"businessKeys":[{"businessKeyType":"CONTEXTUAL","key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}}]}'
 # ident_no_context = '{"timestamp":"2017-01-27T14:18:51Z","correlationId":"c92b8be9-a892-4a76-a8d3-933c85ead7bb","reply-to":"dell.cpsd.eids.identity.request.sds.gouldc-mint","elementIdentities":[{"correlationUuid":"0c180853-bff6-4813-9099-3f80816ce450","identity":{"elementType":"VCESYSTEM","classification":"SYSTEM","businessKeys":[{"businessKeyType":,"key":"IDENTIFIER","value":"VXB-340"},{"businessKeyType":"ABSOLUTE","key":"SERIAL_NUMBER","value":"RTP-VXB340-DQAV34YX"}]}}]}'
 
 # Arrays for Parameterization
-payload_keyaccuracy = [keyaccuracyid_abc, keyaccuracyid_ab, keyaccuracyid_ac, keyaccuracyid_neg]
-payload_negative_messages = [ident_no_element_type, describe_no_element]
-# payload_negative_messages = ['ident_no_element_type', 'ident_no_class', 'ident_no_context', 'describe_no_element']
+#payload_keyaccuracy = [keyaccuracyid_abc, keyaccuracyid_ab, keyaccuracyid_ac, keyaccuracyid_neg]
+#payload_negative_messages = [ident_no_element_type, describe_no_element]
 
 # Globally defined string to hold described element uuid
-elementUuid = ''
+#elementUuid = ''
 
 # Always specify user names & password here at the start. Makes changing them later much easier,
-rmq_username = 'test'
-rmq_password = 'test'
+#rmq_username = 'test'
+#rmq_password = 'test'
 
 ##############################################################################################
 
@@ -66,7 +102,7 @@ def test_identify_element():
     cleanup()
     bind_queues()
     identified_errors = []
-    global elementUuid
+    #global elementUuid
 
     print('Sending Identify Element Message\n')
     # Publish the message
@@ -192,7 +228,7 @@ def test_describe_element():
     print('\n*******************************************************')
 
 
-@pytest.mark.core_services_mvp
+#@pytest.mark.core_services_mvp
 @pytest.mark.parametrize("payload_message", payload_keyaccuracy)
 def test_key_accuracy(payload_message):
     cleanup()
@@ -265,7 +301,7 @@ def test_key_accuracy(payload_message):
     print('TEST: KeyAccuracy test pass.')
     print('\n*******************************************************')
 
-@pytest.mark.core_services_mvp
+#@pytest.mark.core_services_mvp
 @pytest.mark.parametrize("payload_message", payload_negative_messages)
 def test_negative_messages(payload_message):
     cleanup()
@@ -376,7 +412,7 @@ def waitForMsg(queue):
         timeout += sleeptime
 
         q_len = af_support_tools.rmq_message_count(host=ipaddress,
-                                                   port=port,
+                                                   port=5672,
                                                    rmq_username=rmq_username,
                                                    rmq_password=rmq_password,
                                                    queue=queue)
