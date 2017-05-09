@@ -19,7 +19,7 @@ try:
     payload_property_hal = 'ccv_payload'
     env_file = 'env.ini'
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-    cli_user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    cli_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
     cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 
 
