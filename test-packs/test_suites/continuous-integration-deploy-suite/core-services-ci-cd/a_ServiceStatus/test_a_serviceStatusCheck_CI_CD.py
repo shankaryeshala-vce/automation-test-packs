@@ -13,13 +13,13 @@ import pika
 try:
     env_file = 'env.ini'
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+    cli_user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 
 except:
     print('Possible configuration error')
 
-# # Only one if these ipaddress lines should be enabled at any one time
 # ipaddress = '10.3.8.54'
-# # ipaddress = sys.argv[1]
 ########################################################################################################################
 
 
@@ -32,7 +32,7 @@ def get_core_services():
     
     for service in core_dir:
         sendcommand_core= "cat /opt/dell/cpsd/" + service + "/install/docker-compose.yml | grep container_name| cut -f 2 -d ':'"
-        my_return_status_core = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendcommand_core, return_output=True)
+        my_return_status_core = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendcommand_core, return_output=True)
         containerName= my_return_status_core.strip()
         core_list.append(containerName)
     return core_list
@@ -41,7 +41,7 @@ def get_core_services():
 @pytest.fixture
 def get_rcm_services ():
     sendcommand_rcm= "cat /opt/dell/cpsd/rcm-fitness/common/install/docker-compose.yml | grep container_name | cut -f 2 -d ':' "
-    my_return_status_rcm = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendcommand_rcm, return_output=True)
+    my_return_status_rcm = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendcommand_rcm, return_output=True)
     rcm_list=[a.strip() for a in my_return_status_rcm.strip().split("\n")]
     return rcm_list
 
@@ -65,18 +65,18 @@ def test_Core_servicerunning(service_name):
 
     print (service_name)
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
-    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand, return_output=True)
 
     if "Up" not in my_return_status:
         svrrun_err.append(service_name + " not running")
 
     service_name_pid = service_name.replace("symphony-","").replace("-service","").replace("-registry","").replace("-registration","")
     sendCommand_pid = "ps -ef | grep " + service_name_pid +" |grep java | awk '{print $2}'"
-    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_pid, return_output=True)
+    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_pid, return_output=True)
     pid = my_return_pid.strip('\n')
 
     sendCommand_netstat = "netstat -ntp | grep -i \"{}/java\"".format(pid)
-    my_return_netstat = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_netstat, return_output=True)
+    my_return_netstat = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_netstat, return_output=True)
     if "ESTABLISHED" not in my_return_netstat:
         svrrun_err.append(service_name + " rabbit connection not established")
 
@@ -99,18 +99,18 @@ def test_rcm_servicerunning(service_name):
     print (service_name)
 
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
-    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand, return_output=True)
 
     if "Up" not in my_return_status:
         svrrun_err.append(service_name + " not running")
 
     service_name_pid = service_name.replace("symphony-remediation-adapter-rackhd", "").replace("symphony-","").replace("-service","").replace("-registration","").replace("-registry","")
     sendCommand_pid = "ps -ef | grep " + service_name_pid +" |grep java | awk '{print $2}'"
-    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_pid, return_output=True)
+    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_pid, return_output=True)
     pid = my_return_pid.strip('\n')
 
     sendCommand_netstat = "netstat -ntp | grep -i \"{}/java\"".format(pid)
-    my_return_netstat = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_netstat, return_output=True)
+    my_return_netstat = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_netstat, return_output=True)
     if "ESTABLISHED" not in my_return_netstat:
         svrrun_err.append(service_name + " rabbit connection not established")
 
@@ -139,13 +139,13 @@ def test_servicestopstart_core(service_name, pid):
 
 
     sendCommand_pid = "ps -ef | grep -i " + pid + "| grep -v grep |grep java | awk \'FNR == 1 {print$2}\'"
-    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_pid, return_output=True)
+    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_pid, return_output=True)
     initial_pid = my_return_pid.rstrip('\n')
     print ("ps pid " +initial_pid)
 
     get_pid = "netstat -ntp | grep -i \":5672.*ESTABLISHED.*{}/java\"".format(initial_pid)
     sendCommand_netstat = ""+ get_pid +" | awk \'{print $7}\'"
-    return_netstat_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_netstat, return_output=True)
+    return_netstat_pid = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_netstat, return_output=True)
     return_netstat_pid = return_netstat_pid.replace("/java", "") .split("\n")[0]
     print ("netstat pid " +return_netstat_pid)
 
@@ -160,18 +160,18 @@ def test_servicestopstart_core(service_name, pid):
     if initial_pid == return_netstat_pid:
         print ("core services")
         sendCommand_stop = "systemctl stop " + dell_core
-        return_stop = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_stop, return_output=True)
+        return_stop = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_stop, return_output=True)
 
         sendcommand_status = "systemctl status " + dell_core
-        return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendcommand_status, return_output=True)
+        return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendcommand_status, return_output=True)
         if "active (running)" in return_status:
             svrstpstrt_err.append(service_name + " still running")
 
         sendCommand_start = "systemctl start " + dell_core
-        return_start = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_start, return_output=True)
+        return_start = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_start, return_output=True)
 
         sendcommand_status = "systemctl status " + dell_core
-        return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendcommand_status, return_output=True)
+        return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendcommand_status, return_output=True)
 
     if "active (running)" not in return_status:
             svrstpstrt_err.append(service_name + " not running")
@@ -207,20 +207,20 @@ def test_servicestopstart_rcm(service_name, pid):
 
     #sendCommand_pid = "ps -ef | grep " + service_name_pid +" |grep java | awk '{print $2}'"
     sendCommand_pid = "ps -ef | grep -i " + pid + "| grep -v grep |grep java | awk \'FNR == 1 {print$2}\'"
-    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_pid, return_output=True)
+    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_pid, return_output=True)
     initial_pid = my_return_pid.rstrip('\n')
     print ("ps pid " +initial_pid)
 
     get_pid = "netstat -ntp | grep -i \":5672.*ESTABLISHED.*{}/java\"".format(initial_pid)
     sendCommand_netstat = ""+ get_pid +" | awk \'{print $7}\'"
-    return_netstat_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_netstat, return_output=True)
+    return_netstat_pid = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_netstat, return_output=True)
     return_netstat_pid = return_netstat_pid.replace("/java", "") .split("\n")[0]
     print ("netstat pid " +return_netstat_pid)
 
 
     #Saving the ContainerIds in the list Container_id
     sendCommand_ContainerID = "docker ps --filter name=" + service_name + "  --format '{{.ID}}'"
-    return_ContainerID = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_ContainerID, return_output=True)
+    return_ContainerID = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_ContainerID, return_output=True)
     Container_id = return_ContainerID
     print ("Container id" + Container_id)
 
@@ -228,10 +228,10 @@ def test_servicestopstart_rcm(service_name, pid):
     if initial_pid == return_netstat_pid:
         print ("stopping docker Container")
         sendCommand_stop = "docker stop " + Container_id
-        return_stop = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_stop, return_output=True)
+        return_stop = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_stop, return_output=True)
 
         sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
-        my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
+        my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand, return_output=True)
         print ("docker status "+ my_return_status)
 
         if "Up" in my_return_status:
@@ -240,11 +240,11 @@ def test_servicestopstart_rcm(service_name, pid):
         print ("Container id" + Container_id)
         print ("starting docker container")
         sendCommand_start = "docker start " + Container_id
-        return_start = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_start, return_output=True)
+        return_start = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_start, return_output=True)
 
 
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
-    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand, return_output=True)
     print ("docker Status " +my_return_status )
 
 
@@ -252,14 +252,14 @@ def test_servicestopstart_rcm(service_name, pid):
         svrstpstrt_err.append(service_name + " not started")
 
     sendCommand_pid = "ps -ef | grep -i " + pid + "| grep -v grep |grep java | awk \'FNR == 1 {print$2}\'"
-    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_pid, return_output=True)
+    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_pid, return_output=True)
     post_pid = my_return_pid.rstrip('\n')
     print (post_pid)
 
     time.sleep(25)
     #sendCommand_netstat2 = "netstat -ntp | grep -i \"{}/java\"".format(post_pid)
     sendCommand_netstat2 = "netstat -ntp | grep -i \":5672.*ESTABLISHED.*{}/java\"".format(post_pid)
-    my_return_netstat2 = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_netstat2, return_output=True)
+    my_return_netstat2 = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_netstat2, return_output=True)
     print (my_return_netstat2)
 
     if "ESTABLISHED" not in my_return_netstat2:
@@ -278,7 +278,7 @@ def test_servicestop_rcm_yml():
     #stop/start docker containers using yml file
     print ("stopping docker container using yml")
     sendCommand_yml_down = "docker-compose -f /opt/dell/rcm-fitness/common/install/docker-compose.yml down"
-    my_return_down = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_yml_down, return_output=True)
+    my_return_down = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_yml_down, return_output=True)
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.parametrize("service_name" ,rcm_list)
@@ -288,7 +288,7 @@ def test_chkupStatus_yml(service_name):
 
     print ("checking yml up status TBD")
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
-    my_return_status1 = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
+    my_return_status1 = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand, return_output=True)
 
     if "Up" in my_return_status1:
         chkup_err.append(service_name + " still running")
@@ -297,7 +297,7 @@ def test_chkupStatus_yml(service_name):
 def test_servicestart_rcm_yml():
     print ("starting docker container using yml")
     sendCommand_yml_up = "docker-compose -f /opt/dell/rcm-fitness/common/install/docker-compose.yml up -d"
-    my_return_up = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_yml_up, return_output=True)
+    my_return_up = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_yml_up, return_output=True)
     time.sleep(60)
 
 @pytest.mark.rcm_fitness_mvp_extended
@@ -308,17 +308,17 @@ def test_chkStatus_rcm_yml(service_name, pid):
 
 
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
-    my_return_status2 = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
+    my_return_status2 = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand, return_output=True)
 
     if "Up" not in my_return_status2:
         svrstpstrt_yml_err.append(service_name + " not started")
 
     sendCommand_pid = "ps -ef | grep -i " + pid + "| grep -v grep |grep java | awk \'FNR == 1 {print$2}\'"
-    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_pid, return_output=True)
+    my_return_pid = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_pid, return_output=True)
     post_pid = my_return_pid.rstrip('\n')
 
     sendCommand_netstat2 = "netstat -ntp | grep -i \"{}/java\"".format(post_pid)
-    my_return_netstat2 = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand_netstat2, return_output=True)
+    my_return_netstat2 = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand_netstat2, return_output=True)
     print (my_return_netstat2)
     #time.sleep(10)
     if "ESTABLISHED" not in my_return_netstat2:
@@ -340,7 +340,7 @@ def test_rabbitrunning():
     rab_err = []
 
     sendCommand = "service rabbitmq-server status"
-    rabbit_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
+    rabbit_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand, return_output=True)
 
     if "running" not in rabbit_status:
         rab_err.append("rabbitmq-server not running")
