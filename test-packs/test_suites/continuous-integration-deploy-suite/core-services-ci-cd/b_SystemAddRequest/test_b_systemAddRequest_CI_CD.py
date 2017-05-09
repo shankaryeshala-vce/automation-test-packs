@@ -19,6 +19,8 @@ try:
     payload_property_hal = 'ccv_payload'
     env_file = 'env.ini'
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+    cli_user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 
 
 except:
@@ -27,8 +29,6 @@ except:
 
 rmq_username = 'test'
 rmq_password = 'test'
-cli_username = 'root'
-cli_password = 'V1rtu@1c3!'
 port = 5672
 
 
