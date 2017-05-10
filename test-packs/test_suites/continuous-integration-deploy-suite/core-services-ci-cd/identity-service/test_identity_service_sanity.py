@@ -33,13 +33,14 @@ def load_test_data():
     identifyelement = af_support_tools.get_config_file_property(config_file=config_file, heading='identity_service_payloads', property='identifyelement')
 	
     global rmq_username
-    rmq_username = 'test'
+    rmq_username = 'guest'
     global rmq_password
-    rmq_password = 'test'
+    rmq_password = 'guest'
 
 ##############################################################################################
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_ident_status():
     print('\nRunning Identity Status test on system: ', ipaddress)
     status_command = 'docker ps | grep identity-service'
@@ -51,6 +52,7 @@ def test_ident_status():
     cleanup()
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_identify_element():
     cleanup()
     bind_queues()
@@ -116,6 +118,7 @@ def test_identify_element():
     print('\n*******************************************************')
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_describe_element():
     cleanup()
     bind_queues()
@@ -180,6 +183,7 @@ def test_describe_element():
     print('\n*******************************************************')
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 @pytest.mark.parametrize('my_test_type', ['keyaccuracyid_abc', 'keyaccuracyid_ab', 'keyaccuracyid_ac', 'keyaccuracyid_neg'])
 def test_key_accuracy(my_test_type):
     cleanup()
@@ -255,6 +259,7 @@ def test_key_accuracy(my_test_type):
     print('\n*******************************************************')
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 @pytest.mark.parametrize('my_test_type', ['ident_no_element_type', 'describe_no_element'])
 def test_negative_messages(my_test_type):
     cleanup()

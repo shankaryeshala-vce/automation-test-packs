@@ -32,8 +32,8 @@ except:
     print('Possible configuration error')
 
 port = 5672
-rmq_username = 'test'
-rmq_password = 'test'
+rmq_username = 'guest'
+rmq_password = 'guest'
 
 
 #ipaddress = '10.3.8.52'

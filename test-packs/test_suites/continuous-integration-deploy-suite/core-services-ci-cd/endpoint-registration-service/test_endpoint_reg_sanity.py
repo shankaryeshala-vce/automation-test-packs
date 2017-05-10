@@ -36,8 +36,8 @@ rabbiturl = "http://" + rabbitHost + ":15672"
 capabilitiesExchange = "exchange.dell.cpsd.hdp.capability.registry.control"
 endpointExchange = "exchange.dell.cpsd.endpoint.registration.event"
 
-rmq_username = 'test'
-rmq_password = 'test'
+rmq_username = 'guest'
+rmq_password = 'guest'
 
 port = 5672
 
