@@ -40,6 +40,7 @@ def load_test_data():
 ##############################################################################################
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_ident_status():
     print('\nRunning Identity Status test on system: ', ipaddress)
     status_command = 'docker ps | grep identity-service'
@@ -51,6 +52,7 @@ def test_ident_status():
     cleanup()
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_identify_element():
     cleanup()
     bind_queues()
@@ -116,6 +118,7 @@ def test_identify_element():
     print('\n*******************************************************')
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_describe_element():
     cleanup()
     bind_queues()
@@ -180,6 +183,7 @@ def test_describe_element():
     print('\n*******************************************************')
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 @pytest.mark.parametrize('my_test_type', ['keyaccuracyid_abc', 'keyaccuracyid_ab', 'keyaccuracyid_ac', 'keyaccuracyid_neg'])
 def test_key_accuracy(my_test_type):
     cleanup()
@@ -255,6 +259,7 @@ def test_key_accuracy(my_test_type):
     print('\n*******************************************************')
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 @pytest.mark.parametrize('my_test_type', ['ident_no_element_type', 'describe_no_element'])
 def test_negative_messages(my_test_type):
     cleanup()
