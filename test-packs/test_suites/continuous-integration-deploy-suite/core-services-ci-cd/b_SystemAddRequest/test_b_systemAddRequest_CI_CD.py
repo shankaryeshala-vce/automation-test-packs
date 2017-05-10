@@ -27,8 +27,8 @@ except:
     print('Possible configuration error')
 
 
-rmq_username = 'test'
-rmq_password = 'test'
+rmq_username = 'guest'
+rmq_password = 'guest'
 port = 5672
 
 
