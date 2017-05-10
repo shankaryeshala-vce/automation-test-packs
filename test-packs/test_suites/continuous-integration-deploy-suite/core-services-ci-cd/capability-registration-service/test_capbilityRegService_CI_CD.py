@@ -71,7 +71,7 @@ try:
     startPoweredgeProvider = 'docker run --net=host -v /opt/dell/cpsd/rcm-fitness/conf/:/opt/dell/rcm-fitness/conf/ -td cpsd-hal-data-provider-poweredge'
     startRackHDAdapter = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/rackhd-adapter-service/keystore/:/opt/dell/cpsd/rackhd-adapter-service/keystore/ -td cpsd-rackhd-adapter-service'
     startNodeDiscoverPaqx = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/node-discovery-paqx/keystore/:/opt/dell/cpsd/node-discovery-paqx/keystore/ -td cpsd-node-discovery-paqx'
-    startEndpointRegisteryService = 'docker-compose -f /opt/dell/cpsd/registration-services/endpoint-registration/install/docker-compose.yml up -d'
+    startEndpointRegisteryService = 'systemctl start dell-endpoint-registration'
     startVcenterAdapter = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/vcenter-adapter-service/keystore/:/opt/dell/cpsd/vcenter-adapter-service/keystore/ -td cpsd-vcenter-adapter-service'
 
     # The following are the number of Capabilities Tested. If this total number does not match what is returned then the test will need to be updated.
@@ -383,7 +383,7 @@ def test_capabilityRegistry_ListCapabilities():
     vcenterCapabilities5 = 'vcenter-powercommand'
     vcenterCapabilities6 = 'vcenter-discover-cluster'
     vcenterCapabilities7 = 'vcenter-remove-host'
-    vcenterCapabilities8 = 'vcenter-add-host'
+    vcenterCapabilities8 = 'vcenter-addhostvcenter'
     assert vcenterName in return_message, (vcenterName, 'not returned')
     assert vcenterCapabilities1 in return_message, (vcenterCapabilities1, 'capability is not available')
     assert vcenterCapabilities2 in return_message, (vcenterCapabilities2, 'capability is not available')
@@ -489,7 +489,7 @@ def test_capabilityRegistry_Exchanges():
 
 
 # It's likely this test will be removed as the functionality to stop & start containers is being removed
-@pytest.mark.core_services_cd
+@pytest.mark.core_services_mvp_extended
 def test_capaabilityRegistery_StopProvider():
     # When a provider/adapter becomes unavailable it is expected that a "Unregister" message is received
     # In this test we  1. verify the status of the docker container, 2. Stop the docker Container. 3. We verify that a
@@ -499,6 +499,7 @@ def test_capaabilityRegistery_StopProvider():
 
     cleanup()
     bindQueues()
+    time.sleep(15)
 
     # Function format: capabilityRegistryStopProvider(container, provider name, capability1, capability2(optional), capability3(optional)):
 
@@ -506,19 +507,20 @@ def test_capaabilityRegistery_StopProvider():
 
     capabilityRegistryStopProvider('cpsd-hal-data-provider-cisco-network', 'cisco-network-data-provider', 'device-data-discovery', 'device-endpoint-validation')
     capabilityRegistryStopProvider('cpsd-hal-data-provider-poweredge', 'poweredge-compute-data-provider', 'device-data-discovery', 'device-endpoint-validation')
-    # capabilityRegistryStopProvider('cpsd-rackhd-adapter-service', 'rackhd-adapter', 'rackhd-consul-register', 'rackhd-list-nodes', 'rackhd-upgrade-firmware-dellr730-server', 'rackhd-upgrade-firmware-dell-idrac', 'node-discovered-event', 'rackhd-install-esxi', 'rackhd-list-node-catalogs')
-    #capabilityRegistryStopProvider('cpsd-node-discovery-paqx', 'node-discovery-paqx', 'list-discovered-nodes')
-    # capabilityRegistryStopProvider('cpsd-core-endpoint-registry-service', 'endpoint-registry', 'endpoint-registry-lookup')
-    # capabilityRegistryStopProvider('cpsd-vcenter-adapter-service', 'vcenter-adapter', 'vcenter-consul-register', 'vcenter-discover', 'vcenter-enterMaintenance')
+    # Not Reregistering capabilityRegistryStopProvider('cpsd-rackhd-adapter-service', 'rackhd-adapter', 'rackhd-consul-register', 'rackhd-list-nodes', 'rackhd-upgrade-firmware-dellr730-server', 'rackhd-upgrade-firmware-dell-idrac', 'node-discovered-event', 'rackhd-install-esxi', 'rackhd-list-node-catalogs')
+    # Not Reregistering capabilityRegistryStopProvider('cpsd-node-discovery-paqx', 'node-discovery-paqx', 'list-discovered-nodes')
+    # No Container to restart capabilityRegistryStopProvider('cpsd-core-endpoint-registry-service', 'endpoint-registry', 'endpoint-registry-lookup')
+    # Not Reregistering capabilityRegistryStopProvider('cpsd-vcenter-adapter-service', 'vcenter-adapter', 'vcenter-consul-register', 'vcenter-discover', 'vcenter-enterMaintenance')
 
 
     cleanup()
 
 
-@pytest.mark.core_services_cd
+@pytest.mark.core_services_mvp_extended
 def test_capaabilityRegistery_KillProvider():
     cleanup()
     bindQueues()
+    time.sleep(15)
 
     # When a provider/adapter becomes unavailable it is expected that a "Unregister" message is received
     # In this test we  1. verify the status of the docker container, 2. Kill the docker Container. 3. We verify that a
@@ -532,10 +534,10 @@ def test_capaabilityRegistery_KillProvider():
 
     capabilityRegistryKillProvider('cpsd-hal-data-provider-cisco-network', 'cisco-network-data-provider', startCiscoProvider, 'device-data-discovery', 'device-endpoint-validation')
     capabilityRegistryKillProvider('cpsd-hal-data-provider-poweredge', 'poweredge-compute-data-provider', startPoweredgeProvider, 'device-data-discovery', 'device-endpoint-validation')
-    # capabilityRegistryKillProvider('cpsd-rackhd-adapter-service', 'rackhd-adapter', startRackHDAdapter, 'rackhd-consul-register', 'rackhd-list-nodes', 'rackhd-upgrade-firmware-dellr730-server', 'rackhd-upgrade-firmware-dell-idrac', 'node-discovered-event', 'rackhd-install-esxi', 'rackhd-list-node-catalogs')
-    # capabilityRegistryKillProvider('cpsd-node-discovery-paqx', 'node-discovery-paqx', startNodeDiscoverPaqx, 'list-discovered-nodes')
-    capabilityRegistryKillProvider('cpsd-core-endpoint-registry-service', 'endpoint-registry',startEndpointRegisteryService, 'endpoint-registry-lookup')
-    # capabilityRegistryStopProvider('cpsd-vcenter-adapter-service', 'vcenter-adapter', startVcenterAdapter, 'vcenter-consul-register', 'vcenter-discover', 'vcenter-enterMaintenance', 'vcenter-destroy-virtualMachine', 'vcenter-powercommand', 'vcenter-discover-cluster')
+    # Not Reregistering capabilityRegistryKillProvider('cpsd-rackhd-adapter-service', 'rackhd-adapter', startRackHDAdapter, 'rackhd-consul-register', 'rackhd-list-nodes', 'rackhd-upgrade-firmware-dellr730-server', 'rackhd-upgrade-firmware-dell-idrac', 'node-discovered-event', 'rackhd-install-esxi', 'rackhd-list-node-catalogs')
+    # Not Reregistering capabilityRegistryKillProvider('cpsd-node-discovery-paqx', 'node-discovery-paqx', startNodeDiscoverPaqx, 'list-discovered-nodes')
+    capabilityRegistryKillProvider('cpsd-core-endpoint-registration-service', 'endpoint-registry',startEndpointRegisteryService, 'endpoint-registry-lookup')
+    # Not Reregistering capabilityRegistryStopProvider('cpsd-vcenter-adapter-service', 'vcenter-adapter', startVcenterAdapter, 'vcenter-consul-register', 'vcenter-discover', 'vcenter-enterMaintenance', 'vcenter-destroy-virtualMachine', 'vcenter-powercommand', 'vcenter-discover-cluster')
 
     cleanup()
 
@@ -553,8 +555,7 @@ def capabilityRegistryStopProvider(container, provider, capability1, capability2
 
     print('** Test Name: Test the unregister msg with the', provider, 'stopped **\n')
 
-    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
-                                     queue='test.capability.registry.response')
+
 
     # Check the status of the service
     dockerStatus = getdockerStatus(container)
@@ -564,6 +565,10 @@ def capabilityRegistryStopProvider(container, provider, capability1, capability2
     dockerID = getdockerID(container)
     sendCommand = 'docker stop ' + dockerID
     print(sendCommand)
+
+    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                     queue='test.capability.registry.response')
+
     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                       command=sendCommand, return_output=False)
 
@@ -585,7 +590,7 @@ def capabilityRegistryStopProvider(container, provider, capability1, capability2
     headerValue = return_message[0].headers
     headerValue = json.dumps(headerValue)
     typeIDValue = '{"__TypeId__": "com.dell.cpsd.hdp.capability.registry.capability.provider.unregistered.event"}'
-    assert typeIDValue == headerValue
+    assert typeIDValue == headerValue, '__TypeId__ returned and expected do not match'
 
     # Consume the message again, (removing it from the queue this time) and verify the name that unregistered
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
@@ -747,8 +752,7 @@ def capabilityRegistryKillProvider(container, provider, docker, capability1, cap
 
     print('** Test Name: Test the unregister msg with the', provider, 'killed **\n')
 
-    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
-                                     queue='test.capability.registry.response')
+
     # Check the status of the service
     dockerStatus = getdockerStatus(container)
     print('Current ', container, ' status: ', dockerStatus)
@@ -757,6 +761,10 @@ def capabilityRegistryKillProvider(container, provider, docker, capability1, cap
     dockerID = getdockerID(container)
     sendCommand = 'docker kill ' + dockerID
     print(sendCommand)
+
+    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                     queue='test.capability.registry.response')
+
     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                       command=sendCommand, return_output=False)
 

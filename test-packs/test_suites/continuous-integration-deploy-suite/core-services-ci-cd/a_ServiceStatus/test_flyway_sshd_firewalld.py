@@ -14,6 +14,8 @@ import pika
 try:
    env_file = 'env.ini'
    ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+   cli_user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+   cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 
 except:
    print('Possible configuration error')
@@ -27,7 +29,7 @@ def test_flywayrunning():
     flyway_err = []
 
     sendCommand = "flyway | grep 'Flyway 4.1.2 by Boxfuse'"
-    flyway_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
+    flyway_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand, return_output=True)
 
     if "4.1.2" not in flyway_status:
         flyway_err.append("Error: Flyway service not running")
@@ -45,7 +47,7 @@ def test_sshdrunning():
     sshd_err = []
 
     sendCommand = "systemctl status sshd | grep 'Active:'"
-    sshd_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
+    sshd_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand, return_output=True)
 
     if "running" not in sshd_status:
         sshd_err.append("Error: SSHd service not running")
@@ -62,7 +64,7 @@ def test_firewalldrunning():
     firewalld_err = []
 
     sendCommand = "systemctl status firewalld | grep 'Active:'"
-    firewalld_status = af_support_tools.send_ssh_command(host=ipaddress, username='root', password='V1rtu@1c3!', command=sendCommand, return_output=True)
+    firewalld_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_user, password=cli_password, command=sendCommand, return_output=True)
 
     if "inactive" not in firewalld_status:
         firewalld_err.append("Error: Firewalld service is running")

@@ -13,6 +13,7 @@ import time
 # Payloads from symphony-sds.ini:- location: continuous-integration-deploy-suite/symphony-sds.ini
 try:
     payload_file = 'continuous-integration-deploy-suite/symphony-sds.ini'
+#    payload_file = 'symphony-sds.ini'
     payload_heading = 'credential_tests'
     payload_property_add = 'cs_cred_addition'
     payload_property_req = 'cs_cred_request'
@@ -29,14 +30,18 @@ except:
     print('Possible configuration error')
 
 port = 5672
-rmq_username = 'test'
-rmq_password = 'test'
+rmq_username = 'guest'
+rmq_password = 'guest'
 
 cli_username = 'root'
 cli_password = 'V1rtu@1c3!'
 
+#ipaddress = '10.3.8.52'
+
+
 # Add & verify component credentials
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_CS_ComponentCredentials_CI():
     print('\nRunning mvp test on system: ', ipaddress)
     cleanup()
@@ -53,7 +58,7 @@ def test_CS_ComponentCredentials_CI():
 ######################################################################################################################
 
 # Add & verify component credentials
-@pytest.mark.core_services_mvp_extended
+@pytest.mark.core_services_cd
 def test_CS_ComponentCredentials():
     print('\nRunning mvp extended test on system: ', ipaddress)
     cleanup()
@@ -263,7 +268,7 @@ def CS_CredAdd_duplicateEndpoints():
     my_return_text = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                        command=sendCommand, return_output=True)
 
-#    assert error1 in my_return_text
+    assert error1 in my_return_text
     assert error2 in my_return_text
     assert error3 in my_return_text
 

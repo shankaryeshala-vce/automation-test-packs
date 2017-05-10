@@ -19,16 +19,16 @@ try:
     payload_property_hal = 'ccv_payload'
     env_file = 'env.ini'
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+    cli_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 
 
 except:
     print('Possible configuration error')
 
 
-rmq_username = 'test'
-rmq_password = 'test'
-cli_username = 'root'
-cli_password = 'V1rtu@1c3!'
+rmq_username = 'guest'
+rmq_password = 'guest'
 port = 5672
 
 
@@ -38,8 +38,8 @@ port = 5672
 # *** THIS IS THE MAIN TEST *** Add a system
 @pytest.mark.core_services_mvp
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.core_services_cd
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.core_services_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_SystemAdditionRequested():
     print('Running Sanity on system: ', ipaddress)
 
@@ -101,8 +101,8 @@ def test_SystemAdditionRequested():
 # *** Kick of the collectComponentVersion Msg
 @pytest.mark.core_services_mvp
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.core_services_cd
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.core_services_mvp_extended
+@pytest.mark.rcm_fitness_cd_mvp_extended
 def test_HAL_CollectComponentVersion():
     #af_support_tools.mark_defect(defect_id='', user_id='', comments='', date_marked='')
     bindHALQueus()
