@@ -33,9 +33,9 @@ def load_test_data():
     identifyelement = af_support_tools.get_config_file_property(config_file=config_file, heading='identity_service_payloads', property='identifyelement')
 	
     global rmq_username
-    rmq_username = 'test'
+    rmq_username = 'guest'
     global rmq_password
-    rmq_password = 'test'
+    rmq_password = 'guest'
 
 ##############################################################################################
 
