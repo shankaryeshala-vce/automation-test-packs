@@ -61,9 +61,6 @@ def load_test_data():
     global vCenterPassword
     vCenterPassword = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header, property='vcenter_password')    
 
-#######################################################################################################################
-
-try:
     # These are the cli commands needed to start a new docker instance for the named adapter/provider
     global startCiscoProvider
     startCiscoProvider = 'docker run --net=host -v /opt/dell/cpsd/rcm-fitness/conf:/opt/dell/rcm-fitness/conf -td cpsd-hal-data-provider-cisco-network'
@@ -94,10 +91,6 @@ try:
                                    + numOfEndPointRegisteryCapabilities \
                                    + numOfVcenterApapterCapabilities \
                                    + numOfcoprHDCapabilities
-
-except:
-    print('Possible configuration error')
-
 
 #######################################################################################################################
 
@@ -289,7 +282,6 @@ def test_capabilityRegistry_Control_and_Binding():
 
     cleanup()
 
-
 @pytest.mark.core_services_mvp
 def test_capabilityRegistry_ListCapabilities():
     # We are testing that all expected capabilites are returned when a capability Registry Request Message is sent.
@@ -424,8 +416,6 @@ def test_capabilityRegistry_ListCapabilities():
     print('\n*******************************************************\n')
     cleanup()
 
-
-
 @pytest.mark.core_services_mvp
 def test_capabilityRegistry_Exchanges():
 
@@ -488,7 +478,6 @@ def test_capabilityRegistry_Exchanges():
 
     print('\n*******************************************************')
 
-
 # It's likely this test will be removed as the functionality to stop & start containers is being removed
 @pytest.mark.core_services_mvp_extended
 def test_capaabilityRegistery_StopProvider():
@@ -516,7 +505,6 @@ def test_capaabilityRegistery_StopProvider():
 
     cleanup()
 
-
 @pytest.mark.core_services_mvp_extended
 def test_capaabilityRegistery_KillProvider():
     cleanup()
@@ -542,9 +530,7 @@ def test_capaabilityRegistery_KillProvider():
 
     cleanup()
 
-
 #######################################################################################################################
-
 
 def capabilityRegistryStopProvider(container, provider, capability1, capability2=None, capability3=None,
                                    capability4=None, capability5=None, capability6=None, capability7=None):
@@ -741,7 +727,6 @@ def capabilityRegistryStopProvider(container, provider, capability1, capability2
 
     print('\n** Test Complete **')
     print('\n*******************************************************\n')
-
 
 def capabilityRegistryKillProvider(container, provider, docker, capability1, capability2=None, capability3=None,
                                    capability4=None, capability5=None, capability6=None, capability7=None):
@@ -942,10 +927,8 @@ def capabilityRegistryKillProvider(container, provider, docker, capability1, cap
     print('\n** Test Complete **')
     print('\n*******************************************************\n')
 
-
 #######################################################################################################################
 # These are functions needed to manually configure vcenter & rackhd details.
-
 def vCenterConfigApplicationProperties():
     # We need a way for the Vcenter Cluster Discover code to be able to get the VCenter Credentials. Currently the only
     # way to do this is with a application.properties file in the vcenter-adapter container that has the name &
@@ -983,7 +966,6 @@ def vCenterConfigApplicationProperties():
                                       command=sendCommand, return_output=False)
 
     time.sleep(3)
-
 
 def vCenterRegistrationMsg():
     # Until there is a way to automatically register a vcenter we need to register it manually by sending this message.
@@ -1023,7 +1005,6 @@ def vCenterRegistrationMsg():
     return_json = json.loads(return_message, encoding='utf-8')
     #assert return_json['endpoint']['type'] == 'vcenter', 'vcenter not registered with endpoint'
 
-
 def consulBypassMsgRackHD():
     # Until consul is  working properly & integrated with the rackhd adapter in the same environment we need to register
     # it manually by sending this message.
@@ -1042,8 +1023,6 @@ def consulBypassMsgRackHD():
 
 #######################################################################################################################
 # These are common functions that are used throughout the main test.
-
-
 def bindQueues():
     af_support_tools.rmq_bind_queue(host=ipaddress,
                                     port=port, rmq_username=rmq_username, rmq_password=rmq_password,
@@ -1099,7 +1078,6 @@ def bindQueues():
                                     exchange='exchange.cpsd.controlplane.vcenter.response',
                                     routing_key='#')
 
-
 def cleanup():
     print('Cleaning up...')
 
@@ -1129,7 +1107,6 @@ def cleanup():
 
     af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
                                       queue='test.controlplane.vcenter.response')
-
 
 def waitForMsg(queue):
     # This function keeps looping untill a message is in the specified queue. We do need it to timeout and throw an error
@@ -1162,13 +1139,11 @@ def waitForMsg(queue):
             cleanup()
             break
 
-
 def checkForErrors(return_message):
     checklist = 'errors'
     if checklist in return_message:
         print('\nBUG: Error in Response Message\n')
         assert False  # This assert is to fail the test
-
 
 def checkForFailures(return_message):
     checklist = 'failureReasons'
@@ -1178,7 +1153,6 @@ def checkForFailures(return_message):
         print('The following error has been returned :', errorMsg)
         print('Possible component validation issue')
         assert False  # This assert is to fail the test
-
 
 def getdockerID(imageName):
     image = imageName
@@ -1190,7 +1164,6 @@ def getdockerID(imageName):
     containerID = containerID.strip()
     return (containerID)
 
-
 def getdockerStatus(imageName):
     image = imageName
 
@@ -1201,13 +1174,11 @@ def getdockerStatus(imageName):
     containerStatus = containerStatus.strip()
     return (containerStatus)
 
-
-def rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host=None,exchange=None):
+def rest_queue_list(user=None, password=None, host=None, port=15672, virtual_host=None, exchange=None):
     url = 'http://%s:%s/api/exchanges/%s/%s/bindings/source' % (host, port, virtual_host, exchange)
     response = requests.get(url, auth=(user, password))
     queues = [q['destination'] for q in response.json()]
     return queues
-
 
 def test_queues_on_exchange(suppliedExchange, suppliedQueue):
     queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
@@ -1216,6 +1187,5 @@ def test_queues_on_exchange(suppliedExchange, suppliedQueue):
 
     assert suppliedQueue in queues, 'The queue "' + suppliedQueue + '" is not bound to the exchange "' + suppliedExchange + '"'
     print(suppliedExchange, '\nis bound to\n', suppliedQueue, '\n')
-
 
 #######################################################################################################################
