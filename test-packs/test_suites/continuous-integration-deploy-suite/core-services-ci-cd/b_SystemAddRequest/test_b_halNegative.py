@@ -31,7 +31,7 @@ port = 5672
 #######################################################################################################################
 
 # *** collectComponentVersion Negative Test ***
-# @pytest.mark.core_services_mvp_extended
+@pytest.mark.core_services_mvp_extended
 #Negative 1 Test - Invalid JSON Format
 def test_Hal_collectComponentVersions_invalid_json():
 
@@ -96,7 +96,7 @@ def test_Hal_collectComponentVersions_invalid_json():
 ########################################################################################################################
 
 #Negative Test 2 - Invalid Message Properties
-# @pytest.mark.core_services_mvp_extended
+@pytest.mark.core_services_mvp_extended
 def test_Hal_collectComponentVersions_invalid_msg_properties():
 
     print("Running HAL negative test No.2 - Invalid message properties...")
