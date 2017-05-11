@@ -5,10 +5,11 @@
 # Description: Configure a system and run the collectComponentVersions Message
 
 import af_support_tools
-import pytest
 import json
-import time
+import os
 import paramiko
+import pytest
+import time
 
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
