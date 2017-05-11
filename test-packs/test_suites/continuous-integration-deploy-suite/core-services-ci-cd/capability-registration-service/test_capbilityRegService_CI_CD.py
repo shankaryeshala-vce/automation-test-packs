@@ -5,73 +5,77 @@
 # Description:
 
 import af_support_tools
-import pytest
 import json
-import time
+import os
+import pytest
 import requests
+import time
 
-port = 5672
+@pytest.fixture(scope="module", autouse=True)
+def load_test_data():
+    # Update config ini files at runtime
+    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/config_capreg.properties'
+    af_support_tools.set_config_file_property_by_data_file(my_data_file)
 
-try:
+    # Set config ini file name
+    global env_file
     env_file = 'env.ini'
-
+    global capreg_config_file
     capreg_config_file = 'continuous-integration-deploy-suite/config_capreg.ini'
+    global capreg_config_header
     capreg_config_header = 'config_details'
 
-    capreg_config_property_rmq_user = 'rmq_user'
-    capreg_config_property_rmq_password = 'rmq_password'
+    # Set Vars
+    global payload_file
+    payload_file = 'continuous-integration-deploy-suite/symphony-sds.ini'
 
-    capreg_config_property_cli_user = 'cli_user'
-    capreg_config_property_cli_password = 'cli_password'
-
-    capreg_config_property_rackhd_ip = 'rackhd_ipaddress'
-    capreg_config_property_vcenter = 'vcenter'
-    capreg_config_property_vcenter_user = 'vcenter_user'
-    capreg_config_property_vcenter_password = 'vcenter_password'
-
-except:
-    print('Possible configuration error')
-
-try:
-
+    global ipaddress
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+    global cli_username
+    cli_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    global cli_password
+    cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
+	
+    global rmq_username
+    rmq_username = 'guest'
+    global rmq_password
+    rmq_password = 'guest'
+    global port
+    port = 5672
 
-    rmq_username = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                             property=capreg_config_property_rmq_user)
+    #capreg_config_property_rmq_user = 'rmq_user'
+    #capreg_config_property_rmq_password = 'rmq_password'
+    #capreg_config_property_cli_user = 'cli_user'
+    #capreg_config_property_cli_password = 'cli_password'
+    #capreg_config_property_rackhd_ip = 'rackhd_ipaddress'
+    #capreg_config_property_vcenter = 'vcenter'
+    #capreg_config_property_vcenter_user = 'vcenter_user'
+    #capreg_config_property_vcenter_password = 'vcenter_password'
 
-    rmq_password = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                             property=capreg_config_property_rmq_password)
-
-    cli_username = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                             property=capreg_config_property_cli_user)
-
-    cli_password = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                             property=capreg_config_property_cli_password)
-
-    rackHD_IP = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                          property=capreg_config_property_rackhd_ip)
-
-    vCenterFQDN = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                            property=capreg_config_property_vcenter)
-
-    vCenterUser = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                            property=capreg_config_property_vcenter_user)
-
-    vCenterPassword = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                                property=capreg_config_property_vcenter_password)
-
-except:
-    print('Possible configuration error')
+    global rackHD_IP
+    rackHD_IP = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header, property='rackhd_ipaddress')
+    global vCenterFQDN
+    vCenterFQDN = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header, property='vcenter')
+    global vCenterUser
+    vCenterUser = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header, property='vcenter_user')
+    global vCenterPassword
+    vCenterPassword = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header, property='vcenter_password')    
 
 #######################################################################################################################
 
 try:
     # These are the cli commands needed to start a new docker instance for the named adapter/provider
+    global startCiscoProvider
     startCiscoProvider = 'docker run --net=host -v /opt/dell/cpsd/rcm-fitness/conf:/opt/dell/rcm-fitness/conf -td cpsd-hal-data-provider-cisco-network'
+    global startPoweredgeProvider
     startPoweredgeProvider = 'docker run --net=host -v /opt/dell/cpsd/rcm-fitness/conf/:/opt/dell/rcm-fitness/conf/ -td cpsd-hal-data-provider-poweredge'
+    global startRackHDAdapter
     startRackHDAdapter = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/rackhd-adapter-service/keystore/:/opt/dell/cpsd/rackhd-adapter-service/keystore/ -td cpsd-rackhd-adapter-service'
+    global startNodeDiscoverPaqx
     startNodeDiscoverPaqx = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/node-discovery-paqx/keystore/:/opt/dell/cpsd/node-discovery-paqx/keystore/ -td cpsd-node-discovery-paqx'
+    global startEndpointRegisteryService
     startEndpointRegisteryService = 'systemctl start dell-endpoint-registration'
+    global startVcenterAdapter
     startVcenterAdapter = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/vcenter-adapter-service/keystore/:/opt/dell/cpsd/vcenter-adapter-service/keystore/ -td cpsd-vcenter-adapter-service'
 
     # The following are the number of Capabilities Tested. If this total number does not match what is returned then the test will need to be updated.
@@ -82,7 +86,7 @@ try:
     numOfEndPointRegisteryCapabilities = 1
     numOfVcenterApapterCapabilities = 8
     numOfcoprHDCapabilities = 1
-
+    global totalNumOfCapabilitiesTested
     totalNumOfCapabilitiesTested = numOfCiscoProviderCapabilities \
                                    + numOfPowerEdgeCapabilities \
                                    + numOfRackHDAdapterCapabilities \
@@ -98,7 +102,6 @@ except:
 #######################################################################################################################
 
 @pytest.mark.core_services_mvp
-#@pytest.mark.skip
 def test_capabilityRegistry_Control_and_Binding():
     # Every 7 seconds the Capability Registery sends out a message asking "who's out there?" This is a "ping" message.
     # Each service that is alive will respond with a "pong" message.  The correlationID value will be the same on all
@@ -288,7 +291,6 @@ def test_capabilityRegistry_Control_and_Binding():
 
 
 @pytest.mark.core_services_mvp
-#@pytest.mark.skip
 def test_capabilityRegistry_ListCapabilities():
     # We are testing that all expected capabilites are returned when a capability Registry Request Message is sent.
     # All providers and their capabilities should be listed
@@ -425,7 +427,6 @@ def test_capabilityRegistry_ListCapabilities():
 
 
 @pytest.mark.core_services_mvp
-#@pytest.mark.skip
 def test_capabilityRegistry_Exchanges():
 
     # Verify the capability.registry Exchanges are bound to the correct queues
