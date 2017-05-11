@@ -19,7 +19,7 @@ except:
     print('Possible configuration error.')
 
 #Use this to by-pass the env.ini file
-# ipaddress = '10.3.60.128'
+#ipaddress = '10.3.62.105'
 
 new_service_name = "testService"
 new_service_id = "testService1"
@@ -36,8 +36,8 @@ rabbiturl = "http://" + rabbitHost + ":15672"
 capabilitiesExchange = "exchange.dell.cpsd.hdp.capability.registry.control"
 endpointExchange = "exchange.dell.cpsd.endpoint.registration.event"
 
-rmq_username = 'guest'
-rmq_password = 'guest'
+rmq_username = 'test'
+rmq_password = 'test'
 
 port = 5672
 
@@ -45,7 +45,7 @@ port = 5672
 # the payload data used to register services with consul
 
 regData = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, "Port": new_service_port,
-           "Tags": [new_service_tag_1], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
+           "Tags": [new_service_tag_1], "Check": {"HTTP": rabbiturl, "Interval": "2s"}}
 
 regDataNoAddress = {"ID": new_service_id, "Name": new_service_name,
                     "Tags": [new_service_tag_1], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
@@ -62,7 +62,7 @@ regDataWithCheckFailure = {"ID": new_service_id, "Name": new_service_name, "Addr
 
 # *******************************************************************************************
 #
-@pytest.mark.core_services_cd
+@pytest.mark.core_services_mvp_extended
 def test_registerServiceWithNoAddress():
     # Testing that even tho Consul accepts a registration with no Address field, the Endpoint Registry
     # does not advertise its existence
@@ -82,7 +82,7 @@ def test_registerServiceWithNoAddress():
     time.sleep(10)     # allow time between service status change
 # # *******************************************************************************************
 #
-@pytest.mark.core_services_cd
+@pytest.mark.core_services_mvp_extended
 def test_registerServiceWithNoPort():
     # Testing that even tho Consul accepts a registration with no Address field, the Endpoint Registry
     # does not advertise its existence
@@ -103,7 +103,7 @@ def test_registerServiceWithNoPort():
 
 # # *******************************************************************************************
 
-@pytest.mark.core_services_cd
+@pytest.mark.core_services_mvp_extended
 def test_registerServiceWithNoHealthCheck():
     # Testing that even tho Consul accepts a registration with no Address field, the Endpoint Registry
     # does not advertise its existence
@@ -121,10 +121,11 @@ def test_registerServiceWithNoHealthCheck():
 
     # cleanup(new_service_id)
     time.sleep(10)     # allow time between service status change
-
-# # **************************************************************************************
+#
+# # # **************************************************************************************
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_registerServiceSuccess():
     # This test verifies that a succful service register in Consul prompts the Endpoint Registry
     # to publish an endpoint.discovered event to the AMQP bus
@@ -155,21 +156,24 @@ def test_registerServiceSuccess():
     assert not errors_list
 
     time.sleep(10)     # allow time between service status change
-#
-# # **************************************************************************************
+# #
+# # # **************************************************************************************
 
-@pytest.mark.core_services_cd
+@pytest.mark.core_services_mvp_extended
 def test_registerTwoServicesSameName():
     # this test verifies that the same service can be registered twice, but with differing endpoints
 
     errors_list = []
     cleanup("duplicateService1")
     cleanup("duplicateService2")
+
+    time.sleep(20)
+
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
 
     # perform initial registration
     regData1 = {"ID": "duplicateService1", "Name": "duplicateService","Address": "3.3.3.3", "Port": 300,
-                "Tags": ["duplicate1"], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
+                "Tags": ["duplicate1"], "Check": {"HTTP": rabbiturl, "Interval": "2s"}}
     status_code = execRegisterService(regData1)
     assert status_code == 200, "The Register Service task was unsuccessful"
 
@@ -187,14 +191,14 @@ def test_registerTwoServicesSameName():
 
     assert not errors_list
 
-    time.sleep(10)    # necessary whilst ER uses pollinginstead of 'watch'
+    time.sleep(20)    # necessary whilst ER uses pollinginstead of 'watch'
 
     errors_list = []
 
     # add a second service, duplicate name
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
     regData2 = {"ID": "duplicateService2", "Name": "duplicateService","Address": "4.4.4.4", "Port": 301,
-                "Tags": ["duplicate2"], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
+                "Tags": ["duplicate2"], "Check": {"HTTP": rabbiturl, "Interval": "2s"}}
     status_code = execRegisterService(regData2)
     assert status_code == 200, "The Register Service task was unsuccessful"
 
@@ -221,26 +225,32 @@ def test_registerTwoServicesSameName():
 
     assert not errors_list
 
-    cleanup("duplicateService1")
-    cleanup("duplicateService2")
-    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
+    # cleanup("duplicateService1")
+    # cleanup("duplicateService2")
+    time.sleep(200)     # necessary whilst ER uses pollinginstead of 'watch'
 
 # # **************************************************************************************
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_deRegisterServiceSuccess():
     # This test verifies that deregistering a service at Consul prompts the Endpoint Registry to publish
     # an endpoint.unavailable event
     cleanup(new_service_id)
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
 
+    time.sleep(20)
+
     # perform initial registration so we have a service to deregister
     status_code = execRegisterService(regData)
     event_check = verifyEventOnBus(rabbitHost, endpointExchange, "dell.cpsd.endpoint.discovered")
     assert status_code == 200, "The Register Service task was unsuccessful"
 
+    time.sleep(20)     # necessary whilst ER uses pollinginstead of 'watch'
+
     # setup a test queue for endpoint.unavailable
     ssetup(endpointExchange, 'dell.cpsd.endpoint.unavailable')
+    time.sleep(40)     # necessary whilst ER uses pollinginstead of 'watch'
     status_code = execDeRegisterService(new_service_id)
     assert status_code == 200, "The deRegister Service task was unsuccessful"
 
@@ -251,15 +261,15 @@ def test_deRegisterServiceSuccess():
     event = verifyEventOnBus(rabbitHost, endpointExchange, "dell.cpsd.endpoint.unavailable")
     assert new_service_name in event['type'],        "Service Name on the AMQP Bus is incorrect"
 
-    cleanup(new_service_id)
-    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
+    #cleanup(new_service_id)
+    time.sleep(20)     # necessary whilst ER uses pollinginstead of 'watch'
 
 #  **************************************************************************************
 
-@pytest.mark.core_services_cd
+@pytest.mark.core_services_mvp_extended
 def test_deregisterOneOfTwoSameServices():
     # This test verifies what happens if there is a service with 2 instances registered and
-    # one of those services deregisters. An 'endpoint.discovered' event is published listing just details of the 
+    # one of those services deregisters. An 'endpoint.discovered' event is published listing just details of the
     # remaining instance
 
     errors_list = []
@@ -269,22 +279,22 @@ def test_deregisterOneOfTwoSameServices():
 
     # perform initial registration
     regData1 = {"ID": "duplicateService1", "Name": "duplicateService","Address": "3.3.3.3", "Port": 300,
-                "Tags": ["duplicate1"], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
+                "Tags": ["duplicate1"], "Check": {"HTTP": rabbiturl, "Interval": "2s"}}
     status_code = execRegisterService(regData1)
     event_check = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
     assert status_code == 200, "The Register Service task was unsuccessful"
 
-    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
+    time.sleep(12)     # necessary whilst ER uses pollinginstead of 'watch'
 
     # add a second service, duplicate name
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
     regData2 = {"ID": "duplicateService2", "Name": "duplicateService","Address": "4.4.4.4", "Port": 402,
-                "Tags": ["duplicate2"], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
+                "Tags": ["duplicate2"], "Check": {"HTTP": rabbiturl, "Interval": "2s"}}
     status_code = execRegisterService(regData2)
     event_check = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
     assert status_code == 200, "The Register Service task was unsuccessful"
 
-    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
+    time.sleep(12)     # necessary whilst ER uses pollinginstead of 'watch'
 
     # deregister one of the services
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
@@ -311,11 +321,11 @@ def test_deregisterOneOfTwoSameServices():
     cleanup("duplicateService1")
     cleanup("duplicateService2")
 
-    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
+    #time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
 
 # # *****************************************************************************************************
 
-@pytest.mark.core_services_cd
+@pytest.mark.core_services_mvp_extended
 def test_deregisterTwoOfTwoSameServices():
     # This test verifies what happens when all instances of a service (in this case 2) are deregistered
     # An 'endpoint.unavailable' event is expected listing the service.
@@ -327,18 +337,22 @@ def test_deregisterTwoOfTwoSameServices():
 
     # perform initial registration to setup the first instance
     regData1 = {"ID": "duplicateService1", "Name": "duplicateService", "Address": "3.3.3.3", "Port": 300,
-                "Tags": ["duplicate1"], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
+                "Tags": ["duplicate1"], "Check": {"HTTP": rabbiturl, "Interval": "2s"}}
     status_code = execRegisterService(regData1)
     event_check = verifyEventOnBus(rabbitHost, endpointExchange, 'dell.cpsd.endpoint.discovered')
     assert status_code == 200, "The Register Service task was unsuccessful"
 
+    time.sleep(12)
+
     # add a second instance, duplicate name
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
     regData2 = {"ID": "duplicateService2", "Name": "duplicateService","Address": "4.4.4.4", "Port": 403,
-                "Tags": ["duplicate2"], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
+                "Tags": ["duplicate2"], "Check": {"HTTP": rabbiturl, "Interval": "2s"}}
     status_code = execRegisterService(regData2)
     event_check = verifyEventOnBus(rabbitHost, endpointExchange, 'edell.cpsd.endpoint.discovered')
     assert status_code == 200, "The Register Service task was unsuccessful"
+
+    time.sleep(12)     # necessary whilst ER uses pollinginstead of 'watch'
 
     # deregister instance 1
     ssetup(endpointExchange, 'dell.cpsd.endpoint.discovered')
@@ -357,6 +371,8 @@ def test_deregisterTwoOfTwoSameServices():
 
     assert not errors_list
 
+    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
+
     # deregisterinstance 2
     ssetup(endpointExchange, 'dell.cpsd.endpoint.unavailable')
     status_code = execDeRegisterService("duplicateService2")
@@ -368,8 +384,8 @@ def test_deregisterTwoOfTwoSameServices():
 
     cleanup("duplicateService1")
     cleanup("duplicateService2")
-    time.sleep(10)     # necessary whilst ER uses pollinginstead of 'watch'
-#
+
+# #
 # *****************************************************************************************************
 #  Helper functions
 
@@ -462,7 +478,7 @@ def verifyEventOnBus(rmqaddress, exchange, route):
     event = RMQVerifyEventTest()
 
     # teardown the queue
-    Qcleanup()
+    #Qcleanup()
 
     return event
 

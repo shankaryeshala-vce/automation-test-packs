@@ -25,8 +25,6 @@ try:
 
     env_file = 'env.ini'
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-    cli_user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
-    cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 
 except:
     print('Possible configuration error')
@@ -35,6 +33,8 @@ port = 5672
 rmq_username = 'guest'
 rmq_password = 'guest'
 
+cli_username = 'root'
+cli_password = 'V1rtu@1c3!'
 
 #ipaddress = '10.3.8.52'
 
@@ -60,7 +60,7 @@ def test_CS_ComponentCredentials_CI():
 # Add & verify component credentials
 @pytest.mark.core_services_cd
 def test_CS_ComponentCredentials():
-    print('\nRunning test on system: ', ipaddress)
+    print('\nRunning mvp extended test on system: ', ipaddress)
     cleanup()
 
     bindQueues()
@@ -70,8 +70,8 @@ def test_CS_ComponentCredentials():
 
     print('************************************************')
 
-    #CS_CredAdd_CredReq()
-    CS_CredAdd_duplicateComponents()
+    CS_CredAdd_CredReq()
+    #CS_CredAdd_duplicateComponents()
     CS_CredAdd_duplicateEndpoints()
     CS_CredAdd_noCompUuid()
     CS_CredAdd_DBdown()
@@ -138,7 +138,8 @@ def CS_CredAdd_CredReq():
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.component.credential.response')
-
+    print('Return Message from rmq_consume message:')
+    print(return_message)
     return_json = json.loads(return_message, encoding='utf-8')
 
     if 'error' in return_message:
@@ -199,11 +200,12 @@ def CS_CredAdd_duplicateComponents():
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.component.credential.response')
-
+    print('Return Message from rmq_consume message:')
+    print(return_message)
     return_json = json.loads(return_message, encoding='utf-8')
     assert return_json['errors'][0]['code'] == "VAMQP1012E"
 
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/rcm-fitness/services/credential/logs/credential-service-error.log") }\''
+    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
     error1 = "A different object with the same identifier value was already associated with the session"
     error2 = "(attempt 3)"
     error3 = "VAMQP1009E"
@@ -257,7 +259,7 @@ def CS_CredAdd_duplicateEndpoints():
     return_json = json.loads(return_message, encoding='utf-8')
     assert return_json['errors'][0]['code'] == "VAMQP1012E"
 
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/rcm-fitness/services/credential/logs/credential-service-error.log") }\''
+    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
     error1 = "Multiple representations of the same entity"
     error2 = "(attempt 3)"
     error3 = "VAMQP1009E"
@@ -360,7 +362,7 @@ def CS_CredAdd_DBdown():
     return_json = json.loads(return_message, encoding='utf-8')
     assert return_json['errors'][0]['code'] == "VAMQP1012E"
 
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/rcm-fitness/services/credential/logs/credential-service-error.log") }\''
+    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
     error1 = "Unable to acquire JDBC Connection"
     error2 = "(attempt 3)"
     error3 = "VAMQP1009E"
@@ -436,7 +438,7 @@ def CS_CredReq_DBdown():
     assert return_json['errors'][0]['code'] == "VAMQP1012E"
 
     # Send the command to credential-service-error.log file
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/rcm-fitness/services/credential/logs/credential-service-error.log") }\''
+    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
     error1 = "Unable to acquire JDBC Connection"
     error2 = "(attempt 3)"
     error3 = "VAMQP1009E"
@@ -489,7 +491,7 @@ def CS_CredReq_invalidJson():
     if i_am_json == False:
         print('Verified json is invalid')
 
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/rcm-fitness/services/credential/logs/credential-service-error.log") }\''
+    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
     error1 = "VAMQP1008E AMQP error (attempt 1)"
     error2 = "expected close marker for Object"
     error3 = "(attempt 3)"
@@ -538,7 +540,7 @@ def CS_CredReq_invalidMsgProp():
                                                rmq_password=rmq_password, queue='test.component.credential.response')
     assert q_len == 0
 
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/rcm-fitness/services/credential/logs/credential-service-error.log") }\''
+    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
     error1 = "VAMQP2004E Message property [correlationId] is empty.]"
     error2 = "VAMQP1008E AMQP error"
     error3 = "(attempt 3)"
@@ -596,7 +598,7 @@ def CS_CredReq_invalidUuid():
     assert return_json['errors'][0]['code'] == "VAMQP1012E"
 
     # sendCommand = 'docker ps | credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/rcm-fitness/services/credential/logs/credential-service-error.log") }\''
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/rcm-fitness/services/credential/logs/credential-service-error.log") }\''
+    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
     error1 = "VAMQP1008E AMQP error (attempt 1)"
     error2 = "No endpoints in database or something went wrong"
     error3 = "(attempt 3)"
@@ -640,7 +642,7 @@ def bindQueues():
 
 
 def clearLogFiles():
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" sh -c \\"echo > /opt/dell/rcm-fitness/services/credential/logs/credential-service-error.log\\"") }\''
+    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" sh -c \\"echo > /opt/dell/cpsd/credential/logs/credential-service-error.log\\"") }\''
     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                       command=sendCommand, return_output=False)
 
