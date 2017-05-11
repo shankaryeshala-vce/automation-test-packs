@@ -987,6 +987,12 @@ def vCenterConfigApplicationProperties():
 def vCenterRegistrationMsg():
     # Until there is a way to automatically register a vcenter we need to register it manually by sending this message.
 
+    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                     queue='test.controlplane.vcenter.response')
+
+    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                     queue='test.endpoint.registration.event')
+
     the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"vcenter-registtration-corr-id","replyTo":"localhost"},"registrationInfo":{"address":"https://' + vCenterFQDN + ':443","username":"' + vCenterUser + '","password":"' + vCenterPassword + '"}}'
 
     af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username, rmq_password=rmq_password,
