@@ -996,6 +996,26 @@ def vCenterRegistrationMsg():
                                              '__TypeId__': 'com.dell.cpsd.vcenter.registration.info.request'},
                                          payload=the_payload)
 
+    waitForMsg('test.controlplane.vcenter.response')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.controlplane.vcenter.response',
+                                                          remove_message=True)
+    checkForErrors(return_message)
+    return_json = json.loads(return_message, encoding='utf-8')
+    assert return_json['responseInfo']['message']=='SUCCESS', 'ERROR: Vcenter validation failure'
+
+
+    waitForMsg('test.endpoint.registration.event')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.endpoint.registration.event',
+                                                          remove_message=True)
+
+    checkForErrors(return_message)
+    return_json = json.loads(return_message, encoding='utf-8')
+    assert return_json['endpoint']['type'] == 'vcenter', 'vcenter not registered with endpoint'
+
 
 def consulBypassMsgRackHD():
     # Until consul is  working properly & integrated with the rackhd adapter in the same environment we need to register
@@ -1058,6 +1078,18 @@ def bindQueues():
                                     exchange='exchange.dell.cpsd.hdp.capability.registry.event',
                                     routing_key='#')
 
+    af_support_tools.rmq_bind_queue(host=ipaddress,
+                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                    queue='test.endpoint.registration.event',
+                                    exchange='exchange.dell.cpsd.endpoint.registration.event',
+                                    routing_key='#')
+
+    af_support_tools.rmq_bind_queue(host=ipaddress,
+                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                    queue='test.controlplane.vcenter.response',
+                                    exchange='exchange.cpsd.controlplane.vcenter.response',
+                                    routing_key='#')
+
 
 def cleanup():
     print('Cleaning up...')
@@ -1082,6 +1114,12 @@ def cleanup():
 
     af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
                                       queue='test.hdp.capability.registry.event')
+
+    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                      queue='test.endpoint.registration.event')
+
+    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                      queue='test.controlplane.vcenter.response')
 
 
 def waitForMsg(queue):
