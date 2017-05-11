@@ -35,6 +35,7 @@ def load_test_data():
     global payload_property_hal
     payload_property_hal = 'ccv_payload'
     global ipaddress
+
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
     global cli_username
     cli_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
