@@ -1036,6 +1036,8 @@ def consulBypassMsgRackHD():
                                              '__TypeId__': 'com.dell.cpsd.endpoint-registry.endpointsdiscoveredevent'},
                                          payload=the_payload)
 
+    time.sleep(3)
+
 
 #######################################################################################################################
 # These are common functions that are used throughout the main test.
