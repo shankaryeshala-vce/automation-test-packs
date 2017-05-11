@@ -7,7 +7,7 @@
 import af_support_tools
 import json
 import os
-import paramiko
+#import paramiko
 import pytest
 import time
 
