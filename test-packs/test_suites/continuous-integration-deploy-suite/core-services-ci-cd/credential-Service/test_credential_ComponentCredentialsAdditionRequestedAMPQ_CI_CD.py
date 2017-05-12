@@ -13,7 +13,7 @@ import time
 # Payloads from symphony-sds.ini:- location: continuous-integration-deploy-suite/symphony-sds.ini
 try:
     payload_file = 'continuous-integration-deploy-suite/symphony-sds.ini'
-#    payload_file = 'symphony-sds.ini'
+    #payload_file = 'symphony-sds.ini'
     payload_heading = 'credential_tests'
     payload_property_add = 'cs_cred_addition'
     payload_property_req = 'cs_cred_request'
@@ -25,7 +25,8 @@ try:
 
     env_file = 'env.ini'
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-
+    cli_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 except:
     print('Possible configuration error')
 
@@ -33,15 +34,8 @@ port = 5672
 rmq_username = 'guest'
 rmq_password = 'guest'
 
-cli_username = 'root'
-cli_password = 'V1rtu@1c3!'
-
-#ipaddress = '10.3.8.52'
-
-
 # Add & verify component credentials
 @pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
 def test_CS_ComponentCredentials_CI():
     print('\nRunning mvp test on system: ', ipaddress)
     cleanup()
@@ -58,7 +52,7 @@ def test_CS_ComponentCredentials_CI():
 ######################################################################################################################
 
 # Add & verify component credentials
-@pytest.mark.core_services_cd
+@pytest.mark.core_services_mvp_extended
 def test_CS_ComponentCredentials():
     print('\nRunning mvp extended test on system: ', ipaddress)
     cleanup()
@@ -132,6 +126,7 @@ def CS_CredAdd_CredReq():
     # Checking the "Message received" matches the "Message published"
     assert published_json == return_json
     print('TEST: Published Message Received: PASSED')
+    print(published_json)
     time.sleep(2)
 
     # Consume the response message
@@ -169,8 +164,9 @@ def CS_CredAdd_CredReq():
 
 
 # 2, Negative Test - Components with the same uuid should not be added to the DB
+# 2. Feature Test - Component with the same uuid can be updated in the DB now
 def CS_CredAdd_duplicateComponents():
-    print("Running test No. 2 - Negative: Cannot add same components...")
+    print("Running test No. 2 - Feature Test: Component with same UUID can be updated in DB...")
 
     clearLogFiles()
 
@@ -180,15 +176,17 @@ def CS_CredAdd_duplicateComponents():
                                                             property=payload_property_add)
 
     publishMessageCredAdd(the_payload)
-
+    #print('Payload:\n')
+    #print(the_payload)
     time.sleep(2)
 
     # Consume received msg
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
-                                                          queue='test.component.credential.request')
-
+                                                          queue='test.component.credential.response')
     validJson(return_message)
+    #print('Return message:')
+    #print(return_message)
     published_json = json.loads(the_payload, encoding='utf-8')
     return_json = json.loads(return_message, encoding='utf-8')
 
@@ -205,7 +203,7 @@ def CS_CredAdd_duplicateComponents():
     return_json = json.loads(return_message, encoding='utf-8')
     assert return_json['errors'][0]['code'] == "VAMQP1012E"
 
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
+    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-info.log") }\''
     error1 = "A different object with the same identifier value was already associated with the session"
     error2 = "(attempt 3)"
     error3 = "VAMQP1009E"
@@ -255,12 +253,13 @@ def CS_CredAdd_duplicateEndpoints():
     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.component.credential.response')
-
+    print('Return Message from rmq_consume message:')
+    print(return_message)
     return_json = json.loads(return_message, encoding='utf-8')
     assert return_json['errors'][0]['code'] == "VAMQP1012E"
 
     sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
-    error1 = "Multiple representations of the same entity"
+    error1 = "A different object with the same identifier value was already associated with the session"
     error2 = "(attempt 3)"
     error3 = "VAMQP1009E"
 
