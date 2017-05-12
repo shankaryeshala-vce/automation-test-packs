@@ -95,6 +95,7 @@ def load_test_data():
 #######################################################################################################################
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_Control_and_Binding():
     # Every 7 seconds the Capability Registery sends out a message asking "who's out there?" This is a "ping" message.
     # Each service that is alive will respond with a "pong" message.  The correlationID value will be the same on all
@@ -283,6 +284,7 @@ def test_capabilityRegistry_Control_and_Binding():
     cleanup()
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_ListCapabilities():
     # We are testing that all expected capabilites are returned when a capability Registry Request Message is sent.
     # All providers and their capabilities should be listed
@@ -417,6 +419,7 @@ def test_capabilityRegistry_ListCapabilities():
     cleanup()
 
 @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_Exchanges():
 
     # Verify the capability.registry Exchanges are bound to the correct queues
