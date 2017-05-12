@@ -5,73 +5,74 @@
 # Description:
 
 import af_support_tools
-import pytest
 import json
-import time
+import os
+import pytest
 import requests
+import time
 
-port = 5672
+@pytest.fixture(scope="module", autouse=True)
+def load_test_data():
+    # Update config ini files at runtime
+    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/config_capreg.properties'
+    af_support_tools.set_config_file_property_by_data_file(my_data_file)
 
-try:
+    # Set config ini file name
+    global env_file
     env_file = 'env.ini'
-
+    global capreg_config_file
     capreg_config_file = 'continuous-integration-deploy-suite/config_capreg.ini'
+    global capreg_config_header
     capreg_config_header = 'config_details'
 
-    capreg_config_property_rmq_user = 'rmq_user'
-    capreg_config_property_rmq_password = 'rmq_password'
+    # Set Vars
+    global payload_file
+    payload_file = 'continuous-integration-deploy-suite/symphony-sds.ini'
 
-    capreg_config_property_cli_user = 'cli_user'
-    capreg_config_property_cli_password = 'cli_password'
-
-    capreg_config_property_rackhd_ip = 'rackhd_ipaddress'
-    capreg_config_property_vcenter = 'vcenter'
-    capreg_config_property_vcenter_user = 'vcenter_user'
-    capreg_config_property_vcenter_password = 'vcenter_password'
-
-except:
-    print('Possible configuration error')
-
-try:
-
+    global ipaddress
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+    global cli_username
+    cli_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    global cli_password
+    cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
+	
+    global rmq_username
+    rmq_username = 'guest'
+    global rmq_password
+    rmq_password = 'guest'
+    global port
+    port = 5672
 
-    rmq_username = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                             property=capreg_config_property_rmq_user)
+    #capreg_config_property_rmq_user = 'rmq_user'
+    #capreg_config_property_rmq_password = 'rmq_password'
+    #capreg_config_property_cli_user = 'cli_user'
+    #capreg_config_property_cli_password = 'cli_password'
+    #capreg_config_property_rackhd_ip = 'rackhd_ipaddress'
+    #capreg_config_property_vcenter = 'vcenter'
+    #capreg_config_property_vcenter_user = 'vcenter_user'
+    #capreg_config_property_vcenter_password = 'vcenter_password'
 
-    rmq_password = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                             property=capreg_config_property_rmq_password)
+    global rackHD_IP
+    rackHD_IP = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header, property='rackhd_ipaddress')
+    global vCenterFQDN
+    vCenterFQDN = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header, property='vcenter')
+    global vCenterUser
+    vCenterUser = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header, property='vcenter_user')
+    global vCenterPassword
+    vCenterPassword = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header, property='vcenter_password')    
 
-    cli_username = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                             property=capreg_config_property_cli_user)
-
-    cli_password = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                             property=capreg_config_property_cli_password)
-
-    rackHD_IP = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                          property=capreg_config_property_rackhd_ip)
-
-    vCenterFQDN = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                            property=capreg_config_property_vcenter)
-
-    vCenterUser = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                            property=capreg_config_property_vcenter_user)
-
-    vCenterPassword = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                                property=capreg_config_property_vcenter_password)
-
-except:
-    print('Possible configuration error')
-
-#######################################################################################################################
-
-try:
     # These are the cli commands needed to start a new docker instance for the named adapter/provider
+    global startCiscoProvider
     startCiscoProvider = 'docker run --net=host -v /opt/dell/cpsd/rcm-fitness/conf:/opt/dell/rcm-fitness/conf -td cpsd-hal-data-provider-cisco-network'
+    global startPoweredgeProvider
     startPoweredgeProvider = 'docker run --net=host -v /opt/dell/cpsd/rcm-fitness/conf/:/opt/dell/rcm-fitness/conf/ -td cpsd-hal-data-provider-poweredge'
+    global startRackHDAdapter
     startRackHDAdapter = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/rackhd-adapter-service/keystore/:/opt/dell/cpsd/rackhd-adapter-service/keystore/ -td cpsd-rackhd-adapter-service'
+    global startNodeDiscoverPaqx
     startNodeDiscoverPaqx = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/node-discovery-paqx/keystore/:/opt/dell/cpsd/node-discovery-paqx/keystore/ -td cpsd-node-discovery-paqx'
+    global startEndpointRegisteryService
     startEndpointRegisteryService = 'systemctl start dell-endpoint-registration'
+    global startVcenterAdapter
     startVcenterAdapter = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/vcenter-adapter-service/keystore/:/opt/dell/cpsd/vcenter-adapter-service/keystore/ -td cpsd-vcenter-adapter-service'
 
     # The following are the number of Capabilities Tested. If this total number does not match what is returned then the test will need to be updated.
@@ -82,7 +83,7 @@ try:
     numOfEndPointRegisteryCapabilities = 1
     numOfVcenterApapterCapabilities = 8
     numOfcoprHDCapabilities = 1
-
+    global totalNumOfCapabilitiesTested
     totalNumOfCapabilitiesTested = numOfCiscoProviderCapabilities \
                                    + numOfPowerEdgeCapabilities \
                                    + numOfRackHDAdapterCapabilities \
@@ -91,14 +92,9 @@ try:
                                    + numOfVcenterApapterCapabilities \
                                    + numOfcoprHDCapabilities
 
-except:
-    print('Possible configuration error')
-
-
 #######################################################################################################################
 
 @pytest.mark.core_services_mvp
-#@pytest.mark.skip
 def test_capabilityRegistry_Control_and_Binding():
     # Every 7 seconds the Capability Registery sends out a message asking "who's out there?" This is a "ping" message.
     # Each service that is alive will respond with a "pong" message.  The correlationID value will be the same on all
@@ -122,7 +118,7 @@ def test_capabilityRegistry_Control_and_Binding():
     # The correlationID of the consumed message is saved and will be used in the capabilityRegistryBinding() test to
     # trace the response "pong" messages.
     time.sleep(7)
-    # Ensure the COontrol & Binding Queues are empty to start
+    # Ensure the Control & Binding Queues are empty to start
     af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
                                      queue='test.capability.registry.control')
     af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
@@ -286,9 +282,7 @@ def test_capabilityRegistry_Control_and_Binding():
 
     cleanup()
 
-
 @pytest.mark.core_services_mvp
-#@pytest.mark.skip
 def test_capabilityRegistry_ListCapabilities():
     # We are testing that all expected capabilites are returned when a capability Registry Request Message is sent.
     # All providers and their capabilities should be listed
@@ -422,10 +416,7 @@ def test_capabilityRegistry_ListCapabilities():
     print('\n*******************************************************\n')
     cleanup()
 
-
-
 @pytest.mark.core_services_mvp
-#@pytest.mark.skip
 def test_capabilityRegistry_Exchanges():
 
     # Verify the capability.registry Exchanges are bound to the correct queues
@@ -487,7 +478,6 @@ def test_capabilityRegistry_Exchanges():
 
     print('\n*******************************************************')
 
-
 # It's likely this test will be removed as the functionality to stop & start containers is being removed
 @pytest.mark.core_services_mvp_extended
 def test_capaabilityRegistery_StopProvider():
@@ -515,7 +505,6 @@ def test_capaabilityRegistery_StopProvider():
 
     cleanup()
 
-
 @pytest.mark.core_services_mvp_extended
 def test_capaabilityRegistery_KillProvider():
     cleanup()
@@ -541,9 +530,7 @@ def test_capaabilityRegistery_KillProvider():
 
     cleanup()
 
-
 #######################################################################################################################
-
 
 def capabilityRegistryStopProvider(container, provider, capability1, capability2=None, capability3=None,
                                    capability4=None, capability5=None, capability6=None, capability7=None):
@@ -740,7 +727,6 @@ def capabilityRegistryStopProvider(container, provider, capability1, capability2
 
     print('\n** Test Complete **')
     print('\n*******************************************************\n')
-
 
 def capabilityRegistryKillProvider(container, provider, docker, capability1, capability2=None, capability3=None,
                                    capability4=None, capability5=None, capability6=None, capability7=None):
@@ -941,10 +927,8 @@ def capabilityRegistryKillProvider(container, provider, docker, capability1, cap
     print('\n** Test Complete **')
     print('\n*******************************************************\n')
 
-
 #######################################################################################################################
 # These are functions needed to manually configure vcenter & rackhd details.
-
 def vCenterConfigApplicationProperties():
     # We need a way for the Vcenter Cluster Discover code to be able to get the VCenter Credentials. Currently the only
     # way to do this is with a application.properties file in the vcenter-adapter container that has the name &
@@ -983,9 +967,14 @@ def vCenterConfigApplicationProperties():
 
     time.sleep(3)
 
-
 def vCenterRegistrationMsg():
     # Until there is a way to automatically register a vcenter we need to register it manually by sending this message.
+
+    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                     queue='test.controlplane.vcenter.response')
+
+    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                     queue='test.endpoint.registration.event')
 
     the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"vcenter-registtration-corr-id","replyTo":"localhost"},"registrationInfo":{"address":"https://' + vCenterFQDN + ':443","username":"' + vCenterUser + '","password":"' + vCenterPassword + '"}}'
 
@@ -996,6 +985,25 @@ def vCenterRegistrationMsg():
                                              '__TypeId__': 'com.dell.cpsd.vcenter.registration.info.request'},
                                          payload=the_payload)
 
+    waitForMsg('test.controlplane.vcenter.response')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.controlplane.vcenter.response',
+                                                          remove_message=True)
+    checkForErrors(return_message)
+    return_json = json.loads(return_message, encoding='utf-8')
+    assert return_json['responseInfo']['message']=='SUCCESS', 'ERROR: Vcenter validation failure'
+
+
+    waitForMsg('test.endpoint.registration.event')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.endpoint.registration.event',
+                                                          remove_message=True)
+
+    checkForErrors(return_message)
+    return_json = json.loads(return_message, encoding='utf-8')
+    #assert return_json['endpoint']['type'] == 'vcenter', 'vcenter not registered with endpoint'
 
 def consulBypassMsgRackHD():
     # Until consul is  working properly & integrated with the rackhd adapter in the same environment we need to register
@@ -1010,11 +1018,11 @@ def consulBypassMsgRackHD():
                                              '__TypeId__': 'com.dell.cpsd.endpoint-registry.endpointsdiscoveredevent'},
                                          payload=the_payload)
 
+    time.sleep(3)
+
 
 #######################################################################################################################
 # These are common functions that are used throughout the main test.
-
-
 def bindQueues():
     af_support_tools.rmq_bind_queue(host=ipaddress,
                                     port=port, rmq_username=rmq_username, rmq_password=rmq_password,
@@ -1058,6 +1066,17 @@ def bindQueues():
                                     exchange='exchange.dell.cpsd.hdp.capability.registry.event',
                                     routing_key='#')
 
+    af_support_tools.rmq_bind_queue(host=ipaddress,
+                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                    queue='test.endpoint.registration.event',
+                                    exchange='exchange.dell.cpsd.endpoint.registration.event',
+                                    routing_key='#')
+
+    af_support_tools.rmq_bind_queue(host=ipaddress,
+                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                    queue='test.controlplane.vcenter.response',
+                                    exchange='exchange.cpsd.controlplane.vcenter.response',
+                                    routing_key='#')
 
 def cleanup():
     print('Cleaning up...')
@@ -1083,6 +1102,11 @@ def cleanup():
     af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
                                       queue='test.hdp.capability.registry.event')
 
+    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                      queue='test.endpoint.registration.event')
+
+    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                      queue='test.controlplane.vcenter.response')
 
 def waitForMsg(queue):
     # This function keeps looping untill a message is in the specified queue. We do need it to timeout and throw an error
@@ -1115,13 +1139,11 @@ def waitForMsg(queue):
             cleanup()
             break
 
-
 def checkForErrors(return_message):
     checklist = 'errors'
     if checklist in return_message:
         print('\nBUG: Error in Response Message\n')
         assert False  # This assert is to fail the test
-
 
 def checkForFailures(return_message):
     checklist = 'failureReasons'
@@ -1131,7 +1153,6 @@ def checkForFailures(return_message):
         print('The following error has been returned :', errorMsg)
         print('Possible component validation issue')
         assert False  # This assert is to fail the test
-
 
 def getdockerID(imageName):
     image = imageName
@@ -1143,7 +1164,6 @@ def getdockerID(imageName):
     containerID = containerID.strip()
     return (containerID)
 
-
 def getdockerStatus(imageName):
     image = imageName
 
@@ -1154,13 +1174,11 @@ def getdockerStatus(imageName):
     containerStatus = containerStatus.strip()
     return (containerStatus)
 
-
-def rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host=None,exchange=None):
+def rest_queue_list(user=None, password=None, host=None, port=15672, virtual_host=None, exchange=None):
     url = 'http://%s:%s/api/exchanges/%s/%s/bindings/source' % (host, port, virtual_host, exchange)
     response = requests.get(url, auth=(user, password))
     queues = [q['destination'] for q in response.json()]
     return queues
-
 
 def test_queues_on_exchange(suppliedExchange, suppliedQueue):
     queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
@@ -1169,6 +1187,5 @@ def test_queues_on_exchange(suppliedExchange, suppliedQueue):
 
     assert suppliedQueue in queues, 'The queue "' + suppliedQueue + '" is not bound to the exchange "' + suppliedExchange + '"'
     print(suppliedExchange, '\nis bound to\n', suppliedQueue, '\n')
-
 
 #######################################################################################################################
