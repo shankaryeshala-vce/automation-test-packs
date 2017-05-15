@@ -433,54 +433,54 @@ def test_capabilityRegistry_Exchanges():
     print('\n*******************************************************')
 
     print("\nTest: Verify the the Capability Registry Binding is bound to the correct queues\n")
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.binding',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.binding',
                             'queue.dell.cpsd.hdp.capability.registry.binding')
 
 
     print("\nTest: Verify the the Capability Registry Control is bound to the correct queues\n")
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
                             'queue.dell.cpsd.hdp.capability.registry.control.cisco-network-data-provider')
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
                             'queue.dell.cpsd.hdp.capability.registry.control.endpoint-registry')
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
                             'queue.dell.cpsd.hdp.capability.registry.control.node-discovery-paqx')
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
                             'queue.dell.cpsd.hdp.capability.registry.control.poweredge-compute-data-provider')
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
                             'queue.dell.cpsd.hdp.capability.registry.control.rackhd-adapter')
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
                             'queue.dell.cpsd.hdp.capability.registry.control.vcenter-adapter')
 
 
     print("\nTest: Verify the the Capability Registry Event is bound to the correct queues\n")
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
                             'queue.dell.cpsd.hdp.capability.registry.event.node-discovery-paqx')
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
                             'queue.dell.cpsd.hdp.capability.registry.event.dne-paqx')
     # test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.fru-paqx')
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
                             'queue.dell.cpsd.hdp.capability.registry.event.rackhd-adapter')
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
                             'queue.dell.cpsd.hdp.capability.registry.event.vcenter-adapter')
 
 
     print("\nTest: Verify the the Capability Registry Request is bound to the correct queues\n")
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.request',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.request',
                             'queue.dell.cpsd.hdp.capability.registry.request')
 
 
     print("\nTest: Verify the the Capability Registry Response is bound to the correct queues\n")
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
                             'queue.dell.cpsd.hdp.capability.registry.response.coprhd-adapter')
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
                             'queue.dell.cpsd.hdp.capability.registry.response.dne-paqx')
     # test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response', 'queue.dell.cpsd.hdp.capability.registry.response.fru-paqx')
     # test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response', 'queue.dell.cpsd.hdp.capability.registry.response.hal-orchestrator-service')
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
                             'queue.dell.cpsd.hdp.capability.registry.response.node-discovery-paqx')
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
                             'queue.dell.cpsd.hdp.capability.registry.response.rackhd-adapter')
-    test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
                             'queue.dell.cpsd.hdp.capability.registry.response.vcenter-adapter')
 
     print('\n*******************************************************')
@@ -1181,13 +1181,13 @@ def getdockerStatus(imageName):
     containerStatus = containerStatus.strip()
     return (containerStatus)
 
-def rest_queue_list(user=None, password=None, host=None, port=15672, virtual_host=None, exchange=None):
+def rest_queue_list(user=None, password=None, host=None, port=None, virtual_host=None, exchange=None):
     url = 'http://%s:%s/api/exchanges/%s/%s/bindings/source' % (host, port, virtual_host, exchange)
     response = requests.get(url, auth=(user, password))
     queues = [q['destination'] for q in response.json()]
     return queues
 
-def test_queues_on_exchange(suppliedExchange, suppliedQueue):
+def validate_queues_on_exchange(suppliedExchange, suppliedQueue):
     queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
                              exchange=suppliedExchange)
     queues = json.dumps(queues)
