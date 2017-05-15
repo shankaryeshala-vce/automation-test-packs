@@ -215,30 +215,37 @@ def test_capabilityRegistry_Control_and_Binding():
             checkForErrors(return_message)
 
             if capabilityProviderVcenter in return_message:
+                assert vcenterAdapterTested == False, ('Error: Multiple', capabilityProviderVcenter, 'containers are running')
                 print('Test:', capabilityProviderVcenter, 'Binding Message returned\n')
                 vcenterAdapterTested = True
 
             if capabilityProviderNodeDiscoveryPaqx in return_message:
+                assert nodeDiscoveryTested == False, ('Error: Multiple', capabilityProviderNodeDiscoveryPaqx, 'containers are running')
                 print('Test:', capabilityProviderNodeDiscoveryPaqx, 'Binding Message returned\n')
                 nodeDiscoveryTested = True
 
             if capabilityProviderRackhdAdapter in return_message:
+                assert rackhdAdapterTested == False, ('ERROR: Multiple', capabilityProviderRackhdAdapter, 'containers are running')
                 print('Test:', capabilityProviderRackhdAdapter, 'Binding Message returned\n')
                 rackhdAdapterTested = True
 
             if capabilityProviderPowerEdge in return_message:
+                assert powerEdgeProviderTested == False, ('Error: Multiple', capabilityProviderPowerEdge, 'containers are running')
                 print('Test:', capabilityProviderPowerEdge, 'Binding Message returned\n')
                 powerEdgeProviderTested = True
 
             if capabilityProviderCisco in return_message:
+                assert ciscoProviderTested == False, ('Error: Multiple', capabilityProviderCisco, 'containers are running')
                 print('Test:', capabilityProviderCisco, 'Binding Message returned\n')
                 ciscoProviderTested = True
 
             if capabilityProviderEndpoint in return_message:
+                assert endpointTested == False, ('Error: Multiple', capabilityProviderEndpoint, 'containers are running')
                 print('Test:', capabilityProviderEndpoint, 'Binding Message returned\n')
                 endpointTested = True
 
             if capabilityProviderCoprhd in return_message:
+                assert coprhdtested == False, ('Error: Multiple', capabilityProviderCoprhd, 'containers are running')
                 print('Test:', capabilityProviderCoprhd, 'Binding Message returned\n')
                 coprhdtested = True
 
