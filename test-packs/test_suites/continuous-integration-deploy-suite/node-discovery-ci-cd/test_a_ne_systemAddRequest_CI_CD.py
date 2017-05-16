@@ -106,6 +106,11 @@ def test_DNE_SystemAdditionRequested():
     # # TODO above is commented out as its consumming the wrong message
     #
     #
+    # # TODO we could also include a consul api test here
+    # # eg:http://10.3.60.83:8500/v1/agent/services
+    #
+    #
+    #
     # #****************************************************
 
 
