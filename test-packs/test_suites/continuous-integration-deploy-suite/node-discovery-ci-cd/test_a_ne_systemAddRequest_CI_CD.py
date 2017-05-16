@@ -9,6 +9,7 @@ import json
 import os
 import pytest
 import time
+import requests
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -109,6 +110,7 @@ def test_DNE_SystemAdditionRequested():
     # # TODO we could also include a consul api test here
     # # eg:http://10.3.60.83:8500/v1/agent/services
     #
+    # verifyVcenterInConsulAPI()
     #
     #
     # #****************************************************
@@ -206,3 +208,76 @@ def checkForErrors(return_message):
     if checklist in return_message:
         print('\nBUG: Error in Response Message\n')
         assert False  # This assert is to fail the test
+
+
+def verifyVcenterInConsulAPI():
+    # print('\nListing vCenter Clusters on API')
+
+    url_body = ':8500/v1/agent/services'
+    my_url = 'http://' + ipaddress + url_body
+
+    print('GET:', my_url)
+
+    try:
+        url_response = requests.get(my_url)
+        url_response.raise_for_status()
+
+    except requests.exceptions.HTTPError as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        assert False
+
+    except requests.exceptions.Timeout as err:
+        # Not an HTTP-specific error (e.g. connection refused)
+        print(err)
+        print('\n')
+        assert False
+
+    else:
+        # 200
+        print(url_response)
+
+        the_response = url_response.text
+
+        vcenter = '"Service": "vcenter"'
+        assert vcenter in the_response
+        print('vCenter Registered in consul')
+
+        if vcenter in the_response:
+            verifyVcenterStatusInConsulAPI()
+
+
+def verifyVcenterStatusInConsulAPI():
+    # print('\nListing vCenter Clusters on API')
+
+    url_body = ':8500/v1/health/checks/vcenter'
+    my_url = 'http://' + ipaddress + url_body
+
+    print('GET:', my_url)
+
+    try:
+        url_response = requests.get(my_url)
+        url_response.raise_for_status()
+
+    except requests.exceptions.HTTPError as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        assert False
+
+    except requests.exceptions.Timeout as err:
+        # Not an HTTP-specific error (e.g. connection refused)
+        print(err)
+        print('\n')
+        assert False
+
+    else:
+        # 200
+        print(url_response)
+
+        the_response = url_response.text
+
+        vcenterStatus = '"Status": "passing"'
+        assert vcenterStatus in the_response
+        print('vCenter Status = Passing in consul')
