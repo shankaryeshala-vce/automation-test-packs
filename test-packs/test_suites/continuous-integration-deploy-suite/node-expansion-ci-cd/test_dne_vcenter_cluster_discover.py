@@ -260,7 +260,6 @@ def vCenterConfigApplicationProperties():
 def vCenterRegistrationMsg():
     # Until there is a way to automatically register a vcenter we need to register it manually by sending this message.
 
-    print('inhere')
     af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
                                      queue='test.controlplane.vcenter.response')
 
