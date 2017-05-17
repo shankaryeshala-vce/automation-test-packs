@@ -3,7 +3,6 @@
 # Revision: 1.0
 # Code Reviewed by:
 # Description: Testing the Consul Container.
-# test_consul_config.py
 
 import af_support_tools
 import pytest
@@ -38,7 +37,7 @@ def load_test_data():
     global rmq_password
     rmq_password = 'guest'
     global port
-    port = 5671
+    port = 5672
 
 ##############################################################################################
 
