@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # Author: cullia
-# Revision: 2.0
+# Revision: 1.0
 # Code Reviewed by:
 # Description: Configure a system with vcenter & rackhd
 
@@ -50,7 +50,7 @@ def load_test_data():
 
 #######################################################################################################################
 
-
+#This test is nto being run yet as the functionality does not yet exist.
 # @pytest.mark.dne_paqx_parent_mvp
 def test_DNE_SystemAdditionRequested():
     print('Defining System on system: ', ipaddress)
@@ -110,7 +110,7 @@ def test_DNE_SystemAdditionRequested():
     # # TODO we could also include a consul api test here
     # # eg:http://10.3.60.83:8500/v1/agent/services
     #
-    # verifyVcenterInConsulAPI()
+    # verifyServiceInConsulAPI('vcenter')
     #
     #
     # #****************************************************
@@ -210,8 +210,7 @@ def checkForErrors(return_message):
         assert False  # This assert is to fail the test
 
 
-def verifyVcenterInConsulAPI():
-    # print('\nListing vCenter Clusters on API')
+def verifyServiceInConsulAPI(service):
 
     url_body = ':8500/v1/agent/services'
     my_url = 'http://' + ipaddress + url_body
@@ -240,18 +239,17 @@ def verifyVcenterInConsulAPI():
 
         the_response = url_response.text
 
-        vcenter = '"Service": "vcenter"'
-        assert vcenter in the_response
-        print('vCenter Registered in consul')
+        serviceToCheck = '"Service": "'+service+'"'
+        assert serviceToCheck in the_response, ('ERROR:', service, 'is not in Consul\n')
+        print(service, 'Registered in consul')
 
-        if vcenter in the_response:
-            verifyVcenterStatusInConsulAPI()
+        if serviceToCheck in the_response:
+            verifyServiceStatusInConsulAPI(service)
 
 
-def verifyVcenterStatusInConsulAPI():
-    # print('\nListing vCenter Clusters on API')
+def verifyServiceStatusInConsulAPI(service):
 
-    url_body = ':8500/v1/health/checks/vcenter'
+    url_body = ':8500/v1/health/checks/'+service
     my_url = 'http://' + ipaddress + url_body
 
     print('GET:', my_url)
@@ -278,6 +276,7 @@ def verifyVcenterStatusInConsulAPI():
 
         the_response = url_response.text
 
-        vcenterStatus = '"Status": "passing"'
-        assert vcenterStatus in the_response
-        print('vCenter Status = Passing in consul')
+        serviceStatus = '"Status": "passing"'
+        assert serviceStatus in the_response, ('ERROR:', service, 'is not Passing in Consul\n')
+        print(service, 'Status = Passing in consul\n\n')
+
