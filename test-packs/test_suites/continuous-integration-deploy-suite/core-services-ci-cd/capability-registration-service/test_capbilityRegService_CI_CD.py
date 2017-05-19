@@ -71,14 +71,15 @@ def load_test_data():
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_capabilityRegistry_Control_and_Binding():
+def test_capabilityRegistry_Control_and_Binding_Ping_Message():
     # Every 7 seconds the Capability Registery sends out a message asking "who's out there?" This is a "ping" message.
     # Each service that is alive will respond with a "pong" message.  The correlationID value will be the same on all
     # messages so this is used to track that we are getting the correct message and not just "any" message.
+
     print('\nRunning Test on system: ', ipaddress)
 
-    cleanup()
-    bindQueues()
+    cleanupControlBinding()
+    bindQueuesControlBinding()
 
     # Until there is full integration of services we need to register the RackHD & VCenter manually by sending these messages
     print('\nPrerequisite: Manually configuring RackHD & VCenter')
@@ -86,6 +87,7 @@ def test_capabilityRegistry_Control_and_Binding():
     consulBypassMsgRackHD()
     vCenterRegistrationMsg()
     time.sleep(10)
+    print('\n*******************************************************\n')
 
     # PART 1
     # Testing that the capability.registry.control is sending its ping message.  Its expected that in the body of the
@@ -93,8 +95,12 @@ def test_capabilityRegistry_Control_and_Binding():
     # actual Docker ContainerID value.
     # The correlationID of the consumed message is saved and will be used in the capabilityRegistryBinding() test to
     # trace the response "pong" messages.
-    time.sleep(7)
+
     # Ensure the Control & Binding Queues are empty to start
+
+    global correlationID
+
+    time.sleep(7)
     af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
                                      queue='test.capability.registry.control')
     af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
@@ -136,10 +142,12 @@ def test_capabilityRegistry_Control_and_Binding():
     print('The Capability Registry Control Ping message is sent and has the correct containerID:', containerID)
     print('\n*******************************************************\n')
 
-    ####################################################################################################################
-    #
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Control_and_Binding_Pong_Message():
+
     # PART 2
-    # Testing that the expected providers/adapters are sending their respective Pong messages in responce to the Control
+    # Testing that the expected providers/adapters are sending their respective Pong messages in response to the Control
     # Ping message.  The CorrelationID from the control Ping message is used.
 
     print("Test: The Capability Registry Binding. Verify the Pong message from each provider / adapter")
@@ -152,6 +160,7 @@ def test_capabilityRegistry_Control_and_Binding():
     capabilityProviderNodeDiscoveryPaqx = 'node-discovery-paqx'
     capabilityProviderVcenter = 'vcenter-adapter'
     capabilityProviderCoprhd = 'coprhd-adapter'
+    capabilityProviderVcenterDP = 'vcenter-compute-data-provider'
 
     # Each provider/adapter is given a flag that will be set to True once its responded. This method is used as the order
     # in which the responses come in is random. When all are tested the allTested flag is set and the test completes.
@@ -162,12 +171,13 @@ def test_capabilityRegistry_Control_and_Binding():
     nodeDiscoveryTested = False
     vcenterAdapterTested = False
     coprhdtested = False
+    vcenterDPtested = False
     allTested = False
 
     # To prevent the test waiting indefinitely we need to provide a timeout.  When new adapters/providers are added to
     # the test the expectedNumberOfBindings value will increase.
     errorTimeout = 0
-    expectedNumberOfBindings = 7
+    expectedNumberOfBindings = 8
 
     # Keep consuming messages until this condition is no longer true
     while allTested == False and errorTimeout <= expectedNumberOfBindings:
@@ -188,6 +198,7 @@ def test_capabilityRegistry_Control_and_Binding():
                                                                   rmq_password=rmq_password,
                                                                   queue='test.capability.registry.binding')
             checkForErrors(return_message)
+
 
             if capabilityProviderVcenter in return_message:
                 assert vcenterAdapterTested == False, ('Error: Multiple', capabilityProviderVcenter, 'containers are running')
@@ -224,13 +235,19 @@ def test_capabilityRegistry_Control_and_Binding():
                 print('Test:', capabilityProviderCoprhd, 'Binding Message returned\n')
                 coprhdtested = True
 
+            if capabilityProviderVcenterDP in return_message:
+                assert vcenterDPtested == False, ('Error: Multiple', capabilityProviderVcenterDP, 'containers are running')
+                print('Test:', capabilityProviderVcenterDP, 'Binding Message returned\n')
+                vcenterDPtested = True
+
             if ciscoProviderTested == True \
                     and endpointTested == True \
                     and powerEdgeProviderTested == True \
                     and nodeDiscoveryTested == True \
                     and rackhdAdapterTested == True \
                     and vcenterAdapterTested == True \
-                    and coprhdtested == True:
+                    and coprhdtested == True \
+                    and vcenterDPtested == True:
                 allTested = True
 
         # A timeout is included to prevent an infinite loop waiting for a response.
@@ -257,13 +274,19 @@ def test_capabilityRegistry_Control_and_Binding():
             if coprhdtested == False:
                 print('ERROR:', capabilityProviderCoprhd, 'Binding Message is not returned')
 
+            if vcenterDPtested == False:
+                print('ERROR:', capabilityProviderVcenterDP, 'Binding Message is not returned')
+
             assert False, 'Not all expected bindings are replying'
 
         errorTimeout += 1
 
     print('\n*******************************************************\n')
 
-    cleanup()
+    cleanupControlBinding()
+
+#****************************************************************
+# Testing that all expected capabilites are returned int the List Capabilities Message
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
@@ -663,68 +686,148 @@ def test_capabilityRegistry_ListCapabilities_vcenter_compute_data_provider():
     cleanup_CapRegResp()
 
 
-@pytest.mark.core_services_mvp
+#****************************************************************
+# Verify the capability.registry Exchanges are bound to the correct queues
+
+pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_capabilityRegistry_Exchanges():
+def test_capabilityRegistry_Exchanges_capability_registry_binding_to_capability_registry_binding():
 
-    # Verify the capability.registry Exchanges are bound to the correct queues
-
-    # Format: test_queues_on_exchange(exchange, expected queue)
-
-    print('\n*******************************************************')
-
-    print("\nTest: Verify the the Capability Registry Binding is bound to the correct queues\n")
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.binding',
                             'queue.dell.cpsd.hdp.capability.registry.binding')
 
+#****************************************************************
+# Verify the capability.registry Exchanges are bound to the correct queues
 
-    print("\nTest: Verify the the Capability Registry Control is bound to the correct queues\n")
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_control_to_cisco_network_data_provider():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
                             'queue.dell.cpsd.hdp.capability.registry.control.cisco-network-data-provider')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_control_to_endpoint_registry():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
                             'queue.dell.cpsd.hdp.capability.registry.control.endpoint-registry')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_control_to_node_discovery_paqx():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
                             'queue.dell.cpsd.hdp.capability.registry.control.node-discovery-paqx')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_control_to_poweredge_compute_data_provider():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
                             'queue.dell.cpsd.hdp.capability.registry.control.poweredge-compute-data-provider')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_control_to_rackhd_adapter():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
                             'queue.dell.cpsd.hdp.capability.registry.control.rackhd-adapter')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_control_to_vcenter_adapter():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
                             'queue.dell.cpsd.hdp.capability.registry.control.vcenter-adapter')
 
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_control_to_vcenter_compute_data_provider():
 
-    print("\nTest: Verify the the Capability Registry Event is bound to the correct queues\n")
+    validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
+                            'queue.dell.cpsd.hdp.capability.registry.control.vcenter-compute-data-provider')
+
+#****************************************************************
+# Verify the capability.registry Exchanges are bound to the correct queues
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_event_to_event_node_discovery_paqx():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
                             'queue.dell.cpsd.hdp.capability.registry.event.node-discovery-paqx')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_event_to_event_dne_paqx():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
                             'queue.dell.cpsd.hdp.capability.registry.event.dne-paqx')
-    # test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.fru-paqx')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_event_to_event_rackhd_adapter():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
                             'queue.dell.cpsd.hdp.capability.registry.event.rackhd-adapter')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_event_to_event_vcenter_adapter():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
                             'queue.dell.cpsd.hdp.capability.registry.event.vcenter-adapter')
 
+#****************************************************************
+# Verify the capability.registry Exchanges are bound to the correct queues
 
-    print("\nTest: Verify the the Capability Registry Request is bound to the correct queues\n")
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_request_to_capability_registry_request():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.request',
                             'queue.dell.cpsd.hdp.capability.registry.request')
 
+#****************************************************************
+# Verify the capability.registry Exchanges are bound to the correct queues
 
-    print("\nTest: Verify the the Capability Registry Response is bound to the correct queues\n")
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_coprhd_adapter():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
                             'queue.dell.cpsd.hdp.capability.registry.response.coprhd-adapter')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_dne_paqx():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
                             'queue.dell.cpsd.hdp.capability.registry.response.dne-paqx')
-    # test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response', 'queue.dell.cpsd.hdp.capability.registry.response.fru-paqx')
-    # test_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response', 'queue.dell.cpsd.hdp.capability.registry.response.hal-orchestrator-service')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_node_discovery_paqx():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
                             'queue.dell.cpsd.hdp.capability.registry.response.node-discovery-paqx')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_rackhd_adapter():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
                             'queue.dell.cpsd.hdp.capability.registry.response.rackhd-adapter')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_vcenter_adapter():
+
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
                             'queue.dell.cpsd.hdp.capability.registry.response.vcenter-adapter')
 
-    print('\n*******************************************************')
+#****************************************************************
 
 # It's likely this test will be removed as the functionality to stop & start containers is being removed
 @pytest.mark.core_services_mvp_extended
@@ -1333,6 +1436,19 @@ def bindQueues_CapRegResp():
                                     exchange='exchange.dell.cpsd.hdp.capability.registry.response',
                                     routing_key='#')
 
+def bindQueuesControlBinding():
+    af_support_tools.rmq_bind_queue(host=ipaddress,
+                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                    queue='test.capability.registry.control',
+                                    exchange='exchange.dell.cpsd.hdp.capability.registry.control',
+                                    routing_key='#')
+
+    af_support_tools.rmq_bind_queue(host=ipaddress,
+                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                    queue='test.capability.registry.binding',
+                                    exchange='exchange.dell.cpsd.hdp.capability.registry.binding',
+                                    routing_key='#')
+
 def cleanup():
     print('Cleaning up...')
 
@@ -1366,6 +1482,14 @@ def cleanup():
 def cleanup_CapRegResp():
     af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
                                       queue='test.capability.registry.response')
+
+def cleanupControlBinding():
+
+    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                      queue='test.capability.registry.control')
+
+    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                      queue='test.capability.registry.binding')
 
 def waitForMsg(queue):
     # This function keeps looping untill a message is in the specified queue. We do need it to timeout and throw an error
