@@ -43,14 +43,12 @@ def load_test_data():
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_consul_config():
+def test_consul_servicerunning():
 
     print('\n* * * Testing Consul on system:', ipaddress, '* * *\n')
 
     service_name = 'consul'
 
-
-    # 1. Test the service is running
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password, command=sendCommand, return_output=True)
     my_return_status=my_return_status.strip()
@@ -58,10 +56,26 @@ def test_consul_config():
     assert my_return_status == 'Up', (service_name + " not running")
 
 
-    # 2. Verify the Consul API. It is expected that these are running on firstboot.
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_consul_verify_vault():
+
     verifyServiceInConsulAPI('vault')
+
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_consul_verify_apigateway():
+
     verifyServiceInConsulAPI('api-gateway')
+
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_consul_config_dne_paqx():
+
     verifyServiceInConsulAPI('dne-paqx')
+
 
 
 ##############################################################################################
