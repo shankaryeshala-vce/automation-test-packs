@@ -72,7 +72,7 @@ def test_consul_verify_apigateway():
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_consul_config_dne_paqx():
+def test_consul_verify_dne_paqx():
 
     verifyServiceInConsulAPI('dne-paqx')
 
