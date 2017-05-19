@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # Author: cullia
-# Revision: 2.0
+# Revision: 2.1
 # Code Reviewed by:
 # Description:
 
@@ -43,15 +43,6 @@ def load_test_data():
     global port
     port = 5672
 
-    #capreg_config_property_rmq_user = 'rmq_user'
-    #capreg_config_property_rmq_password = 'rmq_password'
-    #capreg_config_property_cli_user = 'cli_user'
-    #capreg_config_property_cli_password = 'cli_password'
-    #capreg_config_property_rackhd_ip = 'rackhd_ipaddress'
-    #capreg_config_property_vcenter = 'vcenter'
-    #capreg_config_property_vcenter_user = 'vcenter_user'
-    #capreg_config_property_vcenter_password = 'vcenter_password'
-
     global rackHD_IP
     rackHD_IP = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header, property='rackhd_ipaddress')
     global vCenterFQDN
@@ -75,22 +66,6 @@ def load_test_data():
     global startVcenterAdapter
     startVcenterAdapter = 'docker run --net=host -v /opt/dell/cpsd/:/opt/dell/cdsd -v /opt/dell/cpsd/vcenter-adapter-service/keystore/:/opt/dell/cpsd/vcenter-adapter-service/keystore/ -td cpsd-vcenter-adapter-service'
 
-    # The following are the number of Capabilities Tested. If this total number does not match what is returned then the test will need to be updated.
-    numOfCiscoProviderCapabilities = 2
-    numOfPowerEdgeCapabilities = 2
-    numOfRackHDAdapterCapabilities = 7
-    numOfNodeDiscoveredPaqxCapabilities = 1
-    numOfEndPointRegisteryCapabilities = 1
-    numOfVcenterApapterCapabilities = 8
-    numOfcoprHDCapabilities = 1
-    global totalNumOfCapabilitiesTested
-    totalNumOfCapabilitiesTested = numOfCiscoProviderCapabilities \
-                                   + numOfPowerEdgeCapabilities \
-                                   + numOfRackHDAdapterCapabilities \
-                                   + numOfNodeDiscoveredPaqxCapabilities \
-                                   + numOfEndPointRegisteryCapabilities \
-                                   + numOfVcenterApapterCapabilities \
-                                   + numOfcoprHDCapabilities
 
 #######################################################################################################################
 
@@ -292,17 +267,20 @@ def test_capabilityRegistry_Control_and_Binding():
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_capabilityRegistry_ListCapabilities():
-    # We are testing that all expected capabilites are returned when a capability Registry Request Message is sent.
-    # All providers and their capabilities should be listed
+def test_capabilityRegistry_ListCapabilities_cisco_network_data_provider():
+    # We are testing that all expected capabilites are returned for the Cisco Network Adapter when a capability Registry
+    # Request Message is sent.
 
-    cleanup()
-    bindQueues()
+    print('\n*******************************************************\n')
 
-    print("\nTest: Send in a list capabilities message and to verify all providers are present")
+    cleanup_CapRegResp()
+    bindQueues_CapRegResp()
+
+    print(
+        "\nTest: Send in a list capabilities message and to verify all cisco-network-data-provider capabilities are present")
 
     # Send in a "list capabilities message"
-    originalcorrelationID = 'capability-registry-list-test-correlationid'
+    originalcorrelationID = 'capability-registry-list-test-cisco-corID'
     the_payload = '{}'
 
     af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
@@ -324,8 +302,6 @@ def test_capabilityRegistry_ListCapabilities():
     checkForErrors(return_message)
     checkForFailures(return_message)
 
-    # New proviers/adapters and their capabilites can be added here.
-
     # Verify the Cisco Network Adapter Response.
     ciscoName = 'cisco-network-data-provider'
     ciscoCapabilities1 = 'device-data-discovery'
@@ -333,21 +309,136 @@ def test_capabilityRegistry_ListCapabilities():
     assert ciscoName in return_message, (ciscoName, 'not returned')
     assert ciscoCapabilities1 in return_message, (ciscoCapabilities1, 'capability is not available')
     assert ciscoCapabilities2 in return_message, (ciscoCapabilities2, 'capability is not available')
-    print('\nAll expected cisco-network-data-provider Capabilities Returned')
+    print('\nAll expected cisco-network-data-provider Capabilities Returned\n')
+
+    cleanup_CapRegResp()
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_ListCapabilities_node_discovery_paqx():
+    # We are testing that all expected capabilites for Node Discovery Response are returned when a capability Registry
+    # Request Message is sent.
+
+    print('\n*******************************************************\n')
+
+    cleanup_CapRegResp()
+    bindQueues_CapRegResp()
+
+    print("\nTest: Send in a list capabilities message and to verify all node-discovery-paqx capabilities are present")
+
+    # Send in a "list capabilities message"
+    originalcorrelationID = 'capability-registry-list-node-discover-corID'
+    the_payload = '{}'
+
+    af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                         rmq_password=rmq_password,
+                                         exchange='exchange.dell.cpsd.hdp.capability.registry.request',
+                                         routing_key='dell.cpsd.hdp.capability.registry.request',
+                                         headers={
+                                             '__TypeId__': 'com.dell.cpsd.hdp.capability.registry.list.capability.providers'},
+                                         payload=the_payload,
+                                         payload_type='json',
+                                         correlation_id={originalcorrelationID})
+
+    # Wait for and consume the Capability Response Message
+    waitForMsg('test.capability.registry.response')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.capability.registry.response')
+
+    checkForErrors(return_message)
+    checkForFailures(return_message)
 
     # Verify the Node Discovery Response
     nodeDisName = 'node-discovery-paqx'
     nodeDisCapabilities1 = 'list-discovered-nodes'
     assert nodeDisName in return_message, (nodeDisName, 'not returned')
     assert nodeDisCapabilities1 in return_message, (nodeDisCapabilities1, 'capability is not available')
-    print('All expected node-discovery-paqx Capabilities Returned')
+
+    print('All expected node-discovery-paqx Capabilities Returned\n')
+
+    cleanup_CapRegResp()
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_ListCapabilities_endpoint_registry():
+    # We are testing that all expected capabilites for Endpoint Registery Response are returned when a capability Registry
+    # Request Message is sent.
+
+    print('\n*******************************************************\n')
+
+    cleanup_CapRegResp()
+    bindQueues_CapRegResp()
+
+    print("\nTest: Send in a list capabilities message and to verify all endpoint-registry capabilities are present")
+
+    # Send in a "list capabilities message"
+    originalcorrelationID = 'capability-registry-listendpoint-registry-corID'
+    the_payload = '{}'
+
+    af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                         rmq_password=rmq_password,
+                                         exchange='exchange.dell.cpsd.hdp.capability.registry.request',
+                                         routing_key='dell.cpsd.hdp.capability.registry.request',
+                                         headers={
+                                             '__TypeId__': 'com.dell.cpsd.hdp.capability.registry.list.capability.providers'},
+                                         payload=the_payload,
+                                         payload_type='json',
+                                         correlation_id={originalcorrelationID})
+
+    # Wait for and consume the Capability Response Message
+    waitForMsg('test.capability.registry.response')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.capability.registry.response')
+
+    checkForErrors(return_message)
+    checkForFailures(return_message)
 
     # Verify the Endpoint Registery Response
     endPointRegName = 'endpoint-registry'
     endPointRegCapabilities1 = 'endpoint-registry-lookup'
     assert endPointRegName in return_message, (endPointRegName, 'not returned')
     assert endPointRegCapabilities1 in return_message, (endPointRegCapabilities1, 'capability is not available')
-    print('All expected endpoint-registry Capabilities Returned')
+    print('All expected endpoint-registry Capabilities Returned\n')
+
+    cleanup_CapRegResp()
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_ListCapabilities_poweredge_compute_data_provider():
+    # We are testing that all expected capabilites for PowerEdge Compute Response are returned when a capability Registry
+    # Request Message is sent.
+
+    print('\n*******************************************************\n')
+
+    cleanup_CapRegResp()
+    bindQueues_CapRegResp()
+
+    print("\nTest: Send in a list capabilities message and to verify all PowerEdge capabilities are present")
+
+    # Send in a "list capabilities message"
+    originalcorrelationID = 'capability-registry-list-PowerEdge-corID'
+    the_payload = '{}'
+
+    af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                         rmq_password=rmq_password,
+                                         exchange='exchange.dell.cpsd.hdp.capability.registry.request',
+                                         routing_key='dell.cpsd.hdp.capability.registry.request',
+                                         headers={
+                                             '__TypeId__': 'com.dell.cpsd.hdp.capability.registry.list.capability.providers'},
+                                         payload=the_payload,
+                                         payload_type='json',
+                                         correlation_id={originalcorrelationID})
+
+    # Wait for and consume the Capability Response Message
+    waitForMsg('test.capability.registry.response')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.capability.registry.response')
+
+    checkForErrors(return_message)
+    checkForFailures(return_message)
 
     # Verify the PowerEdge Response
     powerEdgeName = 'poweredge-compute-data-provider'
@@ -356,7 +447,45 @@ def test_capabilityRegistry_ListCapabilities():
     assert powerEdgeName in return_message, (powerEdgeName, 'not returned')
     assert powerEdgeCapabilities1 in return_message, (powerEdgeCapabilities1, 'capability is not available')
     assert powerEdgeCapabilities2 in return_message, (powerEdgeCapabilities2, 'capability is not available')
-    print('All expected poweredge-compute-data-provider Capabilities Returned')
+    print('All expected poweredge-compute-data-provider Capabilities Returned\n')
+
+    cleanup_CapRegResp()
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_ListCapabilities_rackhd_adapter():
+    # We are testing that all expected capabilites for RackHD Adapter  Response are returned when a capability Registry
+    # Request Message is sent.
+
+    print('\n*******************************************************\n')
+
+    cleanup_CapRegResp()
+    bindQueues_CapRegResp()
+
+    print("\nTest: Send in a list capabilities message and to verify all RackHD Adapter capabilities are present")
+
+    # Send in a "list capabilities message"
+    originalcorrelationID = 'capability-registry-list-rackhd-adapter-corID'
+    the_payload = '{}'
+
+    af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                         rmq_password=rmq_password,
+                                         exchange='exchange.dell.cpsd.hdp.capability.registry.request',
+                                         routing_key='dell.cpsd.hdp.capability.registry.request',
+                                         headers={
+                                             '__TypeId__': 'com.dell.cpsd.hdp.capability.registry.list.capability.providers'},
+                                         payload=the_payload,
+                                         payload_type='json',
+                                         correlation_id={originalcorrelationID})
+
+    # Wait for and consume the Capability Response Message
+    waitForMsg('test.capability.registry.response')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.capability.registry.response')
+
+    checkForErrors(return_message)
+    checkForFailures(return_message)
 
     # Verify the RackHD Apapter Response
     nodeDisName = 'rackhd-adapter'
@@ -375,7 +504,45 @@ def test_capabilityRegistry_ListCapabilities():
     assert nodeDisCapabilities5 in return_message, (nodeDisCapabilities5, 'capability is not available')
     assert nodeDisCapabilities6 in return_message, (nodeDisCapabilities6, 'capability is not available')
     assert nodeDisCapabilities7 in return_message, (nodeDisCapabilities7, 'capability is not available')
-    print('All expected rackhd-adapter Capabilities Returned')
+    print('All expected rackhd-adapter Capabilities Returned\n')
+
+    cleanup_CapRegResp()
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_ListCapabilities_vcenter_adapter():
+    # We are testing that all expected capabilites for VCenter Adapter Response are returned when a capability Registry
+    # Request Message is sent.
+
+    print('\n*******************************************************\n')
+
+    cleanup_CapRegResp()
+    bindQueues_CapRegResp()
+
+    print("\nTest: Send in a list capabilities message and to verify all VCenter Adapter capabilities are present")
+
+    # Send in a "list capabilities message"
+    originalcorrelationID = 'capability-registry-list-vcenter-adapter-corID'
+    the_payload = '{}'
+
+    af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                         rmq_password=rmq_password,
+                                         exchange='exchange.dell.cpsd.hdp.capability.registry.request',
+                                         routing_key='dell.cpsd.hdp.capability.registry.request',
+                                         headers={
+                                             '__TypeId__': 'com.dell.cpsd.hdp.capability.registry.list.capability.providers'},
+                                         payload=the_payload,
+                                         payload_type='json',
+                                         correlation_id={originalcorrelationID})
+
+    # Wait for and consume the Capability Response Message
+    waitForMsg('test.capability.registry.response')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.capability.registry.response')
+
+    checkForErrors(return_message)
+    checkForFailures(return_message)
 
     # Verify the VCenter Response
     vcenterName = 'vcenter-adapter'
@@ -396,7 +563,45 @@ def test_capabilityRegistry_ListCapabilities():
     assert vcenterCapabilities6 in return_message, (vcenterCapabilities6, 'capability is not available')
     assert vcenterCapabilities7 in return_message, (vcenterCapabilities7, 'capability is not available')
     assert vcenterCapabilities8 in return_message, (vcenterCapabilities8, 'capability is not available')
-    print('All expected vcenter-adapter Capabilities Returned')
+    print('All expected vcenter-adapter Capabilities Returned\n')
+
+    cleanup_CapRegResp()
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_ListCapabilities_coprhd_adapter():
+    # We are testing that all expected capabilites for CoprHD Adapter Response are returned when a capability Registry
+    # Request Message is sent.
+
+    print('\n*******************************************************\n')
+
+    cleanup_CapRegResp()
+    bindQueues_CapRegResp()
+
+    print("\nTest: Send in a list capabilities message and to verify all CoprHD Adapter capabilities are present")
+
+    # Send in a "list capabilities message"
+    originalcorrelationID = 'capability-registry-list-coprhd-adapter-corID'
+    the_payload = '{}'
+
+    af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                         rmq_password=rmq_password,
+                                         exchange='exchange.dell.cpsd.hdp.capability.registry.request',
+                                         routing_key='dell.cpsd.hdp.capability.registry.request',
+                                         headers={
+                                             '__TypeId__': 'com.dell.cpsd.hdp.capability.registry.list.capability.providers'},
+                                         payload=the_payload,
+                                         payload_type='json',
+                                         correlation_id={originalcorrelationID})
+
+    # Wait for and consume the Capability Response Message
+    waitForMsg('test.capability.registry.response')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.capability.registry.response')
+
+    checkForErrors(return_message)
+    checkForFailures(return_message)
 
     # Verify the CoprHD Response
     coprHDName = 'coprhd-adapter'
@@ -404,26 +609,59 @@ def test_capabilityRegistry_ListCapabilities():
     assert coprHDName in return_message, (coprHDName, 'not returned')
     assert coprHDCapabilities1 in return_message, (coprHDCapabilities1, 'capability is not available')
 
-    print('All expected coprhd-adapter Capabilities Returned')
+    print('All expected coprhd-adapter Capabilities Returned\n')
 
-    print('\nTested Number of Capabilities:', totalNumOfCapabilitiesTested)
+    cleanup_CapRegResp()
 
-    # We will check how many "capabilities" are returned in the message and compare that to how many we are testing. We
-    # do this becuase if new capabilites are added this test to this point would still Pass. If more capabilities are in
-    # the responce then we know the test needs to be updated.
-
-    returnedNumofCap = return_message.count('"profile"')  # count how many "profiles" (capabilities) are in the retuned msg.
-    print('Actual Number of Capabilites Returned:', returnedNumofCap, '\n')
-
-    # totalNumOfCapabilitiesTested value is calculated in the global settings above.
-    if returnedNumofCap > totalNumOfCapabilitiesTested:
-        print('Warning: test needs to be updated. Not all capabilities are tested')
-
-    # This assert is disabled as it is prefered that the test does not fail if it needs updating.
-    #assert totalNumOfCapabilitiesTested == returnedNumofCap, 'Test needs updating, more capabilites are available than are being tested'
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capabilityRegistry_ListCapabilities_vcenter_compute_data_provider():
+    # We are testing that all expected capabilites for vCenter Compute Data Provider Response are returned when a
+    # capability Registry Request Message is sent.
 
     print('\n*******************************************************\n')
-    cleanup()
+
+    cleanup_CapRegResp()
+    bindQueues_CapRegResp()
+
+    print(
+        "\nTest: Send in a list capabilities message and to verify all vCenter Compute Data Provider capabilities are present")
+
+    # Send in a "list capabilities message"
+    originalcorrelationID = 'capability-registry-list-vcenterdp-corID'
+    the_payload = '{}'
+
+    af_support_tools.rmq_publish_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                         rmq_password=rmq_password,
+                                         exchange='exchange.dell.cpsd.hdp.capability.registry.request',
+                                         routing_key='dell.cpsd.hdp.capability.registry.request',
+                                         headers={
+                                             '__TypeId__': 'com.dell.cpsd.hdp.capability.registry.list.capability.providers'},
+                                         payload=the_payload,
+                                         payload_type='json',
+                                         correlation_id={originalcorrelationID})
+
+    # Wait for and consume the Capability Response Message
+    waitForMsg('test.capability.registry.response')
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.capability.registry.response')
+
+    checkForErrors(return_message)
+    checkForFailures(return_message)
+
+    # Verify the vCenter Compute Data Provider Response
+    vcenterDPName = 'vcenter-compute-data-provider'
+    vcenterDPCapabilities1 = 'device-data-discovery'
+    vcenterDPCapabilities2 = 'device-endpoint-validation'
+    assert vcenterDPName in return_message, (vcenterDPName, 'not returned')
+    assert vcenterDPCapabilities1 in return_message, (vcenterDPCapabilities1, 'capability is not available')
+    assert vcenterDPCapabilities2 in return_message, (vcenterDPCapabilities1, 'capability is not available')
+
+    print('All expected vcenter-compute-data-provider Capabilities Returned\n')
+
+    cleanup_CapRegResp()
+
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
@@ -1088,6 +1326,13 @@ def bindQueues():
                                     exchange='exchange.cpsd.controlplane.vcenter.response',
                                     routing_key='#')
 
+def bindQueues_CapRegResp():
+    af_support_tools.rmq_bind_queue(host=ipaddress,
+                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                    queue='test.capability.registry.response',
+                                    exchange='exchange.dell.cpsd.hdp.capability.registry.response',
+                                    routing_key='#')
+
 def cleanup():
     print('Cleaning up...')
 
@@ -1117,6 +1362,10 @@ def cleanup():
 
     af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
                                       queue='test.controlplane.vcenter.response')
+
+def cleanup_CapRegResp():
+    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+                                      queue='test.capability.registry.response')
 
 def waitForMsg(queue):
     # This function keeps looping untill a message is in the specified queue. We do need it to timeout and throw an error
