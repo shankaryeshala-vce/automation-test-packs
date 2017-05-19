@@ -78,8 +78,8 @@ def test_capabilityRegistry_Control_and_Binding_Ping_Message():
 
     print('\nRunning Test on system: ', ipaddress)
 
-    cleanupControlBinding()
-    bindQueuesControlBinding()
+    cleanup()
+    bindQueues()
 
     # Until there is full integration of services we need to register the RackHD & VCenter manually by sending these messages
     print('\nPrerequisite: Manually configuring RackHD & VCenter')
@@ -283,7 +283,7 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message():
 
     print('\n*******************************************************\n')
 
-    cleanupControlBinding()
+    cleanup()
 
 #****************************************************************
 # Testing that all expected capabilites are returned int the List Capabilities Message
