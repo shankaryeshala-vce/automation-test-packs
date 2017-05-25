@@ -78,70 +78,35 @@ def test_DNE_SystemAdditionRequested():
     time.sleep(1)
 
     # Publish the message to define the system
-    af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username, rmq_password=rmq_password,
+    af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                         rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
                                          exchange='exchange.dell.cpsd.syds.system.definition.request',
                                          routing_key='dell.cpsd.syds.converged.system.addition.requested',
                                          headers={
                                              '__TypeId__': 'com.dell.cpsd.syds.converged.system.addition.requested'},
-                                         payload=the_payload)
+                                         payload=the_payload, ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
     # #****************************************************
-    # #TODO I think This is where we can monitor the vcenter registering with consul. Connented out until code committed. Need to validate manually via trace log first.
-    #
-    # #Make sure the queue is clean
-    # af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
-    #                                  queue='test.endpoint.registration.event')
-    #
-    # waitForMsg('test.controlplane.vcenter.response')
-    # return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
-    #                                                       rmq_password=rmq_password,
-    #                                                       queue='test.controlplane.vcenter.response',
-    #                                                       remove_message=True)
-    #
-    # checkForErrors(return_message)
-    # return_json = json.loads(return_message, encoding='utf-8')
-    # assert return_json['responseInfo']['message'] == 'SUCCESS', 'ERROR: Vcenter validation failure'
-    #
-    #
-    # waitForMsg('test.endpoint.registration.event')
-    # return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
-    #                                                       rmq_password=rmq_password,
-    #                                                       queue='test.endpoint.registration.event',
-    #                                                       remove_message=True)
-    #
-    # checkForErrors(return_message)
-    # return_json = json.loads(return_message, encoding='utf-8')
-    # # assert return_json['endpoint']['type'] == 'vcenter', 'vcenter not registered with endpoint'
-    # # TODO above is commented out as its consumming the wrong message
-    #
-    #
-    # # TODO we could also include a consul api test here
-    # # eg:http://10.3.60.83:8500/v1/agent/services
-    #
-    # verifyServiceInConsulAPI('vcenter')
-    #
-    #
-    # #****************************************************
-
 
     # Call the function to verify the system exists. This will return the system UUID.
 
     the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"sys-def-req-abcd-abcdabcdabcd","replyTo":"sds.localhost"},"systemsFilter":{"systemUuid":"","systemIdentifier":"","serialNumber":""}}'
 
-    af_support_tools.rmq_publish_message(host=ipaddress,
-                                         port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+    af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                         rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
                                          exchange='exchange.dell.cpsd.syds.system.definition.request',
                                          routing_key='dell.cpsd.syds.converged.system.list.requested',
                                          headers={'__TypeId__': 'com.dell.cpsd.syds.converged.system.list.requested'},
                                          payload=the_payload,
-                                         payload_type='json')
+                                         payload_type='json', ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
     # We need to wait until the queue gets the response message
     waitForMsg('test.system.list.found')
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port,
-                                                          rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.system.list.found')
+    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                                          rmq_username=cpsd.props.rmq_username,
+                                                          rmq_password=cpsd.props.rmq_password,
+                                                          queue='test.system.list.found',
+                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
     return_json = json.loads(return_message, encoding='utf-8')
     my_systemUuid = return_json['convergedSystems'][0]['uuid']
@@ -158,36 +123,40 @@ def cleanup():
     # Delete the test queues
     print('Cleaning up...')
 
-    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
-                                      queue='test.system.list.found')
+    af_support_tools.rmq_delete_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                      rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+                                      queue='test.system.list.found', ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
-    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
-                                      queue='test.controlplane.vcenter.response')
+    af_support_tools.rmq_delete_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                      rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+                                      queue='test.controlplane.vcenter.response',
+                                      ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
-    af_support_tools.rmq_delete_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password,
-                                      queue='test.endpoint.registration.event')
+    af_support_tools.rmq_delete_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                      rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+                                      queue='test.endpoint.registration.event', ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
 
 def bindQueus():
     print('\nCreating Queues')
 
-    af_support_tools.rmq_bind_queue(host=ipaddress,
-                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+    af_support_tools.rmq_bind_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                    rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
                                     queue='test.system.list.found',
                                     exchange='exchange.dell.cpsd.syds.system.definition.response',
-                                    routing_key='#')
+                                    routing_key='#', ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
-    af_support_tools.rmq_bind_queue(host=ipaddress,
-                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+    af_support_tools.rmq_bind_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                    rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
                                     queue='test.controlplane.vcenter.response',
                                     exchange='exchange.cpsd.controlplane.vcenter.response',
-                                    routing_key='#')
+                                    routing_key='#', ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
-    af_support_tools.rmq_bind_queue(host=ipaddress,
-                                    port=port, rmq_username=rmq_username, rmq_password=rmq_password,
+    af_support_tools.rmq_bind_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                    rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
                                     queue='test.endpoint.registration.event',
                                     exchange='exchange.dell.cpsd.endpoint.registration.event',
-                                    routing_key='#')
+                                    routing_key='#', ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
 
 def waitForMsg(queue):
@@ -198,11 +167,10 @@ def waitForMsg(queue):
         time.sleep(1)
         timeout += 1
 
-        q_len = af_support_tools.rmq_message_count(host=ipaddress,
-                                                   port=port,
-                                                   rmq_username=rmq_username,
-                                                   rmq_password=rmq_password,
-                                                   queue=queue)
+        q_len = af_support_tools.rmq_message_count(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                                   rmq_username=cpsd.props.rmq_username,
+                                                   rmq_password=cpsd.props.rmq_password,
+                                                   queue=queue, ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
         if timeout > 50:
             print('ERROR: Message took to long to return. Something is wrong')
@@ -216,72 +184,3 @@ def checkForErrors(return_message):
     if checklist in return_message:
         print('\nBUG: Error in Response Message\n')
         assert False  # This assert is to fail the test
-
-
-def verifyServiceInConsulAPI(service):
-    url_body = ':8500/v1/agent/services'
-    my_url = 'http://' + ipaddress + url_body
-
-    print('GET:', my_url)
-
-    try:
-        url_response = requests.get(my_url)
-        url_response.raise_for_status()
-
-    except requests.exceptions.HTTPError as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        assert False
-
-    except requests.exceptions.Timeout as err:
-        # Not an HTTP-specific error (e.g. connection refused)
-        print(err)
-        print('\n')
-        assert False
-
-    else:
-        # 200
-        print(url_response)
-
-        the_response = url_response.text
-
-        serviceToCheck = '"Service": "' + service + '"'
-        assert serviceToCheck in the_response, ('ERROR:', service, 'is not in Consul\n')
-        print(service, 'Registered in consul')
-
-        if serviceToCheck in the_response:
-            verifyServiceStatusInConsulAPI(service)
-
-
-def verifyServiceStatusInConsulAPI(service):
-    url_body = ':8500/v1/health/checks/' + service
-    my_url = 'http://' + ipaddress + url_body
-
-    print('GET:', my_url)
-
-    try:
-        url_response = requests.get(my_url)
-        url_response.raise_for_status()
-
-    except requests.exceptions.HTTPError as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        assert False
-
-    except requests.exceptions.Timeout as err:
-        # Not an HTTP-specific error (e.g. connection refused)
-        print(err)
-        print('\n')
-        assert False
-
-    else:
-        # 200
-        print(url_response)
-
-        the_response = url_response.text
-
-        serviceStatus = '"Status": "passing"'
-        assert serviceStatus in the_response, ('ERROR:', service, 'is not Passing in Consul\n')
-        print(service, 'Status = Passing in consul\n\n')
