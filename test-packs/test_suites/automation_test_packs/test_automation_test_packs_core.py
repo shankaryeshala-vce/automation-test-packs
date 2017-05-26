@@ -7,7 +7,7 @@ import selenium
 def load_test_data():
     # Update config ini files at runtime
     # This can be used to update ini files with sensitive data such as passwords an IP addresses
-    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/data_sensitive_vars.properties'
+    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/automation_test_packs/data_sensitive_vars.properties'
     af_support_tools.set_config_file_property_by_data_file(my_data_file)
 
     # Set config ini file name

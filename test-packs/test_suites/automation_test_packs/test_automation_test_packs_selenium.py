@@ -7,7 +7,7 @@ import selenium
 def load_test_data():
     # Update config ini files at runtime
     # This can be used to update ini files with sensitive data such as passwords an IP addresses
-    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/data_sensitive_vars.properties'
+    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/automation_test_packs/data_sensitive_vars.properties'
     af_support_tools.set_config_file_property_by_data_file(my_data_file)
 
     # Set config ini file name
@@ -21,7 +21,8 @@ def load_test_data():
     my_username = af_support_tools.get_config_file_property(config_file=config_file, heading='data_sensitive_vars', property='username')
     global my_password
     my_password = af_support_tools.get_config_file_property(config_file=config_file, heading='data_sensitive_vars', property='password')
-    
+
+@pytest.mark.automation_test_packs    
 @pytest.mark.taf_mvp
 def test_sample_selenium():
     """
