@@ -338,6 +338,7 @@ def test_capabilityRegistry_ListCapabilities_cisco_network_data_provider():
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
 def test_capabilityRegistry_ListCapabilities_node_discovery_paqx():
     # We are testing that all expected capabilites for Node Discovery Response are returned when a capability Registry
     # Request Message is sent.
@@ -715,6 +716,7 @@ def test_capabilityRegistry_Exchanges_capability_registry_control_to_endpoint_re
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
 def test_capabilityRegistry_Exchanges_capability_registry_control_to_node_discovery_paqx():
 
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
@@ -753,6 +755,7 @@ def test_capabilityRegistry_Exchanges_capability_registry_control_to_vcenter_com
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
 def test_capabilityRegistry_Exchanges_capability_registry_event_to_event_node_discovery_paqx():
 
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
@@ -760,6 +763,7 @@ def test_capabilityRegistry_Exchanges_capability_registry_event_to_event_node_di
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
 def test_capabilityRegistry_Exchanges_capability_registry_event_to_event_dne_paqx():
 
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
@@ -801,6 +805,7 @@ def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_c
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
 def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_dne_paqx():
 
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
@@ -808,6 +813,7 @@ def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_d
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
 def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_node_discovery_paqx():
 
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
