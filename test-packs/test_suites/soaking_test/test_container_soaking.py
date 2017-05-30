@@ -23,7 +23,7 @@ except:
     print('Possible configuration error')
 
 try:
-    container_file = '/home/autouser/automation-test-packs/test-packs/test_suites/config_files/performance/container_list.ini'
+    container_file = 'soaking_test/container_list.ini'
     with open (container_file) as f:
         containers = f.read().splitlines()
     print(containers)
