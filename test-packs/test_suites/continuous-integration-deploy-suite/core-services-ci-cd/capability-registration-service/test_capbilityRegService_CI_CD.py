@@ -83,7 +83,7 @@ def test_capabilityRegistry_Control_and_Binding_Ping_Message():
 
     # Until there is full integration of services we need to register the RackHD & VCenter manually by sending these messages
     print('\nPrerequisite: Manually configuring RackHD & VCenter')
-    vCenterConfigApplicationProperties()
+    #vCenterConfigApplicationProperties()
     consulBypassMsgRackHD()
     vCenterRegistrationMsg()
     time.sleep(10)
@@ -1286,43 +1286,43 @@ def capabilityRegistryKillProvider(container, provider, docker, capability1, cap
 
 #######################################################################################################################
 # These are functions needed to manually configure vcenter & rackhd details.
-def vCenterConfigApplicationProperties():
-    # We need a way for the Vcenter Cluster Discover code to be able to get the VCenter Credentials. Currently the only
-    # way to do this is with a application.properties file in the vcenter-adapter container that has the name &
-    # credentials. This function writes that file and restarts the container.
-
-    applicationProperties = 'spring.rabbitmq.host=localhost' \
-                            '\nspring.rabbitmq.port=5672' \
-                            '\nspring.rabbitmq.username=guest' \
-                            '\nspring.rabbitmq.password=guest' \
-                            '\nserver.port=0' \
-                            '\n' \
-                            '\n#TO BE REMOVED: this is temp solution. Will get these from credential service once it is ready and remove this file.' \
-                            '\n#put this file under here QA can change the vcenter credential without rebuild code.' \
-                            '\n#vcenter.address=https://<iporHost>:443' \
-                            '\nvcenter.address=https://' + vCenterFQDN + ':443' \
-                                                                         '\nvcenter.username=' + vCenterUser + '' \
-                                                                                                               '\nvcenter.password=' + vCenterPassword + ''
-
-    # Get the containerID and and remove the file.
-    vCenterContainerID = getdockerID('cpsd-vcenter-adapter-service')
-    sendCommand = 'docker exec -i ' + vCenterContainerID + ' sh -c "rm application.properties"'
-    af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
-                                      command=sendCommand, return_output=False)
-
-    time.sleep(1)
-
-    # Write to the application.properties file specifying the vcenter name & credentials.
-    sendCommand = 'docker exec -i ' + vCenterContainerID + ' sh -c "echo -e \'' + applicationProperties + '\' >> application.properties"'
-    af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
-                                      command=sendCommand, return_output=False)
-
-    # Restart the vcenter doocker container.
-    sendCommand = 'docker restart ' + vCenterContainerID
-    af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
-                                      command=sendCommand, return_output=False)
-
-    time.sleep(3)
+# def vCenterConfigApplicationProperties():
+#     # We need a way for the Vcenter Cluster Discover code to be able to get the VCenter Credentials. Currently the only
+#     # way to do this is with a application.properties file in the vcenter-adapter container that has the name &
+#     # credentials. This function writes that file and restarts the container.
+#
+#     applicationProperties = 'spring.rabbitmq.host=localhost' \
+#                             '\nspring.rabbitmq.port=5672' \
+#                             '\nspring.rabbitmq.username=guest' \
+#                             '\nspring.rabbitmq.password=guest' \
+#                             '\nserver.port=0' \
+#                             '\n' \
+#                             '\n#TO BE REMOVED: this is temp solution. Will get these from credential service once it is ready and remove this file.' \
+#                             '\n#put this file under here QA can change the vcenter credential without rebuild code.' \
+#                             '\n#vcenter.address=https://<iporHost>:443' \
+#                             '\nvcenter.address=https://' + vCenterFQDN + ':443' \
+#                                                                          '\nvcenter.username=' + vCenterUser + '' \
+#                                                                                                                '\nvcenter.password=' + vCenterPassword + ''
+#
+#     # Get the containerID and and remove the file.
+#     vCenterContainerID = getdockerID('cpsd-vcenter-adapter-service')
+#     sendCommand = 'docker exec -i ' + vCenterContainerID + ' sh -c "rm application.properties"'
+#     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+#                                       command=sendCommand, return_output=False)
+#
+#     time.sleep(1)
+#
+#     # Write to the application.properties file specifying the vcenter name & credentials.
+#     sendCommand = 'docker exec -i ' + vCenterContainerID + ' sh -c "echo -e \'' + applicationProperties + '\' >> application.properties"'
+#     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+#                                       command=sendCommand, return_output=False)
+#
+#     # Restart the vcenter doocker container.
+#     sendCommand = 'docker restart ' + vCenterContainerID
+#     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+#                                       command=sendCommand, return_output=False)
+#
+#     time.sleep(3)
 
 def vCenterRegistrationMsg():
     # Until there is a way to automatically register a vcenter we need to register it manually by sending this message.
