@@ -6,6 +6,11 @@ import pytest
 def load_test_data():
     # Update config ini files at runtime
     # This can be used to update ini files with sensitive data such as passwords an IP addresses
+    
+    # This updates the env.ini file with cpsd common properties
+    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/cpsd-common/cpsd_common.properties'
+    af_support_tools.set_config_file_property_by_data_file(my_data_file)
+    # This updates the sample_config.ini file with sensitive data
     my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/data_sensitive_vars.properties'
     af_support_tools.set_config_file_property_by_data_file(my_data_file)
 
@@ -18,6 +23,30 @@ def load_test_data():
 
     # Set Vars
     # These can be read inside the individual tests and do not need to be made global
+
+    # CPSD Common Properties
+    global cpsd_hostname
+    cpsd_hostname = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+    global cpsd_username
+    cpsd_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    global cpsd_password
+    cpsd_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
+
+    global rmq_username
+    rmq_username = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='username')
+    global rmq_password
+    rmq_password = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='password')
+    global rmq_port
+    rmq_port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='ssl_port')
+    global rmq_ssl
+    rmq_ssl = True
+    global rmq_cert_path
+    rmq_cert_path = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='cert_path')
+
+    # Get Rabbit MQ Certs
+    af_support_tools.rmq_get_server_side_certs(host_hostname=cpsd_hostname, host_username=cpsd_username, host_password=cpsd_password, host_port=22, rmq_certs_path=rmq_cert_path)
+
+    # Data Sensitive Properties
     global my_username
     my_username = af_support_tools.get_config_file_property(config_file=config_file, heading='data_sensitive_vars', property='username')
     global my_password

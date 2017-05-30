@@ -83,7 +83,7 @@ def test_capabilityRegistry_Control_and_Binding_Ping_Message():
 
     # Until there is full integration of services we need to register the RackHD & VCenter manually by sending these messages
     print('\nPrerequisite: Manually configuring RackHD & VCenter')
-    vCenterConfigApplicationProperties()
+    #vCenterConfigApplicationProperties()
     consulBypassMsgRackHD()
     vCenterRegistrationMsg()
     time.sleep(10)
@@ -338,6 +338,7 @@ def test_capabilityRegistry_ListCapabilities_cisco_network_data_provider():
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
 def test_capabilityRegistry_ListCapabilities_node_discovery_paqx():
     # We are testing that all expected capabilites for Node Discovery Response are returned when a capability Registry
     # Request Message is sent.
@@ -687,7 +688,7 @@ def test_capabilityRegistry_ListCapabilities_vcenter_compute_data_provider():
 
 
 #****************************************************************
-# Verify the capability.registry Exchanges are bound to the correct queues
+# Verify the capability.registry Exchanges are bound to the correct queues   dff
 
 pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
@@ -715,6 +716,7 @@ def test_capabilityRegistry_Exchanges_capability_registry_control_to_endpoint_re
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
 def test_capabilityRegistry_Exchanges_capability_registry_control_to_node_discovery_paqx():
 
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.control',
@@ -753,6 +755,7 @@ def test_capabilityRegistry_Exchanges_capability_registry_control_to_vcenter_com
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
 def test_capabilityRegistry_Exchanges_capability_registry_event_to_event_node_discovery_paqx():
 
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
@@ -760,6 +763,7 @@ def test_capabilityRegistry_Exchanges_capability_registry_event_to_event_node_di
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
 def test_capabilityRegistry_Exchanges_capability_registry_event_to_event_dne_paqx():
 
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.event',
@@ -801,6 +805,7 @@ def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_c
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
 def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_dne_paqx():
 
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
@@ -808,6 +813,7 @@ def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_d
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
 def test_capabilityRegistry_Exchanges_capability_registry_response_to_response_node_discovery_paqx():
 
     validate_queues_on_exchange('exchange.dell.cpsd.hdp.capability.registry.response',
@@ -1280,43 +1286,43 @@ def capabilityRegistryKillProvider(container, provider, docker, capability1, cap
 
 #######################################################################################################################
 # These are functions needed to manually configure vcenter & rackhd details.
-def vCenterConfigApplicationProperties():
-    # We need a way for the Vcenter Cluster Discover code to be able to get the VCenter Credentials. Currently the only
-    # way to do this is with a application.properties file in the vcenter-adapter container that has the name &
-    # credentials. This function writes that file and restarts the container.
-
-    applicationProperties = 'spring.rabbitmq.host=localhost' \
-                            '\nspring.rabbitmq.port=5672' \
-                            '\nspring.rabbitmq.username=guest' \
-                            '\nspring.rabbitmq.password=guest' \
-                            '\nserver.port=0' \
-                            '\n' \
-                            '\n#TO BE REMOVED: this is temp solution. Will get these from credential service once it is ready and remove this file.' \
-                            '\n#put this file under here QA can change the vcenter credential without rebuild code.' \
-                            '\n#vcenter.address=https://<iporHost>:443' \
-                            '\nvcenter.address=https://' + vCenterFQDN + ':443' \
-                                                                         '\nvcenter.username=' + vCenterUser + '' \
-                                                                                                               '\nvcenter.password=' + vCenterPassword + ''
-
-    # Get the containerID and and remove the file.
-    vCenterContainerID = getdockerID('cpsd-vcenter-adapter-service')
-    sendCommand = 'docker exec -i ' + vCenterContainerID + ' sh -c "rm application.properties"'
-    af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
-                                      command=sendCommand, return_output=False)
-
-    time.sleep(1)
-
-    # Write to the application.properties file specifying the vcenter name & credentials.
-    sendCommand = 'docker exec -i ' + vCenterContainerID + ' sh -c "echo -e \'' + applicationProperties + '\' >> application.properties"'
-    af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
-                                      command=sendCommand, return_output=False)
-
-    # Restart the vcenter doocker container.
-    sendCommand = 'docker restart ' + vCenterContainerID
-    af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
-                                      command=sendCommand, return_output=False)
-
-    time.sleep(3)
+# def vCenterConfigApplicationProperties():
+#     # We need a way for the Vcenter Cluster Discover code to be able to get the VCenter Credentials. Currently the only
+#     # way to do this is with a application.properties file in the vcenter-adapter container that has the name &
+#     # credentials. This function writes that file and restarts the container.
+#
+#     applicationProperties = 'spring.rabbitmq.host=localhost' \
+#                             '\nspring.rabbitmq.port=5672' \
+#                             '\nspring.rabbitmq.username=guest' \
+#                             '\nspring.rabbitmq.password=guest' \
+#                             '\nserver.port=0' \
+#                             '\n' \
+#                             '\n#TO BE REMOVED: this is temp solution. Will get these from credential service once it is ready and remove this file.' \
+#                             '\n#put this file under here QA can change the vcenter credential without rebuild code.' \
+#                             '\n#vcenter.address=https://<iporHost>:443' \
+#                             '\nvcenter.address=https://' + vCenterFQDN + ':443' \
+#                                                                          '\nvcenter.username=' + vCenterUser + '' \
+#                                                                                                                '\nvcenter.password=' + vCenterPassword + ''
+#
+#     # Get the containerID and and remove the file.
+#     vCenterContainerID = getdockerID('cpsd-vcenter-adapter-service')
+#     sendCommand = 'docker exec -i ' + vCenterContainerID + ' sh -c "rm application.properties"'
+#     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+#                                       command=sendCommand, return_output=False)
+#
+#     time.sleep(1)
+#
+#     # Write to the application.properties file specifying the vcenter name & credentials.
+#     sendCommand = 'docker exec -i ' + vCenterContainerID + ' sh -c "echo -e \'' + applicationProperties + '\' >> application.properties"'
+#     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+#                                       command=sendCommand, return_output=False)
+#
+#     # Restart the vcenter doocker container.
+#     sendCommand = 'docker restart ' + vCenterContainerID
+#     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+#                                       command=sendCommand, return_output=False)
+#
+#     time.sleep(3)
 
 def vCenterRegistrationMsg():
     # Until there is a way to automatically register a vcenter we need to register it manually by sending this message.
@@ -1360,13 +1366,13 @@ def consulBypassMsgRackHD():
     # Until consul is  working properly & integrated with the rackhd adapter in the same environment we need to register
     # it manually by sending this message.
 
-    the_payload = '{"endpoint":{"type":"rackhd","instances":[{"url":"http://' + rackHD_IP + ':8080"}]}}'
+    the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"reg-rackhd-3fb0-9696-3f7d28e17f72"},"registrationInfo":{"address":"http://'+rackHD_IP+':8080/ui","username":"dummy_admin","password":"dummy_password"}}'
 
     af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username, rmq_password=rmq_password,
-                                         exchange='exchange.dell.cpsd.endpoint.registration.event',
-                                         routing_key='dell.cpsd.endpoint.discovered',
+                                         exchange='exchange.dell.cpsd.controlplane.rackhd.request',
+                                         routing_key='controlplane.rackhd.endpoint.register',
                                          headers={
-                                             '__TypeId__': 'com.dell.cpsd.endpoint-registry.endpointsdiscoveredevent'},
+                                             '__TypeId__': 'com.dell.cpsd.rackhd.registration.info.request'},
                                          payload=the_payload)
 
     time.sleep(3)
