@@ -687,7 +687,7 @@ def test_capabilityRegistry_ListCapabilities_vcenter_compute_data_provider():
 
 
 #****************************************************************
-# Verify the capability.registry Exchanges are bound to the correct queues
+# Verify the capability.registry Exchanges are bound to the correct queues   dff
 
 pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
@@ -1360,13 +1360,13 @@ def consulBypassMsgRackHD():
     # Until consul is  working properly & integrated with the rackhd adapter in the same environment we need to register
     # it manually by sending this message.
 
-    the_payload = '{"endpoint":{"type":"rackhd","instances":[{"url":"http://' + rackHD_IP + ':8080"}]}}'
+    the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"reg-rackhd-3fb0-9696-3f7d28e17f72"},"registrationInfo":{"address":"http://'+rackHD_IP+':8080/ui","username":"dummy_admin","password":"dummy_password"}}'
 
     af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username, rmq_password=rmq_password,
-                                         exchange='exchange.dell.cpsd.endpoint.registration.event',
-                                         routing_key='dell.cpsd.endpoint.discovered',
+                                         exchange='exchange.dell.cpsd.controlplane.rackhd.request',
+                                         routing_key='controlplane.rackhd.endpoint.register',
                                          headers={
-                                             '__TypeId__': 'com.dell.cpsd.endpoint-registry.endpointsdiscoveredevent'},
+                                             '__TypeId__': 'com.dell.cpsd.rackhd.registration.info.request'},
                                          payload=the_payload)
 
     time.sleep(3)
