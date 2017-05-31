@@ -53,11 +53,6 @@ def test_containers_soaking():
 #1. Check all container up
 @pytest.mark.soaking
 def test_all_containers_up():
-
-    #with open (container_file) as f:
-    #    containers = f.read().splitlines()
-    #print(containers)
-
     container_up = []
     container_down = []
     container_up_num = 0
@@ -88,7 +83,7 @@ def test_all_containers_up():
 
     print('Total ',container_up_num,' containers up list:',container_up,' \n')
     print('Total ',container_down_num,' containers down list:',container_down,' \n')
-
+	
     assert not container_down_num
 
 #######################################################################################################################
@@ -106,15 +101,15 @@ def test_Container_CPU_MEM():
 
     # then check each service individually
     for servicename in services:
-        cpuPercent, memPercent = test_checkContainerStats(servicename, symphony_hostname)
+        cpuPercent, memPercent = checkContainerStats(servicename, symphony_hostname)
         print(servicename,'cpuPercent ',cpuPercent,'memPercent ',memPercent)
         assert cpuPercent <= 50.0, "The docker container CPU usage is over 50% for"  + servicename
         assert memPercent <= 50.0, "The docker container memory usage is over 50% for "  + servicename
 
 ####################################################################################################
 
-pytest.mark.soaking
-def test_checkContainerStats(service, ipaddress):
+
+def checkContainerStats(service, ipaddress):
     #cpu_cmd = "docker stats --no-stream " + service + " | grep -v CPU | awk \'{print $2}\' | cut -f1 -d\'%\' "
     cpu_cmd = "docker stats --no-stream " + service + " | grep -v CPU | awk '{print $2}' | cut -f1 -d'%' "
     #mem_cmd = "docker stats --no-stream " + service + " | grep -v MEM | awk \'{print $8}\' | cut -f1 -d\'%\' "
