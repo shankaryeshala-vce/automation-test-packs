@@ -1,36 +1,46 @@
 #!/usr/bin/python
-
 # Author: SherryFeng
-
 # Revision: 2.0
-
 # Code Reviewed by:
-
 # Description: Configure cAdvisor container on Symphony ova vm for soaking test enviroment.
 
-import pytest
 import af_support_tools
-import time
-import paramiko
+import pytest
+#import time
+#import paramiko
 
 
-try:
-    env_file = 'env.ini'
-    symphony_hostname = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-    symphony_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
-    symphony_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
-except:
-    print('Possible configuration error')
+@pytest.fixture(scope="module", autouse=True)
+def load_test_data():
+    # Set CPSD common props as global var
+    import cpsd
+    global cpsd
 
-try:
-    container_file = 'soaking_test/container_list.ini'
-    with open (container_file) as f:
-        containers = f.read().splitlines()
+    # Set config ini file name
+    # These can be set inside the individual tests and do not need to be made global
+    global config_file
+    config_file = 'soaking_test/soaking.ini'
+
+    # Set Vars
+    global symphony_hostname
+    symphony_hostname = cpsd.props.base_hostname
+    global symphony_username
+    symphony_username = cpsd.props.base_username
+    global symphony_password
+    symphony_password = cpsd.props.base_password
+
+    global containers
+    containers = af_support_tools.get_config_file_property(config_file=config_file, heading='soaking', property='container_list')
+    containers = containers.split(',')
+
+#######################################################################################################################
+@pytest.mark.soaking
+def test_maliska():
+    print('List of Containers')
     print(containers)
-except:
-    print('Possible container list error')
-
-
+    print(type(containers))
+    assert 5 == 5
+	
 #######################################################################################################################
 @pytest.mark.soaking
 def test_containers_soaking():
@@ -44,9 +54,9 @@ def test_containers_soaking():
 @pytest.mark.soaking
 def test_all_containers_up():
 
-    with open (container_file) as f:
-        containers = f.read().splitlines()
-    print(containers)
+    #with open (container_file) as f:
+    #    containers = f.read().splitlines()
+    #print(containers)
 
     container_up = []
     container_down = []
