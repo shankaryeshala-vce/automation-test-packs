@@ -48,12 +48,6 @@ def load_test_data():
     cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS',
                                                              property='password')
 
-    global rmq_username
-    rmq_username = 'guest'
-    global rmq_password
-    rmq_password = 'guest'
-    global port
-    port = 5671
 
 
 #######################################################################################################################
