@@ -24,6 +24,7 @@ def load_test_data():
 
 @pytest.mark.automation_test_packs    
 @pytest.mark.taf_mvp
+@pytest.mark.taf_mvp_extended
 def test_sample_selenium():
     """
     This sample test is designed to demonstrate a simple selenium test.
