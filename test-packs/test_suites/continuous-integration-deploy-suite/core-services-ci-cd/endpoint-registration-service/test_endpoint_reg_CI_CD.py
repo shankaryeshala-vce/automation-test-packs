@@ -16,49 +16,70 @@ import af_support_tools
 def load_test_data():
 
     try:
+        global env_file
         env_file = 'env.ini'
+        global ipaddress
         ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
     except:
         print('Possible configuration error.')
 
     #Use this to by-pass the env.ini file
     #ipaddress = '10.3.62.105'
-
+    global new_service_name
     new_service_name = "testService"
+    global new_service_id
     new_service_id = "testService1"
+    global new_service_host
     new_service_host = ipaddress
+    global new_service_port
     new_service_port = 200
+    global new_service_tag_1
     new_service_tag_1 = "testTag1"
+    global new_service_tag_2
     new_service_tag_2 = "testTag2"
 
+    global crhost
     crhost = ipaddress      # capabilities registry host
+    global cohost
     cohost = ipaddress      # consul host
+    global rabbitHost
     rabbitHost = ipaddress  # rabbitmq host
+    global rabbiturl
     rabbiturl = "http://" + rabbitHost + ":15672"
 
+    global capabilitiesExchange
     capabilitiesExchange = "exchange.dell.cpsd.hdp.capability.registry.control"
+    global endpointExchange
     endpointExchange = "exchange.dell.cpsd.endpoint.registration.event"
 
+    global rmq_username
     rmq_username = 'test'
+    global rmq_password
     rmq_password = 'test'
 
+    global port
     port = 5672
 
     # *******************************************************************************************
     # the payload data used to register services with consul
 
+    global regData
     regData = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, "Port": new_service_port,
            "Tags": [new_service_tag_1], "Check": {"HTTP": rabbiturl, "Interval": "2s"}}
 
+    global regDataNoAddress
     regDataNoAddress = {"ID": new_service_id, "Name": new_service_name,
                     "Tags": [new_service_tag_1], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
 
+    global regDataNoPort
     regDataNoPort = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host,
                  "Tags": [new_service_tag_1], "Check": {"HTTP": rabbiturl, "Interval": "5s"}}
 
+    global regDataNoHealthCheck
     regDataNoHealthCheck = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host, "Port": new_service_port,
                         "Tags": [new_service_tag_1]}
 
+    global regDataWithCheckFailure
     regDataWithCheckFailure = {"ID": new_service_id, "Name": new_service_name, "Address": new_service_host,
                            "Tags": [new_service_tag_1],
                            "Check": {"DeregisterCriticalServiceAfter": "20s", "HTTP": "http://3.3.3.3:15672", "Interval": "5s"}}
