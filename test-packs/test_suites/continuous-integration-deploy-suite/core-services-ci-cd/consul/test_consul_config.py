@@ -7,15 +7,22 @@
 # Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
 # Dell EMC Confidential/Proprietary Information
 #
-import af_support_tools
 import pytest
 import requests
+import json
+import time
+import af_support_tools
+import os
 
 
 ##############################################################################################
 
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
+    # Update config ini files at runtime
+    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/symphony-sds.properties'
+    af_support_tools.set_config_file_property_by_data_file(my_data_file)
+
     # Set config ini file name
     global env_file
     env_file = 'env.ini'
@@ -91,21 +98,6 @@ def test_consul_verify_Consul_registered():
         url_response = requests.get(my_url)
         url_response.raise_for_status()
 
-    # Error check the response
-    except requests.exceptions.HTTPError as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        assert False
-
-    # Error check the response
-    except requests.exceptions.Timeout as err:
-        # Not an HTTP-specific error (e.g. connection refused)
-        print(err)
-        print('\n')
-        assert False
-
-    else:
         # A 200 has been received
         print(url_response)
 
@@ -117,6 +109,13 @@ def test_consul_verify_Consul_registered():
         assert serviceToCheck in the_response, ('ERROR:', service, 'is not in Consul\n')
 
         print(service, 'Registered in Consul')
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
 
 
 @pytest.mark.core_services_mvp
@@ -142,21 +141,6 @@ def test_consul_verify_Vault_registered():
         url_response = requests.get(my_url)
         url_response.raise_for_status()
 
-    # Error check the response
-    except requests.exceptions.HTTPError as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        assert False
-
-    # Error check the response
-    except requests.exceptions.Timeout as err:
-        # Not an HTTP-specific error (e.g. connection refused)
-        print(err)
-        print('\n')
-        assert False
-
-    else:
         # A 200 has been received
         print(url_response)
 
@@ -168,6 +152,13 @@ def test_consul_verify_Vault_registered():
         assert serviceToCheck in the_response, ('ERROR:', service, 'is not in Consul\n')
 
         print(service, 'Registered in Consul')
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
 
 
 @pytest.mark.core_services_mvp
@@ -192,21 +183,6 @@ def test_consul_verify_Vault_status():
         url_response = requests.get(my_url)
         url_response.raise_for_status()
 
-    # Error check the response
-    except requests.exceptions.HTTPError as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        assert False
-
-    # Error check the response
-    except requests.exceptions.Timeout as err:
-        # Not an HTTP-specific error (e.g. connection refused)
-        print(err)
-        print('\n')
-        assert False
-
-    else:
         # A 200 has been received
         print(url_response)
         the_response = url_response.text
@@ -214,6 +190,13 @@ def test_consul_verify_Vault_status():
         serviceStatus = '"Status": "passing"'
         assert serviceStatus in the_response, ('ERROR:', service, 'is not Passing in Consul\n')
         print(service, 'Status = Passing in consul\n\n')
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
 
 
 @pytest.mark.core_services_mvp
@@ -239,21 +222,6 @@ def test_consul_verify_api_gateway_registered():
         url_response = requests.get(my_url)
         url_response.raise_for_status()
 
-    # Error check the response
-    except requests.exceptions.HTTPError as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        assert False
-
-    # Error check the response
-    except requests.exceptions.Timeout as err:
-        # Not an HTTP-specific error (e.g. connection refused)
-        print(err)
-        print('\n')
-        assert False
-
-    else:
         # A 200 has been received
         print(url_response)
 
@@ -265,6 +233,13 @@ def test_consul_verify_api_gateway_registered():
         assert serviceToCheck in the_response, ('ERROR:', service, 'is not in Consul\n')
 
         print(service, 'Registered in Consul')
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
 
 
 @pytest.mark.core_services_mvp
@@ -289,21 +264,6 @@ def test_consul_verify_api_gateway_status():
         url_response = requests.get(my_url)
         url_response.raise_for_status()
 
-    # Error check the response
-    except requests.exceptions.HTTPError as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        assert False
-
-    # Error check the response
-    except requests.exceptions.Timeout as err:
-        # Not an HTTP-specific error (e.g. connection refused)
-        print(err)
-        print('\n')
-        assert False
-
-    else:
         # A 200 has been received
         print(url_response)
         the_response = url_response.text
@@ -311,5 +271,11 @@ def test_consul_verify_api_gateway_status():
         serviceStatus = '"Status": "passing"'
         assert serviceStatus in the_response, ('ERROR:', service, 'is not Passing in Consul\n')
         print(service, 'Status = Passing in consul\n\n')
+
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
 
 ##############################################################################################

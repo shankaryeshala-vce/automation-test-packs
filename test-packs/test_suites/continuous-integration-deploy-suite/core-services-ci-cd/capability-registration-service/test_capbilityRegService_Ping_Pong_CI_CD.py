@@ -2,7 +2,7 @@
 # Author: cullia
 # Revision: 2.1
 # Code Reviewed by:
-# Description: Verify the Capability Registery Ping-Pong Message sequence.
+# Description: Verify the Capability Registry Ping-Pong Message sequence.
 #
 # Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
 # Dell EMC Confidential/Proprietary Information
@@ -126,7 +126,7 @@ def test_capabilityRegistry_Control_and_Binding_Ping_Message():
     containerID = getdockerID('capability-registry-service')  # getdockerID() logs into vm and returns the dockerID
 
     # The value in the msg body should match the container ID. If they do not match indicates multiple containers
-    assert containerID == retunedValue
+    assert containerID == retunedValue, 'ContainerID does not match RMQ mesage body. Check for multiple containers'
 
     print('The Capability Registry Control Ping message is sent and has the correct containerID:', containerID)
     print('\n*******************************************************\n')

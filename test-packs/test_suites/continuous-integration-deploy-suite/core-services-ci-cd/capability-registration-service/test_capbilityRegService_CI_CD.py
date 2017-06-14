@@ -101,8 +101,17 @@ def test_capabilityRegistry_log_files_exist():
     sendCommand = 'ls ' + filePath
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                          command=sendCommand, return_output=True)
-    assert errorLogFile in my_return_status, 'Error: ' + errorLogFile + ' does not exist'
-    assert infoLogFile in my_return_status, 'Error: ' + infoLogFile + ' does not exist'
+
+    error_list = []
+
+    if (errorLogFile not in my_return_status):
+        error_list.append(errorLogFile)
+
+    if (infoLogFile not in my_return_status):
+        error_list.append(infoLogFile)
+
+    assert not error_list, 'Log file missing'
+
     print('Valid log files exist')
 
 
@@ -160,7 +169,7 @@ def test_capabilityRegistry_log_files_free_of_exceptions():
 @pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_Exchanges_capability_registry_binding_to_capability_registry_binding(
         suppliedExchange='exchange.dell.cpsd.hdp.capability.registry.binding',
-        suppliedQueue='exchange.dell.cpsd.hdp.capability.registry.binding'):
+        suppliedQueue='queue.dell.cpsd.hdp.capability.registry.binding'):
     """
     Title           :       Verify the exchange.dell.cpsd.hdp.capability.registry.binding to exchange.dell.cpsd.hdp.capability.registry.binding RMQ binding
     Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
