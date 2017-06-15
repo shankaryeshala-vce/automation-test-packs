@@ -348,113 +348,113 @@ print("Verifying each of the published message attributes.")
 
 
 
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes1():
 	verifyPublishedAttributes(path + 'getRCMsRequest1.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes2():
 	verifyPublishedAttributes(path + 'getRCMsRequest2.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes3():
 	verifyPublishedAttributes(path + 'getRCMsRequest3.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes4():
 	verifyPublishedAttributes(path + 'getRCMsRequest4.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes5():
 	verifyPublishedAttributes(path + 'getRCMsRequest5.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes6():
 	verifyPublishedAttributes(path + 'getRCMsRequest6.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes7():
 	verifyPublishedAttributes(path + 'getRCMsRequest7.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes8():
 	verifyPublishedAttributes(path + 'getRCMsRequest8.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes9():
 	verifyPublishedAttributes(path + 'getRCMsRequest9.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes10():
 	verifyPublishedAttributes(path + 'getRCMsRequest10.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes11():
 	verifyPublishedAttributes(path + 'getRCMsRequest11.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes12():
 	verifyPublishedAttributes(path + 'getRCMsRequest12.json')
 print("\n\nVerifying each of the response message attributes.")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes1():
 	verifyConsumedAttributes(path + 'getRCMsRequest1.json', path + 'getRCMsResponse1.json', "1.2", "1.2.33", "340", "Vblock")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes2():
 	verifyConsumedAttributes(path + 'getRCMsRequest2.json', path + 'getRCMsResponse2.json', "9.2", "9.2.33", "FLEX", "VxRack")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes3():
 	verifyConsumedAttributes(path + 'getRCMsRequest3.json', path + 'getRCMsResponse3.json', "9.2", "9.2.33", "FLEX", "VxRack")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes4():
 	verifyConsumedAttributes(path + 'getRCMsRequest4.json', path + 'getRCMsResponse4.json', "9.2", "9.2.33", "FLEX", "VxRack")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes5():
 	verifyConsumedAttributes(path + 'getRCMsRequest5.json', path + 'getRCMsResponse5.json', "9.2", "9.2.33", "FLEX", "VxRack")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes6():
 	verifyConsumedAttributes(path + 'getRCMsRequest6.json', path + 'getRCMsResponse6.json', "9.2", "9.2.33", "FLEX", "VxRack")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes7():
 	verifyConsumedAttributes(path + 'getRCMsRequest7.json', path + 'getRCMsResponse7.json', "9.2", "9.2.33", "FLEX", "VxRack")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes8():
 	verifyConsumedAttributes(path + 'getRCMsRequest8.json', path + 'getRCMsResponse8.json', "9.2", "9.2.33", "FLEX", "VxRack")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes9():
 	verifyConsumedAttributes(path + 'getRCMsRequest9.json', path + 'getRCMsResponse9.json', "9.2", "9.2.33", "FLEX", "VxRack")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes10():
 	verifyConsumedAttributes(path + 'getRCMsRequest10.json', path + 'getRCMsResponse10.json', "9.2", "9.2.33", "FLEX", "VxRack")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes11():
 	verifyConsumedAttributes(path + 'getRCMsRequest11.json', path + 'getRCMsResponse11.json', "9.2", "9.2.33", "FLEX", "VxRack")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes12():
 	verifyConsumedAttributes(path + 'getRCMsRequest12.json', path + 'getRCMsResponse12.json', "9.2", "9.2.33", "FLEX", "VxRack")
 print("\n\nVerifying correlation IDs are consistent for each request and response pair.")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID1():
 	verifyCorrectCorrelationID(path + 'getRCMsRequest1.json', path + 'getRCMsResponse1.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID2():
 	verifyCorrectCorrelationID(path + 'getRCMsRequest2.json', path + 'getRCMsResponse2.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID3():
 	verifyCorrectCorrelationID(path + 'getRCMsRequest3.json', path + 'getRCMsResponse3.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID4():
 	verifyCorrectCorrelationID(path + 'getRCMsRequest4.json', path + 'getRCMsResponse4.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID5():
 	verifyCorrectCorrelationID(path + 'getRCMsRequest5.json', path + 'getRCMsResponse5.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID6():
 	verifyCorrectCorrelationID(path + 'getRCMsRequest6.json', path + 'getRCMsResponse6.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID7():
 	verifyCorrectCorrelationID(path + 'getRCMsRequest7.json', path + 'getRCMsResponse7.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID8():
 	verifyCorrectCorrelationID(path + 'getRCMsRequest8.json', path + 'getRCMsResponse8.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID9():
 	verifyCorrectCorrelationID(path + 'getRCMsRequest9.json', path + 'getRCMsResponse9.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID10():
 	verifyCorrectCorrelationID(path + 'getRCMsRequest10.json', path + 'getRCMsResponse10.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID11():
 	verifyCorrectCorrelationID(path + 'getRCMsRequest11.json', path + 'getRCMsResponse11.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID12():
 	verifyCorrectCorrelationID(path + 'getRCMsRequest12.json', path + 'getRCMsResponse12.json')
