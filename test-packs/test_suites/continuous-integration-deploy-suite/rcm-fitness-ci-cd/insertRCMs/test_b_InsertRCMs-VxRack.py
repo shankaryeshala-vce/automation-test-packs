@@ -348,51 +348,51 @@ def test_verifyPublishedAttributes11():
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes12():
     verifyPublishedAttributes(path + 'insertRCMRequest12.json', "June 2021", 37, "9.2", "9.2.33.2", "VxRack", "FLEX", "ADDENDUM")
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID1():
     verifyCorrectCorrelationID(path + 'insertRCMRequest1.json', path + 'insertRCMResponse1.json')
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID2():
     verifyCorrectCorrelationID(path + 'insertRCMRequest2.json', path + 'insertRCMResponse2.json')
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID3():
     verifyCorrectCorrelationID(path + 'insertRCMRequest3.json', path + 'insertRCMResponse3.json')
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID4():
     verifyCorrectCorrelationID(path + 'insertRCMRequest4.json', path + 'insertRCMResponse4.json')
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID5():
     verifyCorrectCorrelationID(path + 'insertRCMRequest5.json', path + 'insertRCMResponse5.json')
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID6():
     verifyCorrectCorrelationID(path + 'insertRCMRequest6.json', path + 'insertRCMResponse6.json')
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID7():
     verifyCorrectCorrelationID(path + 'insertRCMRequest7.json', path + 'insertRCMResponse7.json')
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID8():
     verifyCorrectCorrelationID(path + 'insertRCMRequest8.json', path + 'insertRCMResponse8.json')
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID9():
     verifyCorrectCorrelationID(path + 'insertRCMRequest9.json', path + 'insertRCMResponse9.json')
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID10():
     verifyCorrectCorrelationID(path + 'insertRCMRequest10.json', path + 'insertRCMResponse10.json')
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID11():
     verifyCorrectCorrelationID(path + 'insertRCMRequest11.json', path + 'insertRCMResponse11.json')
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID12():
     verifyCorrectCorrelationID(path + 'insertRCMRequest12.json', path + 'insertRCMResponse12.json')
