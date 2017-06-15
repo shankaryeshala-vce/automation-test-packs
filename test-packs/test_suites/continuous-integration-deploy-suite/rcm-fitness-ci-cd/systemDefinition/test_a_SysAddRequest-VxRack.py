@@ -50,7 +50,7 @@ def load_test_data():
 
 # *** THIS IS THE MAIN TEST *** Add a system
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_SystemAdditionRequested():
     cleanup()
 
@@ -91,7 +91,7 @@ def test_SystemAdditionRequested():
 
 # *** Kick of the collectComponentVersion Msg
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_HAL_CollectComponentVersion():
     bindHALQueus()
 
