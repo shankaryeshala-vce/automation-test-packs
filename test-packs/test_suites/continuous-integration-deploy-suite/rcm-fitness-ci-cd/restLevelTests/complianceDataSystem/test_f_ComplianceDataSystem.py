@@ -289,64 +289,64 @@ def getComplianceDataSystem_NULL():
     print("\nReturned response codes are as expected.")
 
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem1():
     getComplianceDataSystem("VXRACK", "FLEX", "VXRACKFLEX", "730", "R730XD", "SERVER", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem2():
     getComplianceDataSystemSubComps("NIC", "Ethernet 10G 2P", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem3():
     getComplianceDataSystemSubComps("NIC", "Ethernet 10G 4P", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem4():
     getComplianceDataSystemSubComps("BIOS", "BIOS", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem5():
     getComplianceDataSystemSubComps("iDRAC", "Remote Access", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem6():
     getComplianceDataSystemSubComps("RAID", "PERC H730", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem7():
     getComplianceDataSystem("VXRACK", "FLEX", "VXRACKFLEX", "630", "R630", "SERVER", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem8():
     getComplianceDataSystemSubComps("NIC", "Ethernet 10G 2P", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem9():
     getComplianceDataSystemSubComps("NIC", "Ethernet 10G 4P", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem10():
     getComplianceDataSystemSubComps("BIOS", "BIOS", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem11():
     getComplianceDataSystemSubComps("iDRAC", "Remote Access", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem12():
     getComplianceDataSystemSubComps("RAID", "PERC H730", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem13():
     getComplianceDataSystem("VXRACK", "FLEX", "VXRACKFLEX", "VCENTER", "VCENTER", "VCENTER", path + "complianceDataSystemVCENTER.json", systemUUID)
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem14():
     getComplianceDataSystemSubComps("ESXi", "lab.vce.com", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemVCENTER.json", systemUUID)  
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem15():
     getComplianceDataSystem_INVALID(systemUUID[:8])
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem16():
     getComplianceDataSystem_INVALID("----")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem17():
     getComplianceDataSystem_INVALID(" ")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem18():
     getComplianceDataSystem_NULL()
