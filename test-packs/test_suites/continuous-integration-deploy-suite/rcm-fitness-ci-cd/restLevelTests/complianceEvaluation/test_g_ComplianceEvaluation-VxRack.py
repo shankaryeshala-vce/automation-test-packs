@@ -76,7 +76,7 @@ def version():
 
 
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd    
+@pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.parametrize(("type", "model", "identifier", "fileName"), [
     ("iDRAC", "630", "Integrated Remote Access Controller", "iDRAC"),
     ("NIC", "630", "Intel(R) Ethernet 10G 4P X520/I350 rNDC -", "Network"),
