@@ -131,31 +131,31 @@ def getAvailableRCMs_Null(family, model, train, version):
     print(resp.status_code)
     assert resp.status_code == 404, "Request has not been acknowledged as expected."
 
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM1():
     getAvailableRCMs("VxRack", "FLEX", "9.2", "9.2.33.1")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM2():
     getAvailableRCMs_Invalid("VxRack", "FLEX", "9.2", "9.2.99")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM3():
     getAvailableRCMs_Invalid("VxRack", "FLEX", "9.9", "9.2.33")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM4():
     getAvailableRCMs_Invalid("VxRack", "999", "9.2", "9.2.33")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM7():
     getAvailableRCMs_Null("VxRack", "FLEX", "9.2", "")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM8():
     getAvailableRCMs_Null("VxRack", "FLEX", "", "9.2.33")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM9():
     getAvailableRCMs_Null("VxRack", "", "9.2", "9.2.33")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM10():
     getAvailableRCMs_Null("", "1000 FLEX", "9.2", "9.2.33")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM11():
     getAvailableRCMs_Null("", "", "", "")
 #@pytest.mark.TC546560_Empty
