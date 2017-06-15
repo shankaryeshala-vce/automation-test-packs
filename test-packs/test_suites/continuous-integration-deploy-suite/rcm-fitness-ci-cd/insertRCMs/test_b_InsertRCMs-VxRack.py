@@ -301,150 +301,150 @@ def verifyUniqueUUIDinResponse():
 
 
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes1():
     verifyPublishedAttributes(path + 'insertRCMRequest1.json', "March 2019", 66, "1.2", "1.2.33", "Vblock", "340", "MANUFACTURING")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes2():
     verifyPublishedAttributes(path + 'insertRCMRequest2.json', "March 2019", 66, "1.2", "1.2.33", "VxBlock", "340", "MANUFACTURING")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes3():
     verifyPublishedAttributes(path + 'insertRCMRequest3.json', "March 2020", 66, "1.2", "1.2.33.1", "Vblock", "340", "ADDENDUM")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes4():
     verifyPublishedAttributes(path + 'insertRCMRequest4.json', "June 2021", 66, "1.2", "1.2.33.2", "Vblock", "340", "ADDENDUM")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes5():
     verifyPublishedAttributes(path + 'insertRCMRequest5.json', "Sept 2022", 66, "1.2", "1.2.33.3", "Vblock", "340", "ADDENDUM")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes6():
     verifyPublishedAttributes(path + 'insertRCMRequest6.json', "June 2020", 66, "1.2", "1.2.33.1", "VxBlock", "340", "ADDENDUM")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes7():
     verifyPublishedAttributes(path + 'insertRCMRequest7.json', "March 2019", 66, "1.2", "1.2.33", "Vblock", "340", "ORIGINAL")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes8():
     verifyPublishedAttributes(path + 'insertRCMRequest8.json', "March 2019", 66, "1.2", "1.2.33", "VxBlock", "340", "ORIGINAL")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes9():
     verifyPublishedAttributes(path + 'insertRCMRequest9.json', "March 2019", 37, "9.2", "9.2.33", "VxRack", "FLEX", "ORIGINAL")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes10():
     verifyPublishedAttributes(path + 'insertRCMRequest10.json', "March 2019", 37, "9.2", "9.2.33", "VxRack", "FLEX", "MANUFACTURING")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes11():
     verifyPublishedAttributes(path + 'insertRCMRequest11.json', "March 2020", 37, "9.2", "9.2.33.1", "VxRack", "FLEX", "ADDENDUM")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes12():
     verifyPublishedAttributes(path + 'insertRCMRequest12.json', "June 2021", 37, "9.2", "9.2.33.2", "VxRack", "FLEX", "ADDENDUM")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID1():
     verifyCorrectCorrelationID(path + 'insertRCMRequest1.json', path + 'insertRCMResponse1.json')
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID2():
     verifyCorrectCorrelationID(path + 'insertRCMRequest2.json', path + 'insertRCMResponse2.json')
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID3():
     verifyCorrectCorrelationID(path + 'insertRCMRequest3.json', path + 'insertRCMResponse3.json')
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID4():
     verifyCorrectCorrelationID(path + 'insertRCMRequest4.json', path + 'insertRCMResponse4.json')
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID5():
     verifyCorrectCorrelationID(path + 'insertRCMRequest5.json', path + 'insertRCMResponse5.json')
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID6():
     verifyCorrectCorrelationID(path + 'insertRCMRequest6.json', path + 'insertRCMResponse6.json')
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID7():
     verifyCorrectCorrelationID(path + 'insertRCMRequest7.json', path + 'insertRCMResponse7.json')
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID8():
     verifyCorrectCorrelationID(path + 'insertRCMRequest8.json', path + 'insertRCMResponse8.json')
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID9():
     verifyCorrectCorrelationID(path + 'insertRCMRequest9.json', path + 'insertRCMResponse9.json')
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID10():
     verifyCorrectCorrelationID(path + 'insertRCMRequest10.json', path + 'insertRCMResponse10.json')
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID11():
     verifyCorrectCorrelationID(path + 'insertRCMRequest11.json', path + 'insertRCMResponse11.json')
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID12():
     verifyCorrectCorrelationID(path + 'insertRCMRequest12.json', path + 'insertRCMResponse12.json')
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes1():
     verifyConsumedAttributes(path + 'insertRCMResponse1.json', True, "1.2", "1.2.33", "Vblock", "340", "MANUFACTURING")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes2():
     verifyConsumedAttributes(path + 'insertRCMResponse2.json', True, "1.2", "1.2.33", "VxBlock", "340", "MANUFACTURING")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes3():
     verifyConsumedAttributes(path + 'insertRCMResponse3.json', True, "1.2", "1.2.33.1", "Vblock", "340", "ADDENDUM")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes4():
     verifyConsumedAttributes(path + 'insertRCMResponse4.json', True, "1.2", "1.2.33.2", "Vblock", "340", "ADDENDUM")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes5():
     verifyConsumedAttributes(path + 'insertRCMResponse5.json', True, "1.2", "1.2.33.3", "Vblock", "340", "ADDENDUM")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes6():
     verifyConsumedAttributes(path + 'insertRCMResponse6.json', True, "1.2", "1.2.33.1", "VxBlock", "340", "ADDENDUM")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes7():
     verifyConsumedAttributes(path + 'insertRCMResponse7.json', True, "1.2", "1.2.33", "Vblock", "340", "ORIGINAL")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes8():
     verifyConsumedAttributes(path + 'insertRCMResponse8.json', True, "1.2", "1.2.33", "VxBlock", "340", "ORIGINAL")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes9():
     verifyConsumedAttributes(path + 'insertRCMResponse9.json', True, "9.2", "9.2.33", "VxRack", "FLEX", "ORIGINAL")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes10():
     verifyConsumedAttributes(path + 'insertRCMResponse10.json', True, "9.2", "9.2.33", "VxRack", "FLEX", "MANUFACTURING")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes11():
     verifyConsumedAttributes(path + 'insertRCMResponse11.json', True, "9.2", "9.2.33.1", "VxRack", "FLEX", "ADDENDUM")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes12():
     verifyConsumedAttributes(path + 'insertRCMResponse12.json', True, "9.2", "9.2.33.2", "VxRack", "FLEX", "ADDENDUM")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyUniqueUUIDinResponse():
     verifyUniqueUUIDinResponse()
