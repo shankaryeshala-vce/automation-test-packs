@@ -152,22 +152,22 @@ def getRCMDefinition_Null(rcmUUID):
     print(resp.status_code)
     assert resp.status_code == 404, "Request has not been acknowledged as expected."
 
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef1():
     getRCMDefinition("VxRack", "FLEX")
 
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef2():
     getRCMDefinition_Invalid("12345678-1234-1234-1234-12347b7370a2", "VxRack", "FLEX")
 
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef3():
     getRCMDefinition_Invalid("----", "VxRack", "FLEX")
 
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef4():
     getRCMDefinition_Invalid("1-1-1-1-1", "VxRack", "FLEX")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef5():
     getRCMDefinition_Null("")
 
