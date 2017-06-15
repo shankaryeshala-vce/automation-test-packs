@@ -254,39 +254,39 @@ def getComplianceDataSystem_NULL():
 
     print("\nReturned response codes are as expected.")
 
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem1():
     getComplianceDataSystem(path + "complianceDataSystem.json")
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem2():
     getComplianceDataSystemSWITCH("NEXUS", "N3K", "SWITCH", "NETWORKCHASSIS", "3048", path + "rcmSystemDefinition.json", path + "complianceDataSystemNEXUS3K.json")
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem3():
     getComplianceDataSystemSWITCH("NEXUS", "N5K", "SWITCH", "NETWORKCHASSIS", "5548", path + "rcmSystemDefinition.json", path + "complianceDataSystemNEXUS5K.json")
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem4():
     getComplianceDataSystemSWITCH("MDS", "MDS9K", "SWITCH", "NETWORKCHASSIS", "9148", path + "rcmSystemDefinition.json", path + "complianceDataSystemMDS9K.json")
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem5():
     getComplianceDataSystemSWITCH("NEXUS", "N9K", "SWITCH", "NETWORKCHASSIS", "9396", path + "rcmSystemDefinition.json", path + "complianceDataSystemNEXUS9K.json")
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem6():
     getComplianceDataSystem_INVALID(systemUUID[:8])
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem7():
     getComplianceDataSystem_INVALID("----")
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem8():
     getComplianceDataSystem_INVALID(" ")
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem9():
     getComplianceDataSystem_NULL()
