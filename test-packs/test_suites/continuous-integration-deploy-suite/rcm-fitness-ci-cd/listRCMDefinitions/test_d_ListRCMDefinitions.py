@@ -420,100 +420,100 @@ def verifyCorrectCorrelationID(requestFile, responseFile):
     print("All verification steps executed successfully.....")
 
 print (" [x] Sent JSON data to RabbitMQ......")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes1():
 	verifyPublishedAttributes(path + "listRCMDefinitionRequest1.json")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes2():
 	verifyPublishedAttributes(path + "listRCMDefinitionRequest2.json")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes3():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest3.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes4():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest4.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes5():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest5.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes6():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest6.json')
-@pytest.mark.TC546480_Vblock7
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes7():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest7.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes8():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest8.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes9():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest9.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes10():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest10.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes11():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest11.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes12():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest12.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes13():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest13.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes14():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest14.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes15():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest15.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes16():
 	verifyPublishedAttributes(path + 'listRCMDefinitionRequest16.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes1():
 	verifyConsumedAttributesVersion(path + "listRCMDefinitionRequest1.json", path + "listRCMDefinitionResponse1.json")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes2():
 	verifyConsumedAttributesTrain(path + 'listRCMDefinitionRequest2.json', path + 'listRCMDefinitionResponse2.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes3():
 	verifyConsumedAttributesModel(path + 'listRCMDefinitionRequest3.json', path + 'listRCMDefinitionResponse3.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes4():
 	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest4.json', path + 'listRCMDefinitionResponse4.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes5():
 	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest5.json', path + 'listRCMDefinitionResponse5.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes6():
 	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest6.json', path + 'listRCMDefinitionResponse6.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes7():
 	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest7.json', path + 'listRCMDefinitionResponse7.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes8():
 	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest8.json', path + 'listRCMDefinitionResponse8.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes9():
 	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest9.json', path + 'listRCMDefinitionResponse9.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes10():
 	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest10.json', path + 'listRCMDefinitionResponse10.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes11():
 	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest11.json', path + 'listRCMDefinitionResponse11.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes12():
  	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest12.json', path + 'listRCMDefinitionResponse12.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes13():
 	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest13.json', path + 'listRCMDefinitionResponse13.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes14():
 	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest14.json', path + 'listRCMDefinitionResponse14.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes15():
 	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest15.json', path + 'listRCMDefinitionResponse15.json')
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes16():
 	verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest16.json', path + 'listRCMDefinitionResponse16.json')
 # #connection.close()
