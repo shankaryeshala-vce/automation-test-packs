@@ -373,105 +373,105 @@ def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, 
         
  
 
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getSysDef1():
     getSystemDefinition()
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getListCompUUIDs2():
     getListCompUUIDs(systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceData3():
     getComplianceData("730", "RAID", path + "rcmComplianceData-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem4():
     getComplianceDataSystem("730", path + "rcmComplianceDataSystem-VxRack.json",systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getAvailableRCM5():
     getAvailableRCMs("VxRack", "FLEX", "9.2", "9.2.33", "ORIGINAL", path + "rcmAvailableRCMs-VxRack.json")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition6():
     getRCMDefinition("Dell BIOS Firmware", path + "rcmRCMDefinitionDetails-VxRack.json", "ORIGINAL")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval7():
     getRCMEvaluation("Dell BIOS Firmware", "BIOS", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition8():
     getRCMDefinition("Dell iDRAC / Lifecycle Controller Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ORIGINAL")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval9():
     getRCMEvaluation("Dell iDRAC / Lifecycle Controller Firmware", "Integrated Remote Access Controller", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition10():
     getRCMDefinition("Dell Ethernet X520 NDCi350/X520/X540 Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ORIGINAL")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval11():
     getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "2P X520 Adapter", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition12():
     getRCMDefinition("Dell PERC H730P Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ORIGINAL")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval13():
     getRCMEvaluation("Dell PERC H730P Firmware", "PERC H730P Mini", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceData14():
     getComplianceData("730", "SERVER", path + "rcmComplianceData-N3k-Mismatch.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getAvailableRCM15():
     getAvailableRCMs("VxRack", "FLEX", "9.2", "9.2.33.1", "ADDENDUM", path + "rcmAvailableRCMs-VxRack-Mismatch.json")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition16():
     getRCMDefinition("Dell BIOS Firmware", path + "rcmRCMDefinitionDetails-VxRack.json", "ADDENDUM")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval17():
     getRCMEvaluation("Dell BIOS Firmware", "BIOS", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition18():
     getRCMDefinition("Dell iDRAC / Lifecycle Controller Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ADDENDUM")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval19():
     getRCMEvaluation("Dell iDRAC / Lifecycle Controller Firmware", "Integrated Remote Access Controller", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition20():
     getRCMDefinition("Dell Ethernet X520 NDCi350/X520/X540 Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ADDENDUM")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval21():
     getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "4P X520/I350 rNDC", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition22():
     getRCMDefinition("Dell PERC H730P Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ADDENDUM")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval23():
     getRCMEvaluation("Dell PERC H730P Firmware", "PERC H730P Mini", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceData24():
     getComplianceData("630", "RAID", path + "rcmComplianceData-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem25():
     getComplianceDataSystem("630", path + "rcmComplianceDataSystem-VxRack.json",systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getAvailableRCM26():
     getAvailableRCMs("VxRack", "FLEX", "9.2", "9.2.33", "ORIGINAL", path + "rcmAvailableRCMs-VxRack.json")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition27():
     getRCMDefinition("Dell BIOS Firmware", path + "rcmRCMDefinitionDetails-VxRack.json", "ORIGINAL")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval28():
     getRCMEvaluation("Dell BIOS Firmware", "BIOS", "VxRack", "FLEX", "DELL", "POWEREDGE", "R630", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition29():
     getRCMDefinition("Dell iDRAC / Lifecycle Controller Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ORIGINAL")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval30():
     getRCMEvaluation("Dell iDRAC / Lifecycle Controller Firmware", "Integrated Remote Access Controller", "VxRack", "FLEX", "DELL", "POWEREDGE", "R630", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition31():
     getRCMDefinition("Dell Ethernet X520 NDCi350/X520/X540 Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ORIGINAL")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval132():
     getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "2P X520 Adapter", "VxRack", "FLEX", "DELL", "POWEREDGE", "R630", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition33():
     getRCMDefinition("Dell PERC H730P Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ORIGINAL")
-@pytest.mark.rcm_fitness_cd
+@pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval34():
     getRCMEvaluation("Dell PERC H730P Firmware", "PERC H730P Mini", "VxRack", "FLEX", "DELL", "POWEREDGE", "R630", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
