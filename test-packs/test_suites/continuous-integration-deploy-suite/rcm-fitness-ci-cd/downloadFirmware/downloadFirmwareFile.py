@@ -11,7 +11,7 @@ import re
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
     global path
-    path = "/home/autouser/PycharmProjects/auto-framework/test_suites/continuousDeployment/messageLevelTests/downloadFirmware/"
+    path = "/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/downloadFirmware/"
     global ssl_options
     ssl_options={"ca_certs":"/etc/rabbitmq/certs/testca/cacert.pem","certfile":"/etc/rabbitmq/certs/certs/client/cert.pem","keyfile":"/etc/rabbitmq/certs/certs/client/key.pem","cert_reqs":"ssl.CERT_REQUIRED","ssl_version":"ssl.PROTOCOL_TLSv1_2"}
 
