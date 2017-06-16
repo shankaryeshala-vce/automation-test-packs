@@ -127,8 +127,8 @@ def test_vcenter_adapter_servicerunning():
     ('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.vcenter-adapter'),
     ('exchange.dell.cpsd.hdp.capability.registry.response', 'queue.dell.cpsd.hdp.capability.registry.response.vcenter-adapter')
 ])
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
+#@pytest.mark.core_services_mvp
+#@pytest.mark.core_services_mvp_extended
 def test_vcenter_adapter_RMQ_bindings(exchange, queue):
     """
     Title           :       Verify the RMQ bindings
@@ -148,8 +148,8 @@ def test_vcenter_adapter_RMQ_bindings(exchange, queue):
     print(exchange, '\nis bound to\n', queue, '\n')
 
 
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
+#@pytest.mark.core_services_mvp
+#@pytest.mark.core_services_mvp_extended
 def test_vcenter_adapter_full_ListCapabilities():
     """
     Title           :       Verify the registry.list.capability Message returns all vcenter-adapter capabilities
