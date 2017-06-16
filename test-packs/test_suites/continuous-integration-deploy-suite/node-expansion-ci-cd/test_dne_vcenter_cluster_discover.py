@@ -70,8 +70,8 @@ def load_test_data():
 
 #######################################################################################################################
 
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
+#@pytest.mark.dne_paqx_parent_mvp
+#@pytest.mark.dne_paqx_parent_mvp_extended
 def test_vcenter_discover_cluters():
     print('\nRunning test on Symphony system:', ipaddress, 'and Test vCenter:', vCenterFQDN, '\n')
 
