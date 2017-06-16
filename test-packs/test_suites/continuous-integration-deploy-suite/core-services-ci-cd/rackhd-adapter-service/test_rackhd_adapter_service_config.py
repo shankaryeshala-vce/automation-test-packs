@@ -193,6 +193,7 @@ def test_rackHD_adapter_full_ListCapabilities():
                                                           queue='test.capability.registry.response',
                                                           ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
+    time.sleep(5)
     checkForErrors(return_message)
 
     # Verify the RackHD Apapter Response
