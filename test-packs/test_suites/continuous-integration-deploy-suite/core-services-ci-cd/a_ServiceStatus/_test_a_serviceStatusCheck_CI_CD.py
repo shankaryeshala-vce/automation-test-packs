@@ -49,7 +49,7 @@ def get_rcm_services ():
 ##Checking Core Services_mvp
 ########################################################################################################################
 core_list = get_core_services()
-@pytest.mark.core_services_mvp
+#@pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 @pytest.mark.parametrize("service_name", core_list)
 
@@ -89,7 +89,7 @@ def test_Core_servicerunning(service_name):
 ##Checking rcm Services_mvp
 ########################################################################################################################
 rcm_list = get_rcm_services()
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.parametrize("service_name", rcm_list)
 
@@ -333,7 +333,7 @@ def test_chkStatus_rcm_yml(service_name, pid):
 ########################################################################################################################
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rabbitrunning
 def test_rabbitrunning():
