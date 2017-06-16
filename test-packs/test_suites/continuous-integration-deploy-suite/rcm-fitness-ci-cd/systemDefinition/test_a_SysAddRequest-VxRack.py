@@ -21,7 +21,7 @@ def load_test_data():
     host = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
     global port
     port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='port')
-    # port = int(port)
+    port = int(port)
     global rmq_username
     rmq_username = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ',
                                                              property='username')
