@@ -274,7 +274,7 @@ def test_getComplianceDataSystem4():
 @pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem5():
     getComplianceDataSystemSWITCH("NEXUS", "N9K", "SWITCH", "NETWORKCHASSIS", "9396", path + "rcmSystemDefinition.json", path + "complianceDataSystemNEXUS9K.json")
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_cd
 def test_getComplianceDataSystem6():
     getComplianceDataSystem_INVALID(systemUUID[:8])
