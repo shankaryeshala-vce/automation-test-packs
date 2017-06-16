@@ -11,6 +11,7 @@ import json
 import time
 import unittest
 
+
 # Payloads from symphony-sds.ini:- location: continuous-integration-deploy-suite/symphony-sds.ini
 try:
     payload_file = 'continuous-integration-deploy-suite/symphony-sds.ini'
@@ -36,8 +37,8 @@ rmq_username = 'guest'
 rmq_password = 'guest'
 
 # Add & verify component credentials
-@pytest.mark.core_services_mvp
-@unittest.skip("skipping till this is modified to use new credentials service API")
+#@pytest.mark.core_services_mvp
+#@unittest.skip("skipping till this is modified to use new credentials service API")
 def test_CS_ComponentCredentials_CI():
     print('\nRunning mvp test on system: ', ipaddress)
     cleanup()
@@ -54,8 +55,8 @@ def test_CS_ComponentCredentials_CI():
 ######################################################################################################################
 
 # Add & verify component credentials
-@pytest.mark.core_services_mvp_extended
-@unittest.skip("skipping till this is modified to use new credentials service API")
+#@pytest.mark.core_services_mvp_extended
+#@unittest.skip("skipping till this is modified to use new credentials service API")
 def test_CS_ComponentCredentials():
     print('\nRunning mvp extended test on system: ', ipaddress)
     cleanup()

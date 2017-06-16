@@ -148,8 +148,8 @@ def test_rackHD_RMQ_bindings(exchange, queue):
     print(exchange, '\nis bound to\n', queue, '\n')
 
 
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
+#@pytest.mark.core_services_mvp
+#@pytest.mark.core_services_mvp_extended
 def test_rackHD_adapter_full_ListCapabilities():
     """
     Title           :       Verify the registry.list.capability Message returns all rackhd-adapter capabilities
