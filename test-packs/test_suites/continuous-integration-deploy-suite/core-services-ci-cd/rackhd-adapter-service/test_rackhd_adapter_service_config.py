@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # Author: cullia
-# Revision: 1.0
+# Revision: 1.2
 # Code Reviewed by:
 # Description: Testing the RackHD-Adapter Container.
 #
@@ -246,14 +246,13 @@ def test_rackHD_adapter_log_files_exist():
     Returns         :       None
     """
 
-    filePath = '/opt/dell/cpsd/hal-mediation-services/rackhd-adapter/logs/'
+    service = 'rackhd-adapter-service'
+    filePath = '/opt/dell/cpsd/rackhd-adapter-service/logs/'
     errorLogFile = 'rackhd-adapter-error.log'
     infoLogFile = 'rackhd-adapter-info.log'
 
-    sendCommand = 'docker ps | grep rackhd-adapter-service | awk \'{system("docker exec -i "$1" ls /opt/dell/cpsd/rackhd-adapter-service/logs/") }\''
+    sendCommand = 'docker ps | grep '+service+' | awk \'{system("docker exec -i "$1" ls '+filePath+'") }\''
 
-    # Verify the log files exist
-    #sendCommand = 'ls ' + filePath
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                          command=sendCommand, return_output=True)
     error_list = []
@@ -282,6 +281,7 @@ def test_rackhd_adapter_log_files_free_of_exceptions():
     Returns         :       None
     """
 
+    service = 'rackhd-adapter-service'
     filePath = '/opt/dell/cpsd/rackhd-adapter-service/logs/'
     errorLogFile = 'rackhd-adapter-error.log'
     excep1 = 'AuthenticationFailureException'
@@ -290,7 +290,7 @@ def test_rackhd_adapter_log_files_free_of_exceptions():
     excep4 = 'BeanCreationException'
 
     # Verify the log files exist
-    sendCommand = 'docker ps | grep rackhd-adapter-service | awk \'{system("docker exec -i "$1" ls '+filePath+'") }\''
+    sendCommand = 'docker ps | grep '+service+' | awk \'{system("docker exec -i "$1" ls '+filePath+'") }\''
 
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                          command=sendCommand, return_output=True)
