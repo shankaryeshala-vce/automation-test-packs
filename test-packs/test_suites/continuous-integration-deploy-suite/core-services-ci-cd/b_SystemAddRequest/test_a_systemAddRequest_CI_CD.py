@@ -115,10 +115,10 @@ def test_SystemAdditionRequested():
 
 
 # *** Kick of the collectComponentVersion Msg
-@pytest.mark.core_services_mvp
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.core_services_mvp_extended
-@pytest.mark.rcm_fitness_cd_mvp_extended
+#@pytest.mark.core_services_mvp
+#@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.core_services_mvp_extended
+#@pytest.mark.rcm_fitness_cd_mvp_extended
 def test_HAL_CollectComponentVersion():
     #af_support_tools.mark_defect(defect_id='', user_id='', comments='', date_marked='')
     bindHALQueus()
