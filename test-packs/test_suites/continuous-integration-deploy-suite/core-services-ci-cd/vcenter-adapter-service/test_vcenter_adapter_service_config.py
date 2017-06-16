@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # Author: cullia
-# Revision: 1.2
+# Revision: 1.0
 # Code Reviewed by:
-# Description: Testing the RackHD-Adapter Container.
+# Description: Testing the vCenter-Adapter Container.
 #
 # Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
 # Dell EMC Confidential/Proprietary Information
@@ -57,26 +57,25 @@ def load_test_data():
     port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ',
                                                      property='ssl_port')
 
-    # RackHD VM IP & Creds details
+    # vCenter VM IP & Creds details
     global capreg_config_file
     capreg_config_file = 'continuous-integration-deploy-suite/config_capreg.ini'
 
     global capreg_config_header
     capreg_config_header = 'config_details'
 
-    global rackHD_IP
-    rackHD_IP = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
-                                                          property='rackhd_ipaddress')
-
-    global rackHD_username
-    rackHD_username = af_support_tools.get_config_file_property(config_file=capreg_config_file,
-                                                                heading=capreg_config_header,
-                                                                property='rackhd_username')
-
-    global rackHD_password
-    rackHD_password = af_support_tools.get_config_file_property(config_file=capreg_config_file,
-                                                                heading=capreg_config_header,
-                                                                property='rackhd_password')
+    global vcenter_IP
+    vcenter_IP = af_support_tools.get_config_file_property(config_file=capreg_config_file,
+                                                           heading=capreg_config_header, property='vcenter')
+    global vcenter_username
+    vcenter_username = af_support_tools.get_config_file_property(config_file=capreg_config_file,
+                                                                 heading=capreg_config_header, property='vcenter_user')
+    global vcenter_password
+    vcenter_password = af_support_tools.get_config_file_property(config_file=capreg_config_file,
+                                                                 heading=capreg_config_header,
+                                                                 property='vcenter_password')
+    global vcenter_port
+    vcenter_port = '443'
 
 
 #####################################################################
@@ -85,9 +84,9 @@ def load_test_data():
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_rackHD_adapter_servicerunning():
+def test_vcenter_adapter_servicerunning():
     """
-    Title           :       Verify the RackHD-Adapter service is running
+    Title           :       Verify the vCenter-Adapter service is running
     Description     :       This method tests docker service for a container
                             It will fail if :
                                 Docker service is not running for the container
@@ -95,9 +94,9 @@ def test_rackHD_adapter_servicerunning():
     Returns         :       None
     """
 
-    print('\n* * * Testing the Node Discovery PAQX on system:', ipaddress, '* * *\n')
+    print('\n* * * Testing the VCenter-Adapter Service on system:', ipaddress, '* * *\n')
 
-    service_name = 'symphony-rackhd-adapter-service'
+    service_name = 'symphony-vcenter-adapter-service'
 
     # 1. Test the service is running
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
@@ -109,27 +108,28 @@ def test_rackHD_adapter_servicerunning():
 
 
 @pytest.mark.parametrize('exchange, queue', [
-    ('exchange.dell.cpsd.controlplane.rackhd.response', 'controlplane.hardware.list.nodes.response'),
-    ('exchange.dell.cpsd.controlplane.rackhd.response', 'queue.controlplane.hardware.list.node.catalogs.response'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'controlplane.hardware.list.nodes'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'dell.cpsd.service.rcm.capability.update.firmware.requested'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.esxi.install'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.list.node.catalogs'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.set.node.obm.setting'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.rackhd.register'),
-    ('exchange.dell.cpsd.adapter.rackhd.node.discovered.event', 'queue.dell.cpsd.frupaqx.node.discovered-event'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control','queue.dell.cpsd.hdp.capability.registry.control.rackhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.rackhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response', 'queue.dell.cpsd.hdp.capability.registry.response.rackhd-adapter'),
-    ('exchange.dell.cpsd.syds.system.definition.response', 'queue.dell.cpsd.controlplane.rackhd.system.list.found'),
-    ('exchange.dell.cpsd.syds.system.definition.response', 'queue.dell.cpsd.controlplane.rackhd.component.configuration.found'),
-    ('exchange.dell.cpsd.cms.credentials.response', 'queue.dell.cpsd.controlplane.rackhd.credentials.response'),
-    ('exchange.dell.cpsd.endpoint.registration.event', 'queue.dell.cpsd.controlplane.rackhd.endpoint-events'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.rackhd.register')
+    ('exchange.cpsd.controlplane.vcenter.response', 'queue.dell.cpsd.dne-paqx.response.dne-paqx'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.cluster.discover'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.clusteroperation'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.discover'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.host.enter-maintenance'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.host.powercommand'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.register'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIB'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIBConfigure'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.vm.destroy'),
+    ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request', 'queue.dell.cpsd.hdp.hal.data.provider.device.data.discovery.request.vcenter-compute-data-provider'),
+    ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request', 'queue.dell.cpsd.hdp.hal.data.provider.endpoint.validation.request.vcenter-compute-data-provider'),
+    ('exchange.dell.cpsd.syds.system.definition.response', 'queue.dell.cpsd.adapter.vcenter.component.configuration.found'),
+    ('exchange.dell.cpsd.cms.credentials.response', 'queue.dell.cpsd.adapter.vcenter.component.credentials.found'),
+    ('exchange.dell.cpsd.endpoint.registration.event', 'queue.dell.cpsd.controlplane.vcenter.endpoint-events'),
+    ('exchange.dell.cpsd.hdp.capability.registry.control','queue.dell.cpsd.hdp.capability.registry.control.vcenter-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.vcenter-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response', 'queue.dell.cpsd.hdp.capability.registry.response.vcenter-adapter')
 ])
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_rackHD_RMQ_bindings(exchange, queue):
+def test_vcenter_adapter_RMQ_bindings(exchange, queue):
     """
     Title           :       Verify the RMQ bindings
     Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
@@ -150,29 +150,29 @@ def test_rackHD_RMQ_bindings(exchange, queue):
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_rackHD_adapter_full_ListCapabilities():
+def test_vcenter_adapter_full_ListCapabilities():
     """
-    Title           :       Verify the registry.list.capability Message returns all rackhd-adapter capabilities
+    Title           :       Verify the registry.list.capability Message returns all vcenter-adapter capabilities
     Description     :       A registry.list.capability message is sent.  It is expected that a response is returned that
-                            includes a list of all the rackhd-adapter capabilities.
+                            includes a list of all the vcenter-adapter capabilities.
                             It will fail if :
                                No capability.registry.response is received.
-                               The rackhd-adapter is not in the response.
-                               The rackhd-adapter capabilites are not in the response.
+                               The vcenter-adapter is not in the response.
+                               The vcenter-adapter capabilites are not in the response.
     Parameters      :       none
     Returns         :       None
     """
     cleanup()
     bindQueues()
 
-    # Necessary step to manually register a rackHD device inorder to get a full list of capabilities.
-    registerRackHD()
+    # Necessary step to manually register a vcenter device in order to get a full list of capabilities.
+    registerVcenter()
     time.sleep(10)  # allow time for it to be configured
 
-    print("\nTest: Send in a list capabilities message and to verify all RackHD Adapter capabilities are present")
+    print("\nTest: Send in a list capabilities message and to verify all vCenter Adapter capabilities are present")
 
     # Send in a "list capabilities message"
-    originalcorrelationID = 'capability-registry-list-rackhd-adapter-corID'
+    originalcorrelationID = 'capability-registry-list-vcenter-adapter-corID'
     the_payload = '{}'
 
     af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
@@ -195,16 +195,18 @@ def test_rackHD_adapter_full_ListCapabilities():
 
     checkForErrors(return_message)
 
-    # Verify the RackHD Apapter Response
-    identity = 'rackhd-adapter'
-    capabilities1 = 'rackhd-consul-register'
-    capabilities2 = 'rackhd-list-nodes'
-    capabilities3 = 'rackhd-upgrade-firmware-dellr730-server'
-    capabilities4 = 'rackhd-upgrade-firmware-dell-idrac'
-    capabilities5 = 'node-discovered-event'
-    capabilities6 = 'rackhd-install-esxi'
-    capabilities7 = 'rackhd-list-node-catalogs'
-    capabilities8 = 'rackhd-set-node-obm-setting'
+    # Verify the vcenter Apapter Response
+    identity = 'vcenter-adapter'
+    capabilities1 = 'vcenter-consul-register'
+    capabilities2 = 'vcenter-discover'
+    capabilities3 = 'vcenter-enterMaintenance'
+    capabilities4 = 'vcenter-destroy-virtualMachine'
+    capabilities5 = 'vcenter-powercommand'
+    capabilities6 = 'vcenter-discover-cluster'
+    capabilities7 = 'vcenter-remove-host'
+    capabilities8 = 'vcenter-addhostvcenter'
+    capabilities9 = 'vcenter-install-software-vib'
+    capabilities10 = 'vcenter-configure-software-vib'
 
     error_list = []
 
@@ -226,30 +228,34 @@ def test_rackHD_adapter_full_ListCapabilities():
         error_list.append(capabilities7)
     if (capabilities8 not in return_message):
         error_list.append(capabilities8)
+    if (capabilities9 not in return_message):
+        error_list.append(capabilities9)
+    if (capabilities10 not in return_message):
+        error_list.append(capabilities10)
 
-    assert not error_list, ('Missing some rackHD capabilities')
+    assert not error_list, ('Missing some vcenter-adapter capabilities')
 
-    print('All expected rackhd-adapter Capabilities Returned\n')
+    print('All expected vcenter-adapter Capabilities Returned\n')
 
     cleanup()
 
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_rackHD_adapter_log_files_exist():
+def test_vcenter_adapter_log_files_exist():
     """
-    Title           :       Verify rackhd_adapter log files exist
-    Description     :       This method tests that the RackHD Adapter log files exist.
+    Title           :       Verify vcenter-adapter log files exist
+    Description     :       This method tests that the vCenter Adapter log files exist.
                             It will fail:
                                 If the the error and/or info log files do not exists
     Parameters      :       None
     Returns         :       None
     """
 
-    service = 'rackhd-adapter-service'
-    filePath = '/opt/dell/cpsd/rackhd-adapter-service/logs/'
-    errorLogFile = 'rackhd-adapter-error.log'
-    infoLogFile = 'rackhd-adapter-info.log'
+    service = 'vcenter-adapter-service'
+    filePath = '/opt/dell/cpsd/vcenter-adapter-service/logs/'
+    errorLogFile = 'vcenter-adapter-error.log'
+    infoLogFile = 'vcenter-adapter-info.log'
 
     sendCommand = 'docker ps | grep '+service+' | awk \'{system("docker exec -i "$1" ls '+filePath+'") }\''
 
@@ -270,10 +276,10 @@ def test_rackHD_adapter_log_files_exist():
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_rackhd_adapter_log_files_free_of_exceptions():
+def test_vcenter_adapter_log_files_free_of_exceptions():
     """
     Title           :       Verify there are no exceptions in the log files
-    Description     :       This method tests that the rackhd_adapter log files contain no Exceptions.
+    Description     :       This method tests that the vcenter-adapter log files contain no Exceptions.
                             It will fail:
                                 If the the error and/or info log files do not exists
                                 If the error log file contains AuthenticationFailureException, RuntimeException, NullPointerException or BeanCreationException.
@@ -281,9 +287,9 @@ def test_rackhd_adapter_log_files_free_of_exceptions():
     Returns         :       None
     """
 
-    service = 'rackhd-adapter-service'
-    filePath = '/opt/dell/cpsd/rackhd-adapter-service/logs/'
-    errorLogFile = 'rackhd-adapter-error.log'
+    service = 'vcenter-adapter-service'
+    filePath = '/opt/dell/cpsd/vcenter-adapter-service/logs/'
+    errorLogFile = 'vcenter-adapter-error.log'
     excep1 = 'AuthenticationFailureException'
     excep2 = 'RuntimeException'
     excep3 = 'NullPointerException'
@@ -422,16 +428,18 @@ def rest_queue_list(user=None, password=None, host=None, port=None, virtual_host
     #######################################################################################################################
 
 
-def registerRackHD():
-    # Until consul is  working properly & integrated with the rackhd adapter in the same environment we need to register
+def registerVcenter():
+    # Until consul is  working properly & integrated with the vcenter adapter in the same environment we need to register
     # it manually by sending this message.
 
-    the_payload = '{"messageProperties":{"timestamp":"2017-06-14T12:00:00Z","correlationId":"manually-reg-rackhd-3fb0-9696-3f7d28e17f72"},"registrationInfo":{"address":"http://' + rackHD_IP + ':8080/ui","username":"' + rackHD_username + '","password":"' + rackHD_password + '"}}'
+
+    the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"vcenter-registtration-corr-id","replyTo":"localhost"},"registrationInfo":{"address":"https://' + vcenter_IP + ':'+ vcenter_port+'","username":"' + vcenter_username + '","password":"' + vcenter_password + '"}}'
 
     af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                          rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                         exchange='exchange.dell.cpsd.controlplane.rackhd.request',
-                                         routing_key='controlplane.rackhd.endpoint.register',
+                                         ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                         exchange='exchange.cpsd.controlplane.vcenter.request',
+                                         routing_key='controlplane.hypervisor.vcenter.endpoint.register',
                                          headers={
-                                             '__TypeId__': 'com.dell.cpsd.rackhd.registration.info.request'},
-                                         payload=the_payload, ssl_enabled=cpsd.props.rmq_ssl_enabled)
+                                             '__TypeId__': 'com.dell.cpsd.vcenter.registration.info.request'},
+                                         payload=the_payload)
