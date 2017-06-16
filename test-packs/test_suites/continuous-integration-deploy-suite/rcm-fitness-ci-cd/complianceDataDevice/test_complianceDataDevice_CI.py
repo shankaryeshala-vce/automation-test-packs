@@ -310,11 +310,11 @@ def test_getComplianceDataDevice3():
 def test_getComplianceDataDevice4():
     #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceDataNEXUS("NEXUS", "N9K", "C9396", 5, "SWITCH", "FIXEDMODULE", path + "complianceDataDeviceNEXUS9k.json")
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice5():
     #af_support_tools.mark_defect(defect_id='DE12419', user_id='toqeer.akhtar@vce.com', comments='hal layer', date_marked='04/04/2017')
     getComplianceData_INVALID(compUUID[:8])
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_getComplianceDataDevice6():
     getComplianceData_INVALID("----")
 @pytest.mark.rcm_fitness_mvp
