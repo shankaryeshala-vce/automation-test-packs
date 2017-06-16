@@ -9,6 +9,7 @@ import af_support_tools
 import pytest
 import json
 import time
+import unittest
 
 # Payloads from symphony-sds.ini:- location: continuous-integration-deploy-suite/symphony-sds.ini
 try:
@@ -36,6 +37,7 @@ rmq_password = 'guest'
 
 # Add & verify component credentials
 @pytest.mark.core_services_mvp
+@unittest.skip("skipping till this is modified to use new credentials service API")
 def test_CS_ComponentCredentials_CI():
     print('\nRunning mvp test on system: ', ipaddress)
     cleanup()
@@ -53,6 +55,7 @@ def test_CS_ComponentCredentials_CI():
 
 # Add & verify component credentials
 @pytest.mark.core_services_mvp_extended
+@unittest.skip("skipping till this is modified to use new credentials service API")
 def test_CS_ComponentCredentials():
     print('\nRunning mvp extended test on system: ', ipaddress)
     cleanup()
@@ -203,12 +206,12 @@ def CS_CredAdd_duplicateComponents():
     return_json = json.loads(return_message, encoding='utf-8')
     assert return_json['errors'][0]['code'] == "VAMQP1012E"
 
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-info.log") }\''
+    sendCommand = 'docker ps | grep credentials-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credentials/logs/credentials-service-info.log") }\''
     error1 = "A different object with the same identifier value was already associated with the session"
     error2 = "(attempt 3)"
     error3 = "VAMQP1009E"
 
-    # Return contents of the credential-service-error.log
+    # Return contents of the credentials-service-error.log
     my_return_text = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                        command=sendCommand, return_output=True)
 
@@ -258,12 +261,12 @@ def CS_CredAdd_duplicateEndpoints():
     return_json = json.loads(return_message, encoding='utf-8')
     assert return_json['errors'][0]['code'] == "VAMQP1012E"
 
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
+    sendCommand = 'docker ps | grep credentials-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credentials/logs/credentials-service-error.log") }\''
     error1 = "A different object with the same identifier value was already associated with the session"
     error2 = "(attempt 3)"
     error3 = "VAMQP1009E"
 
-    # Return contents of the credential-service-error.log
+    # Return contents of the credentials-service-error.log
     my_return_text = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                        command=sendCommand, return_output=True)
 
@@ -361,14 +364,14 @@ def CS_CredAdd_DBdown():
     return_json = json.loads(return_message, encoding='utf-8')
     assert return_json['errors'][0]['code'] == "VAMQP1012E"
 
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
+    sendCommand = 'docker ps | grep credentials-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credentials/logs/credentials-service-error.log") }\''
     error1 = "Unable to acquire JDBC Connection"
     error2 = "(attempt 3)"
     error3 = "VAMQP1009E"
 
     time.sleep(3)  # Need to wait as the response here takes longer (3 attempts)
 
-    # Return contents of the credential-service-error.log
+    # Return contents of the credentials-service-error.log
     my_return_text = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username,
                                                        password=cli_password,
                                                        command=sendCommand, return_output=True)
@@ -436,15 +439,15 @@ def CS_CredReq_DBdown():
     return_json = json.loads(return_message, encoding='utf-8')
     assert return_json['errors'][0]['code'] == "VAMQP1012E"
 
-    # Send the command to credential-service-error.log file
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
+    # Send the command to credentials-service-error.log file
+    sendCommand = 'docker ps | grep credentials-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credentials/logs/credentials-service-error.log") }\''
     error1 = "Unable to acquire JDBC Connection"
     error2 = "(attempt 3)"
     error3 = "VAMQP1009E"
 
     time.sleep(3)  # Need to wait as the response here takes longer (3 attempts)
 
-    # Return contents of the credential-service-error.log
+    # Return contents of the credentials-service-error.log
     my_return_text = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                        command=sendCommand, return_output=True)
 
@@ -490,12 +493,12 @@ def CS_CredReq_invalidJson():
     if i_am_json == False:
         print('Verified json is invalid')
 
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
+    sendCommand = 'docker ps | grep credentials-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credentials/logs/credentials-service-error.log") }\''
     error1 = "VAMQP1008E AMQP error (attempt 1)"
     error2 = "expected close marker for Object"
     error3 = "(attempt 3)"
 
-    # Return contents of the credential-service-error.log
+    # Return contents of the credentials-service-error.log
     my_return_text = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                        command=sendCommand, return_output=True)
 
@@ -539,7 +542,7 @@ def CS_CredReq_invalidMsgProp():
                                                rmq_password=rmq_password, queue='test.component.credential.response')
     assert q_len == 0
 
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
+    sendCommand = 'docker ps | grep credentials-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credentials/logs/credentials-service-error.log") }\''
     error1 = "VAMQP2004E Message property [correlationId] is empty.]"
     error2 = "VAMQP1008E AMQP error"
     error3 = "(attempt 3)"
@@ -596,8 +599,8 @@ def CS_CredReq_invalidUuid():
     assert return_json['messageProperties']['timestamp']
     assert return_json['errors'][0]['code'] == "VAMQP1012E"
 
-    # sendCommand = 'docker ps | credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/rcm-fitness/services/credential/logs/credential-service-error.log") }\''
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credential/logs/credential-service-error.log") }\''
+    # sendCommand = 'docker ps | credentials-service | awk \'{system("docker exec -i "$1" cat /opt/dell/rcm-fitness/services/credential/logs/credentials-service-error.log") }\''
+    sendCommand = 'docker ps | grep credentials-service | awk \'{system("docker exec -i "$1" cat /opt/dell/cpsd/credentials/logs/credentials-service-error.log") }\''
     error1 = "VAMQP1008E AMQP error (attempt 1)"
     error2 = "No endpoints in database or something went wrong"
     error3 = "(attempt 3)"
@@ -641,7 +644,7 @@ def bindQueues():
 
 
 def clearLogFiles():
-    sendCommand = 'docker ps | grep credential-service | awk \'{system("docker exec -i "$1" sh -c \\"echo > /opt/dell/cpsd/credential/logs/credential-service-error.log\\"") }\''
+    sendCommand = 'docker ps | grep credentials-service | awk \'{system("docker exec -i "$1" sh -c \\"echo > /opt/dell/cpsd/credentials/logs/credentials-service-error.log\\"") }\''
     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                       command=sendCommand, return_output=False)
 
