@@ -344,8 +344,8 @@ def getRCMEvaluation(product, model, filename):
 @pytest.mark.rcm_fitness_cd
 def test_getSysDef1():
     getSystemDefinition()
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd7
+#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_cd
 def test_getComplianceData1():
     getComplianceDataNexus("N3K", "FIXEDMODULE", path + "rcmComplianceData-N3k.json")
 @pytest.mark.rcm_fitness_mvp
@@ -357,10 +357,10 @@ def test_getAvailableRCM1():
 def test_getRCMDefinition1():
     getRCMDefinition("Nexus 3048", path + "rcmRCMDefinitionDetails-N3k.json")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_cd
 def test_getRCMEval1():
     getRCMEvaluation("Nexus", "3048", path + "rcmEvaluationDetails-N3k.json")
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_cd
 def test_getComplianceData2():
     getComplianceDataNexus("N5K", "FIXEDMODULE", path + "rcmComplianceData-N5k.json")
@@ -372,11 +372,11 @@ def test_getAvailableRCM2():
 @pytest.mark.rcm_fitness_cd
 def test_getRCMDefinition2():
     getRCMDefinition("Nexus 55xx", path + "rcmRCMDefinitionDetails-N5k.json")
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_cd
 def test_getRCMEval2():
     getRCMEvaluation("Nexus", "55xx", path + "rcmEvaluationDetails-N5k.json")
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_cd
 def test_getComplianceData3():
     getComplianceDataMDS("9148S", "FIXEDMODULE", path + "rcmComplianceData-MDS9k.json")
@@ -389,10 +389,10 @@ def test_getAvailableRCM3():
 def test_getRCMDefinition3():
     getRCMDefinition("MDS 9148", path + "rcmRCMDefinitionDetails-MDS9k.json")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_cd
 def test_getRCMEval3():
     getRCMEvaluation("MDS", "9148", path + "rcmEvaluationDetails-MDS9k.json")
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_cd
 def test_getComplianceData4():
     getComplianceDataNexus("N3K", "FIXEDMODULE", path + "rcmComplianceData-N3k-Mismatch.json")
@@ -405,10 +405,10 @@ def test_getAvailableRCM4():
 def test_getRCMDefinition4():
     getRCMDefinition("Nexus 3048", path + "rcmRCMDefinitionDetails-N3k-Mismatch.json")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_cd
 def test_getRCMEval4():
     getRCMEvaluation("Nexus", "3048", path + "rcmEvaluationDetails-N3k-Mismatch.json")
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_cd
 def test_getComplianceData5():
     getComplianceDataNexus("N5K", "FIXEDMODULE", path + "rcmComplianceData-N5k-Mismatch.json")
@@ -421,10 +421,10 @@ def test_getAvailableRCM5():
 def test_getRCMDefinition5():
     getRCMDefinition("Nexus 55xx", path + "rcmRCMDefinitionDetails-N5k-Mismatch.json")
 @pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_cd
+#@pytest.mark.rcm_fitness_cd
 def test_getRCMEval5():
     getRCMEvaluation("Nexus", "55xx", path + "rcmEvaluationDetails-N5k-Mismatch.json")
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_cd
 def test_getComplianceData6():
     getComplianceDataMDS("9148S", "FIXEDMODULE", path + "rcmComplianceData-MDS9k-Mismatch.json")
