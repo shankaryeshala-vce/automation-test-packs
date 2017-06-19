@@ -51,8 +51,7 @@ def load_test_data():
     ('rackhd-adapter', 'rackhd-consul-register',),
     ('vcenter-adapter', 'vcenter-consul-register'),
     ('coprhd-adapter', 'coprhd-consul-register'),
-    ('endpoint-registry', 'endpoint-registry-lookup'),
-    ('node-discovery-paqx', 'list-discovered-nodes')
+    ('endpoint-registry', 'endpoint-registry-lookup')
 ])
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
@@ -96,7 +95,8 @@ def test_capabilityRegistry_ListCapabilities_1(param_providerName, param_capabil
 @pytest.mark.parametrize('param_providerName, param_capabilities1, param_capabilities2', [
     ('cisco-network-data-provider', 'device-data-discovery', 'device-endpoint-validation'),
     ('poweredge-compute-data-provider', 'device-data-discovery', 'device-endpoint-validation'),
-    ('vcenter-compute-data-provider', 'device-data-discovery', 'device-endpoint-validation')
+    ('vcenter-compute-data-provider', 'device-data-discovery', 'device-endpoint-validation'),
+    ('node-discovery-paqx', 'list-discovered-nodes', 'manage-node-allocation')
 ])
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
