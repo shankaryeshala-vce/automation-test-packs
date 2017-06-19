@@ -49,6 +49,37 @@ def load_test_data():
     payload_property_req = 'sys_request_payload'
     global payload_property_hal
     payload_property_hal = 'ccv_payload'
+    
+    #my_esrs_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/esrs-service.properties'
+    my_esrs_file = 'cpsd-test-automation-framework:/home/autouser/PycharmProjects/auto-framework/resources/continuous-integration-deploy-suite/esrs-service.properties'
+
+    sendCommand_mkdir = 'mkdir /opt/dell/cpsd/rcm-fitness/esrs-service/conf/'
+    af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password, command=sendCommand_mkdir, return_output=True)
+
+    target_file = '/opt/dell/cpsd/rcm-fitness/esrs-service/conf/esrs-service.properties'
+    # af_support_tools.file_copy_put(host=ipaddress, port=22, username=cli_username, password=cli_password, source_file=os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/esrs-service.properties', destination_file='/opt/dell/cpsd/rcm-fitness/esrs-service/conf/esrs-service.properties')
+    sendCommand_copyToLocal = 'docker cp ' + my_esrs_file + ' ' + target_file
+    af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password, command=sendCommand_copyToLocal, return_output=True)
+
+    serviceStop()
+    serviceStart()
+
+
+def serviceStop():
+    #stop/start docker containers
+    print ("stopping ESRS docker container")
+    sendCommand_esrs_stop = "docker stop esrs-service"
+    my_return_down = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password, command=sendCommand_esrs_stop, return_output=True)
+    time.sleep(2)
+    sendCommand_esrs_remove = "docker rm esrs-service"
+    my_return_down = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password, command=sendCommand_esrs_remove, return_output=True)
+    time.sleep(2)
+
+def serviceStart():
+    print ("starting ESRS docker container using yml")
+    sendCommand_yml_up = "docker-compose -f /opt/dell/cpsd/rcm-fitness/common/install/docker-compose.yml up -d esrs-service"
+    my_return_up = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password, command=sendCommand_yml_up, return_output=True)
+    time.sleep(30)
 
 
 #######################################################################################################################
