@@ -1,3 +1,13 @@
+#!/usr/bin/python
+# Author: russed5
+# Revision: 1.0
+# Code Reviewed by:
+# Description: Testing the ability to change the state of nodes in the Node disocvery postgres DB
+#
+# Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+# Dell EMC Confidential/Proprietary Information
+#
+
 import af_support_tools
 import json
 import os
@@ -28,6 +38,12 @@ def load_test_data():
     global cli_password
     cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS',
                                                               property='password')
+
+    af_support_tools.rmq_get_server_side_certs(host_hostname=cpsd.props.base_hostname,
+                                               host_username=cpsd.props.base_username,
+                                               host_password=cpsd.props.base_password, host_port=22,
+                                               rmq_certs_path=cpsd.props.rmq_cert_path)
+
     global rmq_username
     rmq_username = cpsd.props.rmq_username
     global rmq_password
@@ -38,6 +54,7 @@ def load_test_data():
     rmq_cert_path = cpsd.props.rmq_cert_path
     global rmq_ssl_enabled
     rmq_ssl_enabled = cpsd.props.rmq_ssl_enabled
+
 
     # a node with the following properties will be added to the DB for testing purposes
     global testElementId
@@ -345,6 +362,7 @@ def sendNodeAllocationRequestMessage(node, state):
     try:
         # publish the AMQP message to set the state of the node
         af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username, rmq_password=rmq_password,
+                                         port=rmq_port, ssl_enabled=rmq_ssl_enabled,
                                          exchange=my_exchange,
                                          routing_key=my_routing_key,
                                          headers={
@@ -392,6 +410,7 @@ def bindQueue(exchange, testqueue):
     """ Bind 'testqueue' to 'exchange'."""
 
     af_support_tools.rmq_bind_queue(host=ipaddress,rmq_username=rmq_username, rmq_password=rmq_password,
+                                    port=rmq_port, ssl_enabled=rmq_ssl_enabled,
                                     queue=testqueue,
                                     exchange=exchange,
                                     routing_key='#')
@@ -435,6 +454,7 @@ def waitForMsg(queue):
                                                    port=rmq_port,
                                                    rmq_username=rmq_username,
                                                    rmq_password=rmq_password,
+                                                   ssl_enabled=rmq_ssl_enabled,
                                                    queue=queue)
 
         if timeout > max_timeout:
@@ -450,5 +470,6 @@ def cleanupQ(testqueue):
     af_support_tools.rmq_delete_queue(host=ipaddress, port=rmq_port,
                                       rmq_username=rmq_username,
                                       rmq_password=rmq_password,
+                                      ssl_enabled=rmq_ssl_enabled,
                                     queue=testqueue)
 
