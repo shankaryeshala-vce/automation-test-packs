@@ -195,7 +195,6 @@ def test_registerRackHD():
                                                           queue='test.controlplane.rackhd.response',
                                                           remove_message=True)
     return_json = json.loads(return_message, encoding='utf-8')
-    print (return_json)
     assert return_json['responseInfo']['message'] == 'SUCCESS', 'ERROR: RackHD validation failure'
 
     # Verify that an event to register the rackHD with endpoint registry is triggered
@@ -208,7 +207,6 @@ def test_registerRackHD():
                                                           remove_message=True)
 
     return_json = json.loads(return_message, encoding='utf-8')
-    print (return_json)
     assert return_json['endpoint']['type'] == 'rackhd', 'rackhd not registered with endpoint'
 
     cleanup('test.controlplane.rackhd.response')
@@ -301,7 +299,7 @@ def test_rackHD_adapter_full_ListCapabilities():
 def test_consul_verify_rackHD_registered():
     """
     Test Case Title :       Verify RackHD is registered with Consul
-    Description     :       This method tests that vault is registered in the Consul API http://{SymphonyIP}:8500/v1/agent/services
+    Description     :       This method tests that RackHD is registered in the Consul API http://{SymphonyIP}:8500/v1/agent/services
                             It will fail if :
                                 The line 'Service: "rackhd"' is not present
     Parameters      :       none
@@ -344,7 +342,7 @@ def test_consul_verify_rackHD_registered():
 def test_consul_verify_rackHD_passing_status():
     """
     Test Case Title :       Verify RackHD is Passing in Consul
-    Description     :       This method tests that RackHD-adapter has a passing status in the Consul API http://{SymphonyIP}:8500/v1/health/checks/vault
+    Description     :       This method tests that RackHD-adapter has a passing status in the Consul API http://{SymphonyIP}:8500/v1/health/checks/rackhd
                             It will fail if :
                                 The line '"Status": "passing"' is not present
     Parameters      :       none
