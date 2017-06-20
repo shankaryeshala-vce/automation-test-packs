@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # Author: cullia
-# Revision: 1.2
+# Revision: 1.3
 # Code Reviewed by:
 # Description: Testing the RackHD-Adapter Container.
 #
@@ -118,11 +118,16 @@ def test_rackHD_adapter_servicerunning():
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.set.node.obm.setting'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.rackhd.register'),
     ('exchange.dell.cpsd.adapter.rackhd.node.discovered.event', 'queue.dell.cpsd.frupaqx.node.discovered-event'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control','queue.dell.cpsd.hdp.capability.registry.control.rackhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.rackhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response', 'queue.dell.cpsd.hdp.capability.registry.response.rackhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.control',
+     'queue.dell.cpsd.hdp.capability.registry.control.rackhd-adapter'),
+    (
+            'exchange.dell.cpsd.hdp.capability.registry.event',
+            'queue.dell.cpsd.hdp.capability.registry.event.rackhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response',
+     'queue.dell.cpsd.hdp.capability.registry.response.rackhd-adapter'),
     ('exchange.dell.cpsd.syds.system.definition.response', 'queue.dell.cpsd.controlplane.rackhd.system.list.found'),
-    ('exchange.dell.cpsd.syds.system.definition.response', 'queue.dell.cpsd.controlplane.rackhd.component.configuration.found'),
+    ('exchange.dell.cpsd.syds.system.definition.response',
+     'queue.dell.cpsd.controlplane.rackhd.component.configuration.found'),
     ('exchange.dell.cpsd.cms.credentials.response', 'queue.dell.cpsd.controlplane.rackhd.credentials.response'),
     ('exchange.dell.cpsd.endpoint.registration.event', 'queue.dell.cpsd.controlplane.rackhd.endpoint-events'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.rackhd.register')
@@ -148,8 +153,68 @@ def test_rackHD_RMQ_bindings(exchange, queue):
     print(exchange, '\nis bound to\n', queue, '\n')
 
 
-#@pytest.mark.core_services_mvp
-#@pytest.mark.core_services_mvp_extended
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_registerRackHD():
+    # Until consul is  working properly & integrated with the rackhd adapter in the same environment we need to register
+    # it manually by sending this message.  This test is a prerequisite to getting the full list of
+
+    cleanup('test.controlplane.rackhd.response')
+    cleanup('test.endpoint.registration.event')
+    bindQueues('exchange.dell.cpsd.controlplane.rackhd.response', 'test.controlplane.rackhd.response')
+    bindQueues('exchange.dell.cpsd.endpoint.registration.event', 'test.endpoint.registration.event')
+
+    time.sleep(2)
+
+    af_support_tools.rmq_purge_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                     rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+                                     ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                     queue='test.controlplane.rackhd.response')
+
+    af_support_tools.rmq_purge_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                     rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+                                     ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                     queue='test.endpoint.registration.event')
+
+    the_payload = '{"messageProperties":{"timestamp":"2017-06-14T12:00:00Z","correlationId":"manually-reg-rackhd-3fb0-9696-3f7d28e17f72"},"registrationInfo":{"address":"http://' + rackHD_IP + ':8080/ui","username":"' + rackHD_username + '","password":"' + rackHD_password + '"}}'
+
+    af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                         rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+                                         exchange='exchange.dell.cpsd.controlplane.rackhd.request',
+                                         routing_key='controlplane.rackhd.endpoint.register',
+                                         headers={
+                                             '__TypeId__': 'com.dell.cpsd.rackhd.registration.info.request'},
+                                         payload=the_payload, ssl_enabled=cpsd.props.rmq_ssl_enabled)
+
+    # Verify the RackHD account can be validated
+    assert waitForMsg('test.controlplane.rackhd.response'), 'Error: No RackHD validation message received'
+    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                                          rmq_username=cpsd.props.rmq_username,
+                                                          rmq_password=cpsd.props.rmq_password,
+                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                                          queue='test.controlplane.rackhd.response',
+                                                          remove_message=True)
+    return_json = json.loads(return_message, encoding='utf-8')
+    assert return_json['responseInfo']['message'] == 'SUCCESS', 'ERROR: RackHD validation failure'
+
+    # Verify that an event to register the rackHD with endpoint registry is triggered
+    assert waitForMsg('test.endpoint.registration.event'), 'Error: No message to register with Consul sent by system'
+    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                                          rmq_username=cpsd.props.rmq_username,
+                                                          rmq_password=cpsd.props.rmq_password,
+                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                                          queue='test.endpoint.registration.event',
+                                                          remove_message=True)
+
+    return_json = json.loads(return_message, encoding='utf-8')
+    assert return_json['endpoint']['type'] == 'rackhd', 'rackhd not registered with endpoint'
+
+    cleanup('test.controlplane.rackhd.response')
+    cleanup('test.endpoint.registration.event')
+
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_rackHD_adapter_full_ListCapabilities():
     """
     Title           :       Verify the registry.list.capability Message returns all rackhd-adapter capabilities
@@ -162,12 +227,8 @@ def test_rackHD_adapter_full_ListCapabilities():
     Parameters      :       none
     Returns         :       None
     """
-    cleanup()
-    bindQueues()
-
-    # Necessary step to manually register a rackHD device inorder to get a full list of capabilities.
-    registerRackHD()
-    time.sleep(10)  # allow time for it to be configured
+    cleanup('test.capability.registry.response')
+    bindQueues('exchange.dell.cpsd.hdp.capability.registry.response', 'test.capability.registry.response')
 
     print("\nTest: Send in a list capabilities message and to verify all RackHD Adapter capabilities are present")
 
@@ -186,15 +247,13 @@ def test_rackHD_adapter_full_ListCapabilities():
                                          correlation_id={originalcorrelationID}, ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
     # Wait for and consume the Capability Response Message
-    waitForMsg('test.capability.registry.response')
+    assert waitForMsg('test.capability.registry.response'), 'Error: No List Capability Responce message received'
     return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                                           rmq_username=cpsd.props.rmq_username,
                                                           rmq_password=cpsd.props.rmq_password,
                                                           queue='test.capability.registry.response',
                                                           ssl_enabled=cpsd.props.rmq_ssl_enabled)
-
     time.sleep(5)
-    checkForErrors(return_message)
 
     # Verify the RackHD Apapter Response
     identity = 'rackhd-adapter'
@@ -232,7 +291,88 @@ def test_rackHD_adapter_full_ListCapabilities():
 
     print('All expected rackhd-adapter Capabilities Returned\n')
 
-    cleanup()
+    cleanup('test.capability.registry.response')
+
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_consul_verify_rackHD_registered():
+    """
+    Test Case Title :       Verify RackHD is registered with Consul
+    Description     :       This method tests that vault is registered in the Consul API http://{SymphonyIP}:8500/v1/agent/services
+                            It will fail if :
+                                The line 'Service: "rackhd"' is not present
+    Parameters      :       none
+    Returns         :       None
+    """
+
+    service = 'rackhd'
+
+    url_body = ':8500/v1/agent/services'
+    my_url = 'http://' + ipaddress + url_body
+
+    print('GET:', my_url)
+
+    try:
+        url_response = requests.get(my_url)
+        url_response.raise_for_status()
+
+        # A 200 has been received
+        print(url_response)
+
+        the_response = url_response.text
+
+        # Create the sting as it should appear in the API
+        serviceToCheck = '"Service": "' + service + '"'
+
+        assert serviceToCheck in the_response, ('ERROR:', service, 'is not in Consul\n')
+
+        print(service, 'Registered in Consul')
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_consul_verify_rackHD_passing_status():
+    """
+    Test Case Title :       Verify RackHD is Passing in Consul
+    Description     :       This method tests that RackHD-adapter has a passing status in the Consul API http://{SymphonyIP}:8500/v1/health/checks/vault
+                            It will fail if :
+                                The line '"Status": "passing"' is not present
+    Parameters      :       none
+    Returns         :       None
+    """
+    service = 'rackhd'
+
+    url_body = ':8500/v1/health/checks/' + service
+    my_url = 'http://' + ipaddress + url_body
+
+    print('GET:', my_url)
+
+    try:
+        url_response = requests.get(my_url)
+        url_response.raise_for_status()
+
+        # A 200 has been received
+        print(url_response)
+        the_response = url_response.text
+
+        serviceStatus = '"Status": "passing"'
+        assert serviceStatus in the_response, ('ERROR:', service, 'is not Passing in Consul\n')
+        print(service, 'Status = Passing in consul\n\n')
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
 
 
 @pytest.mark.core_services_mvp
@@ -252,7 +392,7 @@ def test_rackHD_adapter_log_files_exist():
     errorLogFile = 'rackhd-adapter-error.log'
     infoLogFile = 'rackhd-adapter-info.log'
 
-    sendCommand = 'docker ps | grep '+service+' | awk \'{system("docker exec -i "$1" ls '+filePath+'") }\''
+    sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" ls ' + filePath + '") }\''
 
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                          command=sendCommand, return_output=True)
@@ -291,7 +431,7 @@ def test_rackhd_adapter_log_files_free_of_exceptions():
     excep4 = 'BeanCreationException'
 
     # Verify the log files exist
-    sendCommand = 'docker ps | grep '+service+' | awk \'{system("docker exec -i "$1" ls '+filePath+'") }\''
+    sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" ls ' + filePath + '") }\''
 
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                          command=sendCommand, return_output=True)
@@ -301,7 +441,7 @@ def test_rackhd_adapter_log_files_free_of_exceptions():
     error_list = []
 
     # Verify there are no Authentication errors
-    sendCommand = 'docker ps | grep '+service+' | awk \'{system("docker exec -i "$1" cat /'+filePath+errorLogFile+' | grep '+excep1+'") }\''
+    sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" cat /' + filePath + errorLogFile + ' | grep ' + excep1 + '") }\''
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                          command=sendCommand, return_output=True)
     print (my_return_status)
@@ -309,21 +449,21 @@ def test_rackhd_adapter_log_files_free_of_exceptions():
         error_list.append(excep1)
 
     # Verify there are no RuntimeException errors
-    sendCommand = 'docker ps | grep '+service+' | awk \'{system("docker exec -i "$1" cat /'+filePath+errorLogFile+' | grep '+excep2+'") }\''
+    sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" cat /' + filePath + errorLogFile + ' | grep ' + excep2 + '") }\''
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                          command=sendCommand, return_output=True)
     if (excep2 in my_return_status):
         error_list.append(excep2)
 
     # Verify there are no NullPointerException errors
-    sendCommand = 'docker ps | grep '+service+' | awk \'{system("docker exec -i "$1" cat /'+filePath+errorLogFile+' | grep '+excep3+'") }\''
+    sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" cat /' + filePath + errorLogFile + ' | grep ' + excep3 + '") }\''
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                          command=sendCommand, return_output=True)
     if (excep3 in my_return_status):
         error_list.append(excep3)
 
     # Verify there are no BeanCreationException errors
-    sendCommand = 'docker ps | grep '+service+' | awk \'{system("docker exec -i "$1" cat /'+filePath+errorLogFile+' | grep '+excep4+'") }\''
+    sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" cat /' + filePath + errorLogFile + ' | grep ' + excep4 + '") }\''
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                          command=sendCommand, return_output=True)
     if (excep4 in my_return_status):
@@ -331,44 +471,24 @@ def test_rackhd_adapter_log_files_free_of_exceptions():
 
     assert not error_list, 'Exceptions in log files, Review the ' + errorLogFile + ' file'
 
-    print('No '+ excep1, excep2, excep3, excep4 +' exceptions in log files\n')
+    print('No ' + excep1, excep2, excep3, excep4 + ' exceptions in log files\n')
 
 
 ##############################################################################################
-def bindQueues():
-    af_support_tools.rmq_bind_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                    rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                    queue='test.capability.registry.control',
-                                    exchange='exchange.dell.cpsd.hdp.capability.registry.control',
-                                    routing_key='#', ssl_enabled=cpsd.props.rmq_ssl_enabled)
-
-    af_support_tools.rmq_bind_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                    rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                    queue='test.capability.registry.binding',
-                                    exchange='exchange.dell.cpsd.hdp.capability.registry.binding',
-                                    routing_key='#', ssl_enabled=cpsd.props.rmq_ssl_enabled)
-
+def bindQueues(exchange, queue):
     af_support_tools.rmq_bind_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                     rmq_username=cpsd.props.rmq_username,
                                     rmq_password=cpsd.props.rmq_password,
-                                    queue='test.capability.registry.response',
-                                    exchange='exchange.dell.cpsd.hdp.capability.registry.response',
+                                    queue=queue,
+                                    exchange=exchange,
                                     routing_key='#', ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
 
-def cleanup():
-    af_support_tools.rmq_delete_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                      rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                      queue='test.capability.registry.control', ssl_enabled=cpsd.props.rmq_ssl_enabled)
-
-    af_support_tools.rmq_delete_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                      rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                      queue='test.capability.registry.binding', ssl_enabled=cpsd.props.rmq_ssl_enabled)
-
+def cleanup(queue):
     af_support_tools.rmq_delete_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                       rmq_username=cpsd.props.rmq_username,
                                       rmq_password=cpsd.props.rmq_password,
-                                      queue='test.capability.registry.response', ssl_enabled=cpsd.props.rmq_ssl_enabled)
+                                      queue=queue, ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
 
 def waitForMsg(queue):
@@ -398,15 +518,9 @@ def waitForMsg(queue):
 
         if timeout > max_timeout:
             print('ERROR: Message took too long to return. Something is wrong')
-            cleanup()
-            break
+            return False
 
-
-def checkForErrors(return_message):
-    checklist = 'errors'
-    if checklist in return_message:
-        print('\nBUG: Error in Response Message\n')
-        assert False  # This assert is to fail the test
+    return True
 
 
 def rest_queue_list(user=None, password=None, host=None, port=None, virtual_host=None, exchange=None):
@@ -421,18 +535,3 @@ def rest_queue_list(user=None, password=None, host=None, port=None, virtual_host
     return queues
 
     #######################################################################################################################
-
-
-def registerRackHD():
-    # Until consul is  working properly & integrated with the rackhd adapter in the same environment we need to register
-    # it manually by sending this message.
-
-    the_payload = '{"messageProperties":{"timestamp":"2017-06-14T12:00:00Z","correlationId":"manually-reg-rackhd-3fb0-9696-3f7d28e17f72"},"registrationInfo":{"address":"http://' + rackHD_IP + ':8080/ui","username":"' + rackHD_username + '","password":"' + rackHD_password + '"}}'
-
-    af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                         rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                         exchange='exchange.dell.cpsd.controlplane.rackhd.request',
-                                         routing_key='controlplane.rackhd.endpoint.register',
-                                         headers={
-                                             '__TypeId__': 'com.dell.cpsd.rackhd.registration.info.request'},
-                                         payload=the_payload, ssl_enabled=cpsd.props.rmq_ssl_enabled)
