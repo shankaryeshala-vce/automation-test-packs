@@ -53,7 +53,7 @@ def load_test_data():
     #my_esrs_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/esrs-service.properties'
     my_esrs_file = 'cpsd-test-automation-framework:/home/autouser/PycharmProjects/auto-framework/resources/continuous-integration-deploy-suite/esrs-service.properties'
 
-    sendCommand_mkdir = 'mkdir /opt/dell/cpsd/rcm-fitness/esrs-service/conf/'
+    sendCommand_mkdir = 'mkdir -p /opt/dell/cpsd/rcm-fitness/esrs-service/conf/'
     af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password, command=sendCommand_mkdir, return_output=True)
 
     target_file = '/opt/dell/cpsd/rcm-fitness/esrs-service/conf/esrs-service.properties'
