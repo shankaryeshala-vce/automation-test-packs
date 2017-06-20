@@ -187,7 +187,7 @@ def test_registerRackHD():
                                          payload=the_payload, ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
     # Verify the RackHD account can be validated
-    waitForMsg('test.controlplane.rackhd.response')
+    assert waitForMsg('test.controlplane.rackhd.response'), 'Error: No RackHD validation message received'
     return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                                           rmq_username=cpsd.props.rmq_username,
                                                           rmq_password=cpsd.props.rmq_password,
@@ -198,7 +198,7 @@ def test_registerRackHD():
     assert return_json['responseInfo']['message'] == 'SUCCESS', 'ERROR: RackHD validation failure'
 
     # Verify that an event to register the rackHD with endpoint registry is triggered
-    waitForMsg('test.endpoint.registration.event')
+    assert waitForMsg('test.endpoint.registration.event'), 'Error: No message to register with Consul sent by system'
     return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                                           rmq_username=cpsd.props.rmq_username,
                                                           rmq_password=cpsd.props.rmq_password,
@@ -247,7 +247,7 @@ def test_rackHD_adapter_full_ListCapabilities():
                                          correlation_id={originalcorrelationID}, ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
     # Wait for and consume the Capability Response Message
-    waitForMsg('test.capability.registry.response')
+    assert waitForMsg('test.capability.registry.response'), 'Error: No List Capability Responce message received'
     return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                                           rmq_username=cpsd.props.rmq_username,
                                                           rmq_password=cpsd.props.rmq_password,
@@ -299,7 +299,7 @@ def test_rackHD_adapter_full_ListCapabilities():
 def test_consul_verify_rackHD_registered():
     """
     Test Case Title :       Verify RackHD is registered with Consul
-    Description     :       This method tests that RackHD is registered in the Consul API http://{SymphonyIP}:8500/v1/agent/services
+    Description     :       This method tests that vault is registered in the Consul API http://{SymphonyIP}:8500/v1/agent/services
                             It will fail if :
                                 The line 'Service: "rackhd"' is not present
     Parameters      :       none
@@ -342,7 +342,7 @@ def test_consul_verify_rackHD_registered():
 def test_consul_verify_rackHD_passing_status():
     """
     Test Case Title :       Verify RackHD is Passing in Consul
-    Description     :       This method tests that RackHD-adapter has a passing status in the Consul API http://{SymphonyIP}:8500/v1/health/checks/rackhd
+    Description     :       This method tests that RackHD-adapter has a passing status in the Consul API http://{SymphonyIP}:8500/v1/health/checks/vault
                             It will fail if :
                                 The line '"Status": "passing"' is not present
     Parameters      :       none
@@ -518,7 +518,9 @@ def waitForMsg(queue):
 
         if timeout > max_timeout:
             print('ERROR: Message took too long to return. Something is wrong')
-            break
+            return False
+
+    return True
 
 
 def rest_queue_list(user=None, password=None, host=None, port=None, virtual_host=None, exchange=None):
