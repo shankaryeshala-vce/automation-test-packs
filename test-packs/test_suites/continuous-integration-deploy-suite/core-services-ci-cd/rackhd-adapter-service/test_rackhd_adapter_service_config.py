@@ -53,29 +53,29 @@ def load_test_data():
     port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ',
                                                      property='ssl_port')
 
-    # Update config ini files at runtime
+    # Update setup_config.ini file at runtime
     my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/setup_config.properties'
     af_support_tools.set_config_file_property_by_data_file(my_data_file)
 
     # RackHD VM IP & Creds details
-    global capreg_config_file
-    capreg_config_file = 'continuous-integration-deploy-suite/setup_config.ini'
+    global setup_config_file
+    setup_config_file = 'continuous-integration-deploy-suite/setup_config.ini'
 
-    global capreg_config_header
-    capreg_config_header = 'config_details'
+    global setup_config_header
+    setup_config_header = 'config_details'
 
     global rackHD_IP
-    rackHD_IP = af_support_tools.get_config_file_property(config_file=capreg_config_file, heading=capreg_config_header,
+    rackHD_IP = af_support_tools.get_config_file_property(config_file=setup_config_file, heading=setup_config_header,
                                                           property='rackhd_ipaddress')
 
     global rackHD_username
-    rackHD_username = af_support_tools.get_config_file_property(config_file=capreg_config_file,
-                                                                heading=capreg_config_header,
+    rackHD_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                heading=setup_config_header,
                                                                 property='rackhd_username')
 
     global rackHD_password
-    rackHD_password = af_support_tools.get_config_file_property(config_file=capreg_config_file,
-                                                                heading=capreg_config_header,
+    rackHD_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                heading=setup_config_header,
                                                                 property='rackhd_password')
 
 
