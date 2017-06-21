@@ -503,7 +503,7 @@ def waitForMsg(queue):
     timeout = 0
 
     # Max number of seconds to wait
-    max_timeout = 100
+    max_timeout = 200
 
     # Amount of time in seconds that the loop is going to wait on each iteration
     sleeptime = 1
