@@ -27,10 +27,6 @@ def load_test_data():
                                                host_password=cpsd.props.base_password, host_port=22,
                                                rmq_certs_path=cpsd.props.rmq_cert_path)
 
-    # Update config ini files at runtime
-    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/symphony-sds.properties'
-    af_support_tools.set_config_file_property_by_data_file(my_data_file)
-
     # Set config ini file name
     global env_file
     env_file = 'env.ini'
@@ -56,6 +52,10 @@ def load_test_data():
     global port
     port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ',
                                                      property='ssl_port')
+
+    # Update config ini files at runtime
+    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/config_capreg.properties'
+    af_support_tools.set_config_file_property_by_data_file(my_data_file)
 
     # RackHD VM IP & Creds details
     global capreg_config_file

@@ -80,6 +80,98 @@ def test_capabilityRegistry_servicerunning():
     assert my_return_status == 'Up', (service_name + " not running")
 
 
+@pytest.mark.parametrize('exchange, queue', [
+    ('exchange.dell.cpsd.hdp.capability.registry.binding', 'queue.dell.cpsd.hdp.capability.registry.binding'),
+    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.cisco-network-data-provider'),
+    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.coprhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.endpoint-registry'),
+    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.poweredge-compute-data-provider'),
+    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.rackhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.vcenter-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.vcenter-compute-data-provider'),
+    ('exchange.dell.cpsd.hdp.capability.registry.event','queue.dell.cpsd.hdp.capability.registry.event.rackhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.event','queue.dell.cpsd.hdp.capability.registry.event.vcenter-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.event','queue.dell.cpsd.hdp.capability.registry.event.coprhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.request','queue.dell.cpsd.hdp.capability.registry.request'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.coprhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.rackhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.vcenter-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.hal-orchestrator-service')
+])
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_capability_registry_RMQ_bindings_core(exchange, queue):
+    """
+    Title           :       Verify the Capability Registry expected RMQ bindings.
+    Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
+                            It uses the RMQ API to check.
+                            It will fail if :
+                                The RMQ binding does not exist
+    Parameters      :       1. RMQ Exchange. 2. RQM Queue
+    Returns         :       None
+    """
+
+    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
+                             exchange=exchange)
+    queues = json.dumps(queues)
+
+    assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
+    print(exchange, '\nis bound to\n', queue, '\n')
+
+
+@pytest.mark.parametrize('exchange, queue', [
+    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.node-discovery-paqx'),
+    ('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.node-discovery-paqx'),
+    ('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.dne-paqx'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.dne-paqx'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.node-discovery-paqx')
+])
+@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_capability_registry_RMQ_bindings_dne(exchange, queue):
+    """
+    Title           :       Verify the Capability Registry expected RMQ bindings.
+    Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
+                            It uses the RMQ API to check.
+                            It will fail if :
+                                The RMQ binding does not exist
+    Parameters      :       1. RMQ Exchange. 2. RQM Queue
+    Returns         :       None
+    """
+
+    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
+                             exchange=exchange)
+    queues = json.dumps(queues)
+
+    assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
+    print(exchange, '\nis bound to\n', queue, '\n')
+
+
+@pytest.mark.parametrize('exchange, queue', [
+    ('exchange.dell.cpsd.hdp.capability.registry.event','queue.dell.cpsd.hdp.capability.registry.event.fru-paqx'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.fru-paqx'),
+])
+@pytest.mark.fru_paqx_parent
+@pytest.mark.fru_mvp
+def test_capability_registry_RMQ_bindings_fru(exchange, queue):
+    """
+    Title           :       Verify the Capability Registry expected RMQ bindings.
+    Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
+                            It uses the RMQ API to check.
+                            It will fail if :
+                                The RMQ binding does not exist
+    Parameters      :       1. RMQ Exchange. 2. RQM Queue
+    Returns         :       None
+    """
+
+    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
+                             exchange=exchange)
+    queues = json.dumps(queues)
+
+    assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
+    print(exchange, '\nis bound to\n', queue, '\n')
+
+
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_log_files_exist():
@@ -160,52 +252,6 @@ def test_capabilityRegistry_log_files_free_of_exceptions():
     assert not error_list, 'Exceptions in log files, Review the ' + errorLogFile + ' file'
 
     print('No Authentication, RuntimeException or NullPointerException in log files\n')
-
-
-@pytest.mark.parametrize('exchange, queue', [
-    ('exchange.dell.cpsd.hdp.capability.registry.binding', 'queue.dell.cpsd.hdp.capability.registry.binding'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.cisco-network-data-provider'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.coprhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.endpoint-registry'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.node-discovery-paqx'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.poweredge-compute-data-provider'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.rackhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.vcenter-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.vcenter-compute-data-provider'),
-    ('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.node-discovery-paqx'),
-    ('exchange.dell.cpsd.hdp.capability.registry.event','queue.dell.cpsd.hdp.capability.registry.event.dne-paqx'),
-    ('exchange.dell.cpsd.hdp.capability.registry.event','queue.dell.cpsd.hdp.capability.registry.event.rackhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.event','queue.dell.cpsd.hdp.capability.registry.event.vcenter-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.event','queue.dell.cpsd.hdp.capability.registry.event.coprhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.event','queue.dell.cpsd.hdp.capability.registry.event.fru-paqx'),
-    ('exchange.dell.cpsd.hdp.capability.registry.request','queue.dell.cpsd.hdp.capability.registry.request'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.coprhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.dne-paqx'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.node-discovery-paqx'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.rackhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.vcenter-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.fru-paqx'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.hal-orchestrator-service')
-])
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
-def test_capability_registry_RMQ_bindings(exchange, queue):
-    """
-    Title           :       Verify the Capability Registry expected RMQ bindings.
-    Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
-                            It uses the RMQ API to check.
-                            It will fail if :
-                                The RMQ binding does not exist
-    Parameters      :       1. RMQ Exchange. 2. RQM Queue
-    Returns         :       None
-    """
-
-    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
-                             exchange=exchange)
-    queues = json.dumps(queues)
-
-    assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
-    print(exchange, '\nis bound to\n', queue, '\n')
 
 
 #######################################################################################################################
