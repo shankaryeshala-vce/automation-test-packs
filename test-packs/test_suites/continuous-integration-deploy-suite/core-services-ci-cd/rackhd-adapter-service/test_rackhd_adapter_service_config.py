@@ -109,7 +109,6 @@ def test_rackHD_adapter_servicerunning():
 
 
 @pytest.mark.parametrize('exchange, queue', [
-    ('exchange.dell.cpsd.controlplane.rackhd.response', 'controlplane.hardware.list.nodes.response'),
     ('exchange.dell.cpsd.controlplane.rackhd.response', 'queue.controlplane.hardware.list.node.catalogs.response'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'controlplane.hardware.list.nodes'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'dell.cpsd.service.rcm.capability.update.firmware.requested'),
@@ -117,24 +116,66 @@ def test_rackHD_adapter_servicerunning():
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.list.node.catalogs'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.set.node.obm.setting'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.rackhd.register'),
-    ('exchange.dell.cpsd.adapter.rackhd.node.discovered.event', 'queue.dell.cpsd.frupaqx.node.discovered-event'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control',
-     'queue.dell.cpsd.hdp.capability.registry.control.rackhd-adapter'),
-    (
-            'exchange.dell.cpsd.hdp.capability.registry.event',
-            'queue.dell.cpsd.hdp.capability.registry.event.rackhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response',
-     'queue.dell.cpsd.hdp.capability.registry.response.rackhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.rackhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.rackhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response', 'queue.dell.cpsd.hdp.capability.registry.response.rackhd-adapter'),
     ('exchange.dell.cpsd.syds.system.definition.response', 'queue.dell.cpsd.controlplane.rackhd.system.list.found'),
-    ('exchange.dell.cpsd.syds.system.definition.response',
-     'queue.dell.cpsd.controlplane.rackhd.component.configuration.found'),
+    ('exchange.dell.cpsd.syds.system.definition.response', 'queue.dell.cpsd.controlplane.rackhd.component.configuration.found'),
     ('exchange.dell.cpsd.cms.credentials.response', 'queue.dell.cpsd.controlplane.rackhd.credentials.response'),
     ('exchange.dell.cpsd.endpoint.registration.event', 'queue.dell.cpsd.controlplane.rackhd.endpoint-events'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.rackhd.register')
 ])
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_rackHD_RMQ_bindings(exchange, queue):
+def test_rackHD_RMQ_bindings_core(exchange, queue):
+    """
+    Title           :       Verify the RMQ bindings
+    Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
+                            It uses the RMQ API to check.
+                            It will fail if :
+                                The RMQ binding does not exist
+    Parameters      :       1. RMQ Exchange. 2. RQM Queue
+    Returns         :       None
+    """
+
+    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
+                             exchange=exchange)
+    queues = json.dumps(queues)
+
+    assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
+    print(exchange, '\nis bound to\n', queue, '\n')
+
+
+@pytest.mark.parametrize('exchange, queue', [
+    ('exchange.dell.cpsd.controlplane.rackhd.response', 'controlplane.hardware.list.nodes.response')
+])
+@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_rackHD_RMQ_bindings_dne(exchange, queue):
+    """
+    Title           :       Verify the RMQ bindings
+    Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
+                            It uses the RMQ API to check.
+                            It will fail if :
+                                The RMQ binding does not exist
+    Parameters      :       1. RMQ Exchange. 2. RQM Queue
+    Returns         :       None
+    """
+
+    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
+                             exchange=exchange)
+    queues = json.dumps(queues)
+
+    assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
+    print(exchange, '\nis bound to\n', queue, '\n')
+
+
+@pytest.mark.parametrize('exchange, queue', [
+    ('exchange.dell.cpsd.adapter.rackhd.node.discovered.event', 'queue.dell.cpsd.frupaqx.node.discovered-event')
+])
+@pytest.mark.fru_paqx_parent
+@pytest.mark.fru_mvp
+def test_rackHD_RMQ_bindings_fru(exchange, queue):
     """
     Title           :       Verify the RMQ bindings
     Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
