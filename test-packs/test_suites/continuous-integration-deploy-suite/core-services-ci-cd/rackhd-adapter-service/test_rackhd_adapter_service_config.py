@@ -54,12 +54,12 @@ def load_test_data():
                                                      property='ssl_port')
 
     # Update config ini files at runtime
-    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/config_capreg.properties'
+    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/setup_config.properties'
     af_support_tools.set_config_file_property_by_data_file(my_data_file)
 
     # RackHD VM IP & Creds details
     global capreg_config_file
-    capreg_config_file = 'continuous-integration-deploy-suite/config_capreg.ini'
+    capreg_config_file = 'continuous-integration-deploy-suite/setup_config.ini'
 
     global capreg_config_header
     capreg_config_header = 'config_details'
