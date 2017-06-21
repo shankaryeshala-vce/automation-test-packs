@@ -52,8 +52,8 @@ def load_test_data():
 #######################################################################################################################
 
 
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
+#@pytest.mark.dne_paqx_parent_mvp
+#@pytest.mark.dne_paqx_parent_mvp_extended
 def test_DNE_SystemAdditionRequested():
     print('Defining System on system: ', ipaddress)
 
