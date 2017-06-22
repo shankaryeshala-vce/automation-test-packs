@@ -2,7 +2,7 @@
 # Author:
 # Revision: 1.0
 # Code Reviewed by:
-# Description: Testing the simple Info Node Expansion APIs boh local & via api-gateway
+# Description: Testing the simple Info Node Expansion APIs both local & via api-gateway
 #
 # Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
 # Dell EMC Confidential/Proprietary Information
@@ -74,8 +74,7 @@ def test_node_expansion_api_local_dne(url, expected_response):
         # A 200 has been received
         print(url_response)
 
-        the_response = url_response.text
-
+        the_response = url_response.text  # Save the body of the response to a variable
         assert expected_response in the_response, ('ERROR:', expected_response, 'is not returned\n')
 
 
@@ -120,8 +119,7 @@ def test_node_expansion_api_gateway_dne(url, expected_response):
         # A 200 has been received
         print(url_response)
 
-        the_response = url_response.text
-
+        the_response = url_response.text  # Save the body of the response to a variable
         assert expected_response in the_response, ('ERROR:', expected_response, 'is not returned\n')
 
 
@@ -132,4 +130,4 @@ def test_node_expansion_api_gateway_dne(url, expected_response):
         print('\n')
         raise Exception(err)
 
-##############################################################################################
+        ##############################################################################################
