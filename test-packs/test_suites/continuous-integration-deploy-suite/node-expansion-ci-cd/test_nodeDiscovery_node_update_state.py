@@ -64,7 +64,7 @@ def load_test_data():
 
 ##############################################################################################
 
-@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_changeNodeStateToFAILED():
     """ Verify that the state of a Node, persisted by the Node Discovery PAQX, can be set to 'FAILED'"""
@@ -91,7 +91,7 @@ def test_changeNodeStateToFAILED():
 
 ##############################################################################################
 
-@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_changeNodeStateToADDED():
     """ Verify that the state of a Node, persisted by the Node Discovery PAQX, can be set to 'ADDED'"""
@@ -118,7 +118,7 @@ def test_changeNodeStateToADDED():
 
 ##############################################################################################
 
-@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_changeNodeStateToDISCOVERED():
     """ Verify that the state of a Node, persisted by the Node Discovery PAQX, can be set to 'DISCOVERED'"""
@@ -145,7 +145,7 @@ def test_changeNodeStateToDISCOVERED():
 
 ##############################################################################################
 
-@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_changeNodeStateToRESERVED():
     """ Verify that the state of a Node, persisted by the Node Discovery PAQX, can be set to 'RESERVED'"""
@@ -172,7 +172,7 @@ def test_changeNodeStateToRESERVED():
 
 ##############################################################################################
 
-@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_lookupNodeState():
     """ Verify that the state(s) of a Node persisted by the Node Discovery PAQX can be looked-up"""
