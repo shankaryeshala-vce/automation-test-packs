@@ -253,6 +253,8 @@ def test_registerRackHD():
 
     cleanup('test.controlplane.rackhd.response')
     cleanup('test.endpoint.registration.event')
+    
+    time.sleep(2)
 
 
 @pytest.mark.core_services_mvp
