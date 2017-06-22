@@ -67,10 +67,10 @@ def load_test_data():
 
     global vcenter_IP
     vcenter_IP = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                           heading=setup_config_header, property='vcenter')
+                                                           heading=setup_config_header, property='vcenter_ipaddress')
     global vcenter_username
     vcenter_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                 heading=setup_config_header, property='vcenter_user')
+                                                                 heading=setup_config_header, property='vcenter_username')
     global vcenter_password
     vcenter_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                                  heading=setup_config_header,
