@@ -33,6 +33,9 @@ def load_test_data():
     global ipaddress
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
 
+    global protocol
+    protocol = 'http://'
+
     global dne_port
     dne_port = ':8071'
 
@@ -44,13 +47,13 @@ def load_test_data():
 # These are the main tests.
 #####################################################################
 
-@pytest.mark.parametrize('url, expected_response', [
+@pytest.mark.parametrize('dne_url_body, expected_response', [
     ('/dne/about', 'Node Expansion API v0.1'),
     ('/swagger-ui.html#', '<!DOCTYPE html>')
 ])
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_node_expansion_api_local_dne(url, expected_response):
+def test_node_expansion_api_local_dne(dne_url_body, expected_response):
     """
     Title           :       Verify the Node Expansion Local APIs
     Description     :       This methind tests that the expected local Node Expansion APIs are returning as expected.
@@ -59,11 +62,8 @@ def test_node_expansion_api_local_dne(url, expected_response):
     Parameters      :       1. The URL Body 2. The expected output
     Returns         :       None
     """
-    dne_url_body = url
 
-    expected_response = expected_response
-
-    my_dne_url = 'http://' + ipaddress + dne_port + dne_url_body
+    my_dne_url = protocol + ipaddress + dne_port + dne_url_body
 
     print('GET:', my_dne_url)
 
@@ -87,13 +87,13 @@ def test_node_expansion_api_local_dne(url, expected_response):
 
 
 @pytest.mark.skip(reason='Defect: ESTS-128946')
-@pytest.mark.parametrize('url, expected_response', [
+@pytest.mark.parametrize('dne_url_body, expected_response', [
     ('/dne-paqx/dne/about', 'Node Expansion API v0.1'),
     ('/dne-paqx/swagger-ui.html#', '<!DOCTYPE html>')
 ])
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_node_expansion_api_gateway_dne(url, expected_response):
+def test_node_expansion_api_gateway_dne(dne_url_body, expected_response):
     """
     Title           :       Verify the Node Expansion api-gateway APIs
     Description     :       This methind tests that the expected  Node Expansion APIs are returning as expected via
@@ -104,11 +104,7 @@ def test_node_expansion_api_gateway_dne(url, expected_response):
     Returns         :       None
     """
 
-    dne_url_body = url
-
-    expected_response = expected_response
-
-    my_dne_url = 'http://' + ipaddress + gateway_port + dne_url_body
+    my_dne_url = protocol + ipaddress + gateway_port + dne_url_body
 
     print('GET:', my_dne_url)
 
