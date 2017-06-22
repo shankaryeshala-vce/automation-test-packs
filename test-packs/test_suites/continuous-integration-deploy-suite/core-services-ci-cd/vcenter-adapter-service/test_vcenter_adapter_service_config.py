@@ -233,7 +233,7 @@ def test_registerVcenter():
     cleanup('test.controlplane.vcenter.response')
     cleanup('test.endpoint.registration.event')
 
-    time.sleep(2)
+    time.sleep(3)
 
 
 @pytest.mark.core_services_mvp
@@ -535,7 +535,7 @@ def waitForMsg(queue):
     timeout = 0
 
     # Max number of seconds to wait
-    max_timeout = 200
+    max_timeout = 400
 
     # Amount of time in seconds that the loop is going to wait on each iteration
     sleeptime = 1
