@@ -123,8 +123,7 @@ def test_rackHD_adapter_servicerunning():
     ('exchange.dell.cpsd.syds.system.definition.response', 'queue.dell.cpsd.controlplane.rackhd.component.configuration.found'),
     ('exchange.dell.cpsd.cms.credentials.response', 'queue.dell.cpsd.controlplane.rackhd.credentials.response'),
     ('exchange.dell.cpsd.endpoint.registration.event', 'queue.dell.cpsd.controlplane.rackhd.endpoint-events'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.rackhd.register')
-])
+    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.rackhd.register')])
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_rackHD_RMQ_bindings_core(exchange, queue):
@@ -147,8 +146,7 @@ def test_rackHD_RMQ_bindings_core(exchange, queue):
 
 
 @pytest.mark.parametrize('exchange, queue', [
-    ('exchange.dell.cpsd.controlplane.rackhd.response', 'controlplane.hardware.list.nodes.response')
-])
+    ('exchange.dell.cpsd.controlplane.rackhd.response', 'controlplane.hardware.list.nodes.response')])
 @pytest.mark.dne_paqx_parent
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_rackHD_RMQ_bindings_dne(exchange, queue):
@@ -171,8 +169,7 @@ def test_rackHD_RMQ_bindings_dne(exchange, queue):
 
 
 @pytest.mark.parametrize('exchange, queue', [
-    ('exchange.dell.cpsd.adapter.rackhd.node.discovered.event', 'queue.dell.cpsd.frupaqx.node.discovered-event')
-])
+    ('exchange.dell.cpsd.adapter.rackhd.node.discovered.event', 'queue.dell.cpsd.frupaqx.node.discovered-event')])
 @pytest.mark.fru_paqx_parent
 @pytest.mark.fru_mvp
 def test_rackHD_RMQ_bindings_fru(exchange, queue):
@@ -237,6 +234,7 @@ def test_registerRackHD():
                                                           queue='test.controlplane.rackhd.response',
                                                           remove_message=True)
     return_json = json.loads(return_message, encoding='utf-8')
+    print (return_json)
     assert return_json['responseInfo']['message'] == 'SUCCESS', 'ERROR: RackHD validation failure'
 
     # Verify that an event to register the rackHD with endpoint registry is triggered
@@ -249,12 +247,13 @@ def test_registerRackHD():
                                                           remove_message=True)
 
     return_json = json.loads(return_message, encoding='utf-8')
+    print (return_json)
     assert return_json['endpoint']['type'] == 'rackhd', 'rackhd not registered with endpoint'
 
     cleanup('test.controlplane.rackhd.response')
     cleanup('test.endpoint.registration.event')
     
-    time.sleep(2)
+    time.sleep(3)
 
 
 @pytest.mark.core_services_mvp
@@ -546,7 +545,7 @@ def waitForMsg(queue):
     timeout = 0
 
     # Max number of seconds to wait
-    max_timeout = 200
+    max_timeout = 500
 
     # Amount of time in seconds that the loop is going to wait on each iteration
     sleeptime = 1
