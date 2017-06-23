@@ -49,8 +49,7 @@ def load_test_data():
 
 @pytest.mark.parametrize('dne_url_body, expected_response', [
     ('/dne/about', 'Node Expansion API v0.1'),
-    ('/swagger-ui.html#', '<!DOCTYPE html>')
-])
+    ('/swagger-ui.html#', '<!DOCTYPE html>')])
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_node_expansion_api_local_dne(dne_url_body, expected_response):
@@ -86,11 +85,9 @@ def test_node_expansion_api_local_dne(dne_url_body, expected_response):
         raise Exception(err)
 
 
-@pytest.mark.skip(reason='Defect: ESTS-128946')
 @pytest.mark.parametrize('dne_url_body, expected_response', [
     ('/dne-paqx/dne/about', 'Node Expansion API v0.1'),
-    ('/dne-paqx/swagger-ui.html#', '<!DOCTYPE html>')
-])
+    ('/dne-paqx/swagger-ui.html#', '<!DOCTYPE html>')])
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_node_expansion_api_gateway_dne(dne_url_body, expected_response):

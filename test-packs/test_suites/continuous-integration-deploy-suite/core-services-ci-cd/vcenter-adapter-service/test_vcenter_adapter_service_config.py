@@ -53,7 +53,6 @@ def load_test_data():
     port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ',
                                                      property='ssl_port')
 
-
     # Update setup_config.ini file at runtime
     my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/setup_config.properties'
     af_support_tools.set_config_file_property_by_data_file(my_data_file)
@@ -70,7 +69,8 @@ def load_test_data():
                                                            heading=setup_config_header, property='vcenter_ipaddress')
     global vcenter_username
     vcenter_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                 heading=setup_config_header, property='vcenter_username')
+                                                                 heading=setup_config_header,
+                                                                 property='vcenter_username')
     global vcenter_password
     vcenter_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                                  heading=setup_config_header,
@@ -118,15 +118,20 @@ def test_vcenter_adapter_servicerunning():
     ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIB'),
     ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIBConfigure'),
     ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.vm.destroy'),
-    ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request', 'queue.dell.cpsd.hdp.hal.data.provider.device.data.discovery.request.vcenter-compute-data-provider'),
-    ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request', 'queue.dell.cpsd.hdp.hal.data.provider.endpoint.validation.request.vcenter-compute-data-provider'),
-    ('exchange.dell.cpsd.syds.system.definition.response', 'queue.dell.cpsd.adapter.vcenter.component.configuration.found'),
+    ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request',
+     'queue.dell.cpsd.hdp.hal.data.provider.device.data.discovery.request.vcenter-compute-data-provider'),
+    ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request',
+     'queue.dell.cpsd.hdp.hal.data.provider.endpoint.validation.request.vcenter-compute-data-provider'),
+    ('exchange.dell.cpsd.syds.system.definition.response',
+     'queue.dell.cpsd.adapter.vcenter.component.configuration.found'),
     ('exchange.dell.cpsd.cms.credentials.response', 'queue.dell.cpsd.adapter.vcenter.component.credentials.found'),
     ('exchange.dell.cpsd.endpoint.registration.event', 'queue.dell.cpsd.controlplane.vcenter.endpoint-events'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.vcenter-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.vcenter-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response', 'queue.dell.cpsd.hdp.capability.registry.response.vcenter-adapter')
-])
+    ('exchange.dell.cpsd.hdp.capability.registry.control',
+     'queue.dell.cpsd.hdp.capability.registry.control.vcenter-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.event',
+     'queue.dell.cpsd.hdp.capability.registry.event.vcenter-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response',
+     'queue.dell.cpsd.hdp.capability.registry.response.vcenter-adapter')])
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_vcenter_adapter_RMQ_bindings_core(exchange, queue):
@@ -147,10 +152,10 @@ def test_vcenter_adapter_RMQ_bindings_core(exchange, queue):
     assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
     print(exchange, '\nis bound to\n', queue, '\n')
 
+
 @pytest.mark.skip(reason='Defect: ESTS-128120')
 @pytest.mark.parametrize('exchange, queue', [
-    ('exchange.cpsd.controlplane.vcenter.response', 'queue.dell.cpsd.dne-paqx.response.dne-paqx')
-])
+    ('exchange.cpsd.controlplane.vcenter.response', 'queue.dell.cpsd.dne-paqx.response.dne-paqx')])
 @pytest.mark.dne_paqx_parent
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_vcenter_adapter_RMQ_bindings_dne(exchange, queue):
@@ -196,7 +201,7 @@ def test_registerVcenter():
                                      queue='test.endpoint.registration.event')
 
     the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"vcenter-registtration-corr-id","replyTo":"localhost"},"registrationInfo":{"address":"https://' + vcenter_IP + ':' + vcenter_port + '","username":"' + vcenter_username + '","password":"' + vcenter_password + '"}}'
-
+    print(the_payload)
     af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                          rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
@@ -206,8 +211,7 @@ def test_registerVcenter():
                                              '__TypeId__': 'com.dell.cpsd.vcenter.registration.info.request'},
                                          payload=the_payload)
 
-
-    #Verify the vcenter is validated
+    # Verify the vcenter is validated
     assert waitForMsg('test.controlplane.vcenter.response'), 'ERROR: No validation Message Returned'
     return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                                           rmq_username=cpsd.props.rmq_username,
@@ -216,9 +220,10 @@ def test_registerVcenter():
                                                           queue='test.controlplane.vcenter.response',
                                                           remove_message=True)
     return_json = json.loads(return_message, encoding='utf-8')
+    print (return_json)
     assert return_json['responseInfo']['message'] == 'SUCCESS', 'ERROR: Vcenter validation failure'
 
-    #Verify the system triggers a msg to register vcenter with consul
+    # Verify the system triggers a msg to register vcenter with consul
     assert waitForMsg('test.endpoint.registration.event'), 'ERROR: No message to register with Consul sent'
     return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                                           rmq_username=cpsd.props.rmq_username,
@@ -228,6 +233,7 @@ def test_registerVcenter():
                                                           remove_message=True)
 
     return_json = json.loads(return_message, encoding='utf-8')
+    print (return_json)
     assert return_json['endpoint']['type'] == 'vcenter', 'vcenter not registered with endpoint'
 
     cleanup('test.controlplane.vcenter.response')
@@ -278,8 +284,6 @@ def test_vcenter_adapter_full_ListCapabilities():
                                                           ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
     time.sleep(5)
-    print (return_message)
-
     # Verify the vcenter Apapter Response
     identity = 'vcenter-adapter'
     capabilities1 = 'vcenter-consul-register'
@@ -535,7 +539,7 @@ def waitForMsg(queue):
     timeout = 0
 
     # Max number of seconds to wait
-    max_timeout = 400
+    max_timeout = 500
 
     # Amount of time in seconds that the loop is going to wait on each iteration
     sleeptime = 1
