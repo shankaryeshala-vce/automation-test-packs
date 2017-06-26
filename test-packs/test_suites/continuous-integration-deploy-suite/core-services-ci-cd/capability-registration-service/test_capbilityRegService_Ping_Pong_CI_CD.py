@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Author: cullia
+# Author:
 # Revision: 2.1
 # Code Reviewed by:
 # Description: Verify the Capability Registry Ping-Pong Message sequence.
@@ -57,9 +57,9 @@ def load_test_data():
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_capabilityRegistry_Control_and_Binding_Ping_Message():
+def test_capabilityRegistry_Control_and_Binding_Ping_Message_core():
     """
-    Title           :       Verify the Capability Registry Control Ping Message
+    Title           :       Verify the Capability Registry Control Ping Message of the Core services
     Description     :       Every 7 seconds the Capability Registery sends out a message asking "who's out there?".
                             This is a "ping" message. Each service that is alive will respond with a "pong" message.
                             The correlationID value will be the same on all messages so this is used to track that we
@@ -134,10 +134,10 @@ def test_capabilityRegistry_Control_and_Binding_Ping_Message():
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_capabilityRegistry_Control_and_Binding_Pong_Message():
+def test_capabilityRegistry_Control_and_Binding_Pong_Message_core():
     """
     Title           :       Verify the Capability Registry Binding Pong Message
-    Description     :       Every 7 seconds the Capability Registery sends out a message asking "who's out there?".
+    Description     :       Every 7 seconds the Capability Registry sends out a message asking "who's out there?".
                             This is a "ping" message. Each service that is alive will respond with a "pong" message.
                             The correlationID value will be the same on all messages so this is used to track that we
                             are getting the correct message and not just "any" message.
@@ -157,7 +157,6 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message():
     capabilityProvider_Vcenter_Adapter = 'vcenter-adapter'
     capabilityProvider_Coprhd_Adapter = 'coprhd-adapter'
     capabilityProvider_Endpoint_Registry = 'endpoint-registry'
-    capabilityProvider_Node_Discovery_Paqx = 'node-discovery-paqx'
 
     # Each provider/adapter is given a flag that will be set to True once its responded. This method is used as the order
     # in which the responses come in is random. When all are tested the allTested flag is set and the test completes.
@@ -168,14 +167,13 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message():
     vcenter_Adapter_Tested = False
     coprhd_Adapter_Tested = False
     endpoint_Registry_Tested = False
-    node_Discovery_Paqx_Tested = False
 
     allTested = False
 
     # To prevent the test waiting indefinitely we need to provide a timeout.  When new adapters/providers are added to
     # the test the expectedNumberOfBindings value will increase.
     errorTimeout = 0
-    expectedNumberOfBindings = 8
+    expectedNumberOfBindings = 9
 
     # Keep consuming messages until this condition is no longer true
     while allTested == False and errorTimeout <= expectedNumberOfBindings:
@@ -252,13 +250,6 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message():
                     print('Test:', capabilityProvider_Endpoint_Registry, 'Binding Message returned\n')
                     endpoint_Registry_Tested = True
 
-            if capabilityProvider_Node_Discovery_Paqx in return_message:
-                if (node_Discovery_Paqx_Tested == True):
-                    error_list.append(capabilityProvider_Node_Discovery_Paqx)
-                else:
-                    print('Test:', capabilityProvider_Node_Discovery_Paqx, 'Binding Message returned\n')
-                    node_Discovery_Paqx_Tested = True
-
             assert not error_list, 'Multiple Containers Running'
 
             if cisco_Network_Data_Provider_Tested == True \
@@ -267,8 +258,7 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message():
                     and rackhd_Adapter_Tested == True \
                     and vcenter_Adapter_Tested == True \
                     and coprhd_Adapter_Tested == True \
-                    and endpoint_Registry_Tested == True \
-                    and node_Discovery_Paqx_Tested == True:
+                    and endpoint_Registry_Tested == True:
                 allTested = True
 
         # A timeout is included to prevent an infinite loop waiting for a response.
@@ -301,13 +291,173 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message():
                 print('ERROR:', capabilityProvider_Coprhd_Adapter, 'Binding Message is not returned')
                 error_list.append(capabilityProvider_Coprhd_Adapter)
 
-            if node_Discovery_Paqx_Tested == False:
-                print('ERROR:', capabilityProvider_Node_Discovery_Paqx, 'Binding Message is not returned')
-                error_list.append(capabilityProvider_Node_Discovery_Paqx)
-
             if endpoint_Registry_Tested == False:
                 print('ERROR:', capabilityProvider_Endpoint_Registry, 'Binding Message is not returned')
                 error_list.append(capabilityProvider_Endpoint_Registry)
+
+            assert not error_list, 'Not all expected bindings are replying'
+
+        errorTimeout += 1
+
+    print('\n*******************************************************\n')
+
+    cleanup()
+
+
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_capabilityRegistry_Control_and_Binding_Ping_Message_dne():
+    """
+    Title           :       Verify the Capability Registry Control Ping Message fro a DNE specific capability
+    Description     :       Every 7 seconds the Capability Registery sends out a message asking "who's out there?".
+                            This is a "ping" message. Each service that is alive will respond with a "pong" message.
+                            The correlationID value will be the same on all messages so this is used to track that we
+                            are getting the correct message and not just "any" message.
+                            It will fail if :
+                               No capability.registry.control message is published.
+                               The containerID does not match the body of the message.
+    Parameters      :       none
+    Returns         :       None
+    """
+
+    print('\nRunning Test on system: ', ipaddress)
+
+    cleanup()
+    bindQueues()
+
+    print('\n*******************************************************\n')
+
+    global correlationID  # Set as a Global parameter as it will be used in the next test.
+
+    # Ensure the Control & Binding Queues are empty to start
+    af_support_tools.rmq_purge_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                     rmq_username=cpsd.props.rmq_username,
+                                     rmq_password=cpsd.props.rmq_password,
+                                     queue='test.capability.registry.control', ssl_enabled=cpsd.props.rmq_ssl_enabled)
+
+    af_support_tools.rmq_purge_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                     rmq_username=cpsd.props.rmq_username,
+                                     rmq_password=cpsd.props.rmq_password,
+                                     queue='test.capability.registry.binding', ssl_enabled=cpsd.props.rmq_ssl_enabled)
+
+    print('\nTest: The Capability Registry Control. Verify the Ping message')
+
+    # Wait for & consume a "Ping" Message. The message is left in the queue to be consumed again. The correlationID is
+    # in the header and the return_basic_properties flag is set to True in order to get the header value. When
+    # basic_properties are returned the message cannot be converted to json which is the reason its "consumed" twice.
+    waitForMsg('test.capability.registry.control')
+    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                                          rmq_username=cpsd.props.rmq_username,
+                                                          rmq_password=cpsd.props.rmq_password,
+                                                          queue='test.capability.registry.control',
+                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                                          remove_message=False, return_basic_properties=True)
+
+    # Save the correlationID to be used in next part of the test
+    correlationID = return_message[0].correlation_id
+    correlationID = json.dumps(correlationID)
+
+    print('The CorrelationID for this Control Msg:', correlationID)
+
+    # The message is consumed again, checked for errors and converted to JSON. The body of the message contains the
+    # containerID under the "hostname" value. This value will be compared to the actual containerID value
+    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                                          rmq_username=cpsd.props.rmq_username,
+                                                          rmq_password=cpsd.props.rmq_password,
+                                                          queue='test.capability.registry.control',
+                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled)
+
+    checkForErrors(return_message)
+    return_json = json.loads(return_message, encoding='utf-8')
+    retunedValue = return_json['hostname']
+
+    # Get the actual Container ID value and compare it to the RMQ message body
+    containerID = getdockerID('capability-registry-service')  # getdockerID() logs into vm and returns the dockerID
+
+    # The value in the msg body should match the container ID. If they do not match indicates multiple containers
+    assert containerID == retunedValue, 'ContainerID does not match RMQ mesage body. Check for multiple containers'
+
+    print('The Capability Registry Control Ping message is sent and has the correct containerID:', containerID)
+    print('\n*******************************************************\n')
+
+
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_capabilityRegistry_Control_and_Binding_Pong_Message_dne():
+    """
+    Title           :       Verify the Capability Registry Binding Pong Message
+    Description     :       Every 7 seconds the Capability Registery sends out a message asking "who's out there?".
+                            This is a "ping" message. Each service that is alive will respond with a "pong" message.
+                            The correlationID value will be the same on all messages so this is used to track that we
+                            are getting the correct message and not just "any" message.
+                            It will fail if :
+                               Not all expected services respond with their Pong message.
+                               If a service responds twice (indicates multiple containers are running for the same service)
+    Parameters      :       none
+    Returns         :       None
+    """
+    print("Test: The Capability Registry Binding. Verify the Pong message from each provider / adapter")
+
+    # This is the list of DNE Specific current/providers
+    capabilityProvider_Node_Discovery_Paqx = 'node-discovery-paqx'
+
+    # Each provider/adapter is given a flag that will be set to True once its responded. This method is used as the order
+    node_Discovery_Paqx_Tested = False
+
+    allTested = False
+
+    # To prevent the test waiting indefinitely we need to provide a timeout.  When new adapters/providers are added to
+    # the test the expectedNumberOfBindings value will increase.
+    errorTimeout = 0
+    expectedNumberOfBindings = 9
+
+    # Keep consuming messages until this condition is no longer true
+    while allTested == False and errorTimeout <= expectedNumberOfBindings:
+
+        # Only a message that comes in with the same correlationID as the Ping message is tested
+        waitForMsg('test.capability.registry.binding')
+        return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                                              rmq_username=cpsd.props.rmq_username,
+                                                              rmq_password=cpsd.props.rmq_password,
+                                                              queue='test.capability.registry.binding',
+                                                              ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                                              remove_message=False, return_basic_properties=True)
+
+        testcorrelationID = return_message[0].correlation_id
+        testcorrelationID = json.dumps(testcorrelationID)
+
+        if testcorrelationID == correlationID:  # Only check messages that have the same CorrelationID as the ping message
+
+            error_list = []
+            return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname,
+                                                                  port=cpsd.props.rmq_port,
+                                                                  rmq_username=cpsd.props.rmq_username,
+                                                                  rmq_password=cpsd.props.rmq_password,
+                                                                  queue='test.capability.registry.binding',
+                                                                  ssl_enabled=cpsd.props.rmq_ssl_enabled)
+            checkForErrors(return_message)
+
+            if capabilityProvider_Node_Discovery_Paqx in return_message:
+                if (node_Discovery_Paqx_Tested == True):
+                    error_list.append(capabilityProvider_Node_Discovery_Paqx)
+                else:
+                    print('Test:', capabilityProvider_Node_Discovery_Paqx, 'Binding Message returned\n')
+                    node_Discovery_Paqx_Tested = True
+
+            assert not error_list, 'Multiple Containers Running'
+
+            if node_Discovery_Paqx_Tested == True:
+                allTested = True
+
+        # A timeout is included to prevent an infinite loop waiting for a response.
+        # If a response hasn't been received the flag will still be false and this can be used to return an error.
+        if errorTimeout == expectedNumberOfBindings:
+
+            error_list = []
+
+            if node_Discovery_Paqx_Tested == False:
+                print('ERROR:', capabilityProvider_Node_Discovery_Paqx, 'Binding Message is not returned')
+                error_list.append(capabilityProvider_Node_Discovery_Paqx)
 
             assert not error_list, 'Not all expected bindings are replying'
 
