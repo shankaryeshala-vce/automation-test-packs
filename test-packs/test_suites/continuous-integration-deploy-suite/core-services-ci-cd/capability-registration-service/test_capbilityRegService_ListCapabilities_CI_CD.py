@@ -51,11 +51,10 @@ def load_test_data():
     ('rackhd-adapter', 'rackhd-consul-register',),
     ('vcenter-adapter', 'vcenter-consul-register'),
     ('coprhd-adapter', 'coprhd-consul-register'),
-    ('endpoint-registry', 'endpoint-registry-lookup')
-])
+    ('endpoint-registry', 'endpoint-registry-lookup')])
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_capabilityRegistry_ListCapabilities_1(param_providerName, param_capabilities1):
+def test_capabilityRegistry_ListCapabilities_core_1(param_providerName, param_capabilities1):
     """
     Title           :       Verify the registry.list.capability Message returns all capabilities for the provider under test
     Description     :       A registry.list.capability message is sent.  It is expected that a response is returned that
@@ -95,12 +94,54 @@ def test_capabilityRegistry_ListCapabilities_1(param_providerName, param_capabil
 @pytest.mark.parametrize('param_providerName, param_capabilities1, param_capabilities2', [
     ('cisco-network-data-provider', 'device-data-discovery', 'device-endpoint-validation'),
     ('poweredge-compute-data-provider', 'device-data-discovery', 'device-endpoint-validation'),
-    ('vcenter-compute-data-provider', 'device-data-discovery', 'device-endpoint-validation'),
-    ('node-discovery-paqx', 'list-discovered-nodes', 'manage-node-allocation')
-])
+    ('vcenter-compute-data-provider', 'device-data-discovery', 'device-endpoint-validation')])
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_capabilityRegistry_ListCapabilities_2(param_providerName, param_capabilities1, param_capabilities2):
+def test_capabilityRegistry_ListCapabilities_core_2(param_providerName, param_capabilities1, param_capabilities2):
+    """
+    Title           :       Verify the registry.list.capability Message returns all capabilities for the provider under test
+    Description     :       A registry.list.capability message is sent.  It is expected that a response is returned that
+                            includes a list of all the  capabilities.
+                            It will fail if :
+                               No capability.registry.response is received.
+                               The provider is not in the response.
+                               The capabilities are not in the response.
+    Parameters      :       none
+    Returns         :       None
+    """
+    cleanup()
+    bindQueues()
+
+    print(
+        "\nTest: Send in a list capabilities message and to verify all capabilities are present")
+
+    return_message = publish_list_capability_msg()
+
+    providerName = param_providerName
+    capabilities1 = param_capabilities1
+    capabilities2 = param_capabilities2
+
+    error_list = []
+
+    if (providerName not in return_message):
+        error_list.append(providerName)
+    if (capabilities1 not in return_message):
+        error_list.append(capabilities1)
+    if (capabilities2 not in return_message):
+        error_list.append(capabilities2)
+
+    assert not error_list, ('Missing the service or some capabilities')
+
+    print('\nAll expected Capabilities Returned\n')
+
+    cleanup()
+
+
+@pytest.mark.parametrize('param_providerName, param_capabilities1, param_capabilities2', [
+    ('node-discovery-paqx', 'list-discovered-nodes', 'manage-node-allocation')])
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_capabilityRegistry_ListCapabilities_dne_2(param_providerName, param_capabilities1, param_capabilities2):
     """
     Title           :       Verify the registry.list.capability Message returns all capabilities for the provider under test
     Description     :       A registry.list.capability message is sent.  It is expected that a response is returned that
