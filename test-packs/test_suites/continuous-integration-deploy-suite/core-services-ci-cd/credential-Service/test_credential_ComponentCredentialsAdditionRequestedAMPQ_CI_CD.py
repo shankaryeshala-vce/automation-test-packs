@@ -12,29 +12,51 @@ import time
 import unittest
 
 
-# Payloads from symphony-sds.ini:- location: continuous-integration-deploy-suite/symphony-sds.ini
-try:
-    payload_file = 'continuous-integration-deploy-suite/symphony-sds.ini'
-    #payload_file = 'symphony-sds.ini'
-    payload_heading = 'credential_tests'
-    payload_property_add = 'cs_cred_addition'
-    payload_property_req = 'cs_cred_request'
-    payload_property_neg1 = 'cs_no_comp_addition'
-    payload_property_neg2 = 'ca_dup_ep_addition'
-    payload_property_neg3 = 'cs_invalid_json'
-    payload_property_neg4 = 'cs_invalid_msg_prop'
-    payload_property_neg5 = 'cs_req_invalid_uuid'
 
+@pytest.fixture(scope="module", autouse=True)
+def load_test_data():
+    # Update config ini files at runtime
+    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/symphony-sds.properties'
+    af_support_tools.set_config_file_property_by_data_file(my_data_file)
+
+    # Set config ini file name
+    global env_file
     env_file = 'env.ini'
-    ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-    cli_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
-    cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
-except:
-    print('Possible configuration error')
 
-port = 5672
-rmq_username = 'guest'
-rmq_password = 'guest'
+    # Set Vars
+    # Payloads from symphony-sds.ini:- location: continuous-integration-deploy-suite/symphony-sds.ini
+    global payload_file
+    payload_file = 'continuous-integration-deploy-suite/symphony-sds.ini'
+    global payload_heading
+    payload_heading = 'credential_tests'
+    global payload_property_add
+    payload_property_add = 'cs_cred_addition'
+    global payload_property_req
+    payload_property_req = 'cs_cred_request'
+    global payload_property_neg1
+    payload_property_neg1 = 'cs_no_comp_addition'
+    global payload_property_neg2
+    payload_property_neg2 = 'ca_dup_ep_addition'
+    global payload_property_neg3
+    payload_property_neg3 = 'cs_invalid_json'
+    global payload_property_neg4
+    payload_property_neg4 = 'cs_invalid_msg_prop'
+    global payload_property_neg5
+    payload_property_neg5 = 'cs_req_invalid_uuid'
+       
+    global ipaddress
+    ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+    global cli_username
+    cli_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    global cli_password
+    cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
+	
+    global rmq_username
+    rmq_username = 'guest'
+    global rmq_password
+    rmq_password = 'guest'
+    global port
+    port = 5672
 
 # Add & verify component credentials
 #@pytest.mark.core_services_mvp
@@ -55,7 +77,7 @@ def test_CS_ComponentCredentials_CI():
 ######################################################################################################################
 
 # Add & verify component credentials
-#@pytest.mark.core_services_mvp_extended
+@pytest.mark.core_services_mvp_extended
 #@unittest.skip("skipping till this is modified to use new credentials service API")
 def test_CS_ComponentCredentials():
     print('\nRunning mvp extended test on system: ', ipaddress)
