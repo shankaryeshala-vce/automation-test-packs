@@ -66,7 +66,7 @@ def load_test_data():
 
     global rackHD_IP
     rackHD_IP = af_support_tools.get_config_file_property(config_file=setup_config_file, heading=setup_config_header,
-                                                          property='rackhd_ipaddress')
+                                                          property='rackhd_integration_ipaddress')
 
     global rackHD_username
     rackHD_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
