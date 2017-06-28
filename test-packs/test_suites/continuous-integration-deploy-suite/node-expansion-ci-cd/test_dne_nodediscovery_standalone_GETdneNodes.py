@@ -123,7 +123,7 @@ def test_DellNodeExp():
     assert currentNodes == '[]', 'ERROR: New nodes are already discovered and waiting to be handled'
 
     # Step 2: Publish a message to dummy a node discovery. Values used here are all dummy values.
-    the_payload = '{"data":{"ipMacAddresses":[{"ipAddress":"172.31.128.12","macAddress":"xy:y4:56:56:cf:8x"},{"macAddress":"xy:y6:9f:e0:e4:fx"},{"macAddress":"xy:y6:9f:e0:x4:fx"},{"macAddress":"xy:ye:96:56:cf:8x"},{"macAddress":"xy:ye:96:56:xf:8x"},{"macAddress":"xy:ye:96:x6:cf:8x"}],"nodeId":"123456789012345678909777","nodeType":"compute"},"messageProperties":{"timestamp":"2017-06-27T08:58:32.437+0000"},"action":"discovered","createdAt":"2017-06-27T08:58:31.871Z","nodeId":"123456789012345678909777","severity":"information","type":"node","typeId":"123456789012345678909777","version":"1.0"}'
+    the_payload = '{"data":{"ipMacAddresses":[{"ipAddress":"172.31.128.12","macAddress":"fb-43-62-54-d4-3a"},{"macAddress":"b9-ce-c4-73-10-35"},{"macAddress":"4d-63-c5-48-9f-5c"},{"macAddress":"1d-97-c3-a0-42-1a"},{"macAddress":"ce-1d-b5-a6-65-ad"},{"macAddress":"30-e5-72-6f-78-79"}],"nodeId":"123456789012345678909777","nodeType":"compute"},"messageProperties":{"timestamp":"2017-06-27T08:58:32.437+0000"},"action":"discovered","createdAt":"2017-06-27T08:58:31.871Z","nodeId":"123456789012345678909777","severity":"information","type":"node","typeId":"123456789012345678909777","version":"1.0"}'
 
     af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                          rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
@@ -287,7 +287,7 @@ def rackHD_adapter_full_ListCapabilities():
     if (capabilities1 not in return_message):
         error_list.append(capabilities1)
 
-    # If the capability isnt there then call the function t register the vcenter
+    # If the capability isnt there then call the function to register the RackHD
     if error_list:
         print('Need to register a rackHD, calling function...')
         registerRackHD()
