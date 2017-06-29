@@ -246,22 +246,22 @@ def getSystemDefinitionNullUUID():
 
 
 #@pytest.mark.TC546466
-@pytest.mark.core_services_mvp
+@pytest.mark.rcm_fitness_mvp
 def test_getSysDef1():
     getSystemDefinition("VXRACK", "FLEX", "1000", "NETWORK")
-@pytest.mark.core_services_mvp
+@pytest.mark.rcm_fitness_mvp
 def test_getSysDef2():
     getSystemDefinitionByUUID("VXRACK", "FLEX", "1000", "NETWORK")
-@pytest.mark.core_services_mvp
+@pytest.mark.rcm_fitness_mvp
 def test_getSysDef3():
     getComponentBySystemUUID("NEXUS", "N3K", "SWITCH", "MGMT-", 2)
-@pytest.mark.core_services_mvp
+@pytest.mark.rcm_fitness_mvp
 def test_getSysDef4():
     getComponentBySystemUUID("NEXUS", "N5K", "SWITCH", "N5", 2)
-@pytest.mark.core_services_mvp
+@pytest.mark.rcm_fitness_mvp
 def test_getSysDef4a():
     getComponentBySystemUUID("NEXUS", "N9K", "SWITCH", "N9", 2)
-@pytest.mark.core_services_mvp
+@pytest.mark.rcm_fitness_mvp
 def test_getSysDef5():
     getComponentBySystemUUID("MDS", "MDS9000", "SWITCH", "M9", 2)
 # @pytest.mark.TC546466_Vblock
@@ -297,7 +297,7 @@ def test_getSysDef5():
 # @pytest.mark.TC546466_Vblock
 # def test_getCompSysDefInvalid2():
 #     getComponentByInvalidSystemUUID("1111")
-@pytest.mark.core_services_mvp
+@pytest.mark.rcm_fitness_mvp
 def test_getSysDefNull():
     getSystemDefinitionNullUUID()
 
