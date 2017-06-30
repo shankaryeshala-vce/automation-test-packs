@@ -20,7 +20,7 @@ def load_test_data():
     global jsonfilepath
     jsonfilepath = 'IDRAC.json'
     global amqptooljar
-    amqptooljar = str(os.environ.get('AF_RESOURCES_PATH')) + '/system-definition/amqp_tool/amqp-post-1.0-SNAPSHOT.jar'
+    amqptooljar = str(os.environ.get('AF_RESOURCES_PATH')) + '/system-definition/amqp-post-1.0-SNAPSHOT.jar'
     # Set Vars
     global ip_address
     ip_address = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
