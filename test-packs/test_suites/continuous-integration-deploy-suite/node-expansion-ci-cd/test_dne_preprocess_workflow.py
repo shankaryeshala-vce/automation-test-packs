@@ -46,7 +46,7 @@ def load_test_data():
 #####################################################################
 # These are the main tests.
 #####################################################################
-@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_preprocess_request_workflows():
     """
@@ -110,7 +110,7 @@ def test_preprocess_request_workflows():
         raise Exception(err)
 
 
-@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_preprocess_status_workflow():
     """
@@ -164,7 +164,7 @@ def test_preprocess_status_workflow():
 
 
 @pytest.mark.parametrize('stepName', [('findAvailableNodes'), ('configIdrac'), ('findVCluster')])
-@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_preprocess_step_workflow(stepName):
     """
