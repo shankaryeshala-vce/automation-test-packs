@@ -223,3 +223,222 @@ def test_preprocess_step_workflow(stepName):
         print(err)
         print('\n')
         raise Exception(err)
+
+
+#####################################################################
+
+
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_nodes_GET_workflows():
+    """
+    Title           :       Verify the GET function on /dne/nodes API
+    Description     :       Send a GET to /dne/nodes details body.
+                            We are not asserting on the content of the response as this is variable.
+                            It will fail if :
+                                The expected json response is not correct
+    Parameters      :       none
+    Returns         :       None
+    """
+
+    print('\n=======================Add Node Work Flow Test Begin=======================\n')
+
+    # Invoke /dne/nodes REST API call to gather the info that will be needed for add node.
+    print('GET /dne/nodes REST API call to get the discovered node and it\'s uuid...\n')
+
+    try:
+        endpoint = '/dne/nodes'
+        url_body = protocol + ipaddress + dne_port + endpoint
+        response = requests.get(url_body)
+        # verify the status_code
+        assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
+        data = response.json()
+
+        print('Valid /dne/nodes GET sent')
+        time.sleep(1)
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+
+@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_nodes_request_workflows():
+    """
+    Title           :       Verify the POST function on /dne/nodes API
+    Description     :       Send a POST to /dne/nodes where the body of the request is the typical DNE config
+                            details body.
+                            It will fail if :
+                                The expected json response is not correct
+    Parameters      :       none
+    Returns         :       None
+    """
+
+    # Invoke POST /dne/nodes REST API
+    print('POST /dne/nodes REST API call to provision an unallocated node...\n')
+
+    global nodes_workflow_id  # set this value as global as it will be used in the next test.
+
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
+    with open(filePath) as fixture:
+        request_body = json.loads(fixture.read())
+
+    try:
+        endpoint = '/dne/nodes'
+        url_body = protocol + ipaddress + dne_port + endpoint
+        response = requests.post(url_body, json=request_body, headers=headers)
+        # verify the status_code
+        assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
+        data = response.json()
+
+        nodes_workflow_id = data['workflowId']
+
+        error_list = []
+
+        if data['workflow'] != 'addNode':
+            error_list.append('workflow')
+
+        if data['status'] != 'SUBMITTED':
+            error_list.append('status')
+
+        if not data['workflowId']:
+            error_list.append('workflowID')
+
+        assert not error_list, 'Error: missing fields from den/nodes response'
+
+        for link in data['links']:
+            if link['rel'] is 'self':
+                assert link[
+                           'href'] == "/nodes/" + nodes_workflow_id + "/startAddNodeWorkflow", 'Error: Invalid href in dne/nodes response'
+
+        print('Valid /dne/nodes request sent')
+        time.sleep(2)
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_nodes_status_workflow():
+    """
+    Title           :       Verify the GET function on /dne/nodes/<jobId> API
+    Description     :       Send a GET to /dne/nodes/<jobId>. The <jobId> value is the workFlowID obtained in the
+                            previous test_nodes_request_workflows() test.
+                            It will fail if :
+                                The expected json response is not correct
+    Parameters      :       none
+    Returns         :       None
+    """
+    # Step 2: Invoke /dne/nodes/{jobId} REST API call to get the status
+    print("\n\nGET /dne/nodes/<jobId> REST API call to get the nodes job status...\n")
+
+    try:
+        endpoint = '/dne/nodes/'
+        url_body = protocol + ipaddress + dne_port + endpoint + nodes_workflow_id
+        response = requests.get(url_body)
+        # verify the status_code
+        assert response.status_code == 200, 'Error: 200 not returned from dne\\nodes'
+        data = response.json()
+
+        error_list = []
+
+        if data['workflowId'] != nodes_workflow_id:
+            error_list.append(data['workflowId'])
+
+        if not data['workflow']:
+            error_list.append(data['workflow'])
+
+        if not data['status']:
+            error_list.append(data['status'])
+
+        if not data['workflowTasksResponseList']:
+            error_list.append(data['workflowTasksResponseList'])
+
+        if not data['links']:
+            error_list.append(data['links'])
+
+        assert not error_list, 'Error: Not all tasks returned in /dne/nodes'
+        # Note: we are not asserting on the contents of "workflowTasksResponseList": [] as this is changeable.
+
+        print('Valid /dne/nodes/{jobId} status returned')
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+
+@pytest.mark.parametrize('stepName', [('findAvailableNodes'), ('configIdrac')])
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_nodes_step_workflow(stepName):
+    """
+    Title           :       Verify the POST function on /dne/nodes/step/{stepName} API
+    Description     :       Send a POST to /dne/nodes/step/{stepName}. The 3 {stepName} values are "findAvailableNodes"
+                            & "configIdrac"
+                            It will fail if :
+                                The expected json response is not correct
+    Parameters      :       none
+    Returns         :       None
+    """
+
+    # Step 3: Invoke /dne/nodes/step/{stepName} REST API call to get the status
+    print("\n\nPOST /dne/nodes/step/{stepName} REST API call to get the step status...\n")
+
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
+    with open(filePath) as fixture:
+        request_body = json.loads(fixture.read())
+
+    try:
+        endpoint = '/dne/nodes/step/'
+        url_body = protocol + ipaddress + dne_port + endpoint + stepName
+
+        print (url_body)
+        response = requests.post(url_body, json=request_body, headers=headers)
+        # verify the status_code
+        assert response.status_code == 200, 'Error: 200 not returned from dne\\nodes'
+        data = response.json()
+
+        error_list = []
+
+        if not data['correlationId']:
+            error_list.append(data['correlationId'])
+
+        if not data['workflowId']:
+            error_list.append(data['workflowId'])
+
+        if not data['workflow']:
+            error_list.append(data['workflow'])
+
+        if not data['status']:
+            error_list.append(data['status'])
+
+        if not data['links']:
+            error_list.append(data['links'])
+
+        assert not error_list, 'Error: Not all tasks returned in /dne/nodes'
+        # Note: we are not asserting on the contents of "workflowTasksResponseList": [] as this is changeable.
+
+        print('Valid /dne/nodes/step' + stepName + ' status returned')
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+    print('\n=======================Add Node Work Flow Test End=======================\n')
