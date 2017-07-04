@@ -86,7 +86,6 @@ def test_preprocess_request_workflows():
         if data['workflow'] != 'preProcessWorkflow':
             error_list.append(data['workflow'])
 
-        print (data['status'])
         if data['status'] != 'SUBMITTED' and data['status'] != 'IN_PROGRESS':
             error_list.append(data['status'])
 
