@@ -266,7 +266,7 @@ def test_nodes_GET_workflows():
         raise Exception(err)
 
 
-@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_nodes_request_workflows():
     """
