@@ -2,6 +2,7 @@ import af_support_tools
 import os
 import pytest
 import json
+import time
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
     # Set config ini file name
@@ -92,8 +93,10 @@ def run_amqp_tool(amqp_tool_jar, system_def_json):
     Returns             :       0 or 1 (Boolean)
     """
     test_status = "pass"
-    cmd = 'java -jar ' + amqp_tool_jar + ' ' + system_def_json 
+    cmd = 'java -jar ' + amqp_tool_jar + ' ' + system_def_json
     output = os.system(cmd)
+    # Adding sleepp to debug if it is timing issue
+    time.sleep(10)
     if (output != 0):
         test_status = "fail"
     if (test_status == "fail"):
@@ -121,14 +124,19 @@ def check_vault_credential_keys(container_id):
                                 0 or 1 (Boolean)
     """
     cmd = "docker exec " + container_id + " vault list secret"
+    # Adding print statements to debug
+    print ("cmd:",cmd)
     output = af_support_tools.send_ssh_command(host=ip_address, username=username, password=password, command=cmd, return_output=True).strip()    
     output_list = output.split("\n")
+    print ("output_list:",output_list) 
     output_length = len(output_list)
     credential_list_json = ""
     credential_list = 0
     # if credential keys are not found return, else check the credentials using Vault commands and compare with json input 
     del output_list[0]
+    print ("output_list1:",output_list)
     del output_list[0]
+    print ("output_list2:",output_list)
     for uuid in output_list:
         cmd1 = "docker exec " + container_id + " vault list secret/" + uuid
         output1 = af_support_tools.send_ssh_command(host=ip_address, username=username, password=password, command=cmd1, return_output=True).strip()    
