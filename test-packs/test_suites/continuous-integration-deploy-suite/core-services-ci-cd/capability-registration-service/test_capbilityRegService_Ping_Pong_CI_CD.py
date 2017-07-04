@@ -150,7 +150,6 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message_core():
     print("Test: The Capability Registry Binding. Verify the Pong message from each provider / adapter")
 
     # This is the list of current/providers
-    capabilityProvider_Cisco_Network_Data_Provider = 'cisco-network-data-provider'
     capabilityProvider_Poweredge_Compute_Data_Provider = 'poweredge-compute-data-provider'
     capabilityProvider_Vcenter_Compute_Data_Provider = 'vcenter-compute-data-provider'
     capabilityProvider_Rackhd_Adapter = 'rackhd-adapter'
@@ -160,7 +159,6 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message_core():
 
     # Each provider/adapter is given a flag that will be set to True once its responded. This method is used as the order
     # in which the responses come in is random. When all are tested the allTested flag is set and the test completes.
-    cisco_Network_Data_Provider_Tested = False
     poweredge_Compute_Data_Provider_Tested = False
     vcenter_Compute_Data_Provider_Tested = False
     rackhd_Adapter_Tested = False
@@ -173,7 +171,7 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message_core():
     # To prevent the test waiting indefinitely we need to provide a timeout.  When new adapters/providers are added to
     # the test the expectedNumberOfBindings value will increase.
     errorTimeout = 0
-    expectedNumberOfBindings = 9
+    expectedNumberOfBindings = 8
 
     # Keep consuming messages until this condition is no longer true
     while allTested == False and errorTimeout <= expectedNumberOfBindings:
@@ -200,13 +198,6 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message_core():
                                                                   queue='test.capability.registry.binding',
                                                                   ssl_enabled=cpsd.props.rmq_ssl_enabled)
             checkForErrors(return_message)
-
-            if capabilityProvider_Cisco_Network_Data_Provider in return_message:
-                if (cisco_Network_Data_Provider_Tested == True):
-                    error_list.append(capabilityProvider_Cisco_Network_Data_Provider)
-                else:
-                    print('Test:', capabilityProvider_Cisco_Network_Data_Provider, 'Binding Message returned\n')
-                    cisco_Network_Data_Provider_Tested = True
 
             if capabilityProvider_Poweredge_Compute_Data_Provider in return_message:
                 if (poweredge_Compute_Data_Provider_Tested == True):
@@ -252,8 +243,7 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message_core():
 
             assert not error_list, 'Multiple Containers Running'
 
-            if cisco_Network_Data_Provider_Tested == True \
-                    and poweredge_Compute_Data_Provider_Tested == True \
+            if poweredge_Compute_Data_Provider_Tested == True \
                     and vcenter_Compute_Data_Provider_Tested == True \
                     and rackhd_Adapter_Tested == True \
                     and vcenter_Adapter_Tested == True \
@@ -266,10 +256,6 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message_core():
         if errorTimeout == expectedNumberOfBindings:
 
             error_list = []
-
-            if cisco_Network_Data_Provider_Tested == False:
-                print('ERROR:', capabilityProvider_Cisco_Network_Data_Provider, 'Binding Message is not returned')
-                error_list.append(capabilityProvider_Cisco_Network_Data_Provider)
 
             if poweredge_Compute_Data_Provider_Tested == False:
                 print('ERROR:', capabilityProvider_Poweredge_Compute_Data_Provider, 'Binding Message is not returned')

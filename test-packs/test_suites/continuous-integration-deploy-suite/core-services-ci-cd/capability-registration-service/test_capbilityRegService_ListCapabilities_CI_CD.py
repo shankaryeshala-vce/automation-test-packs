@@ -92,7 +92,6 @@ def test_capabilityRegistry_ListCapabilities_core_1(param_providerName, param_ca
 
 
 @pytest.mark.parametrize('param_providerName, param_capabilities1, param_capabilities2', [
-    ('cisco-network-data-provider', 'device-data-discovery', 'device-endpoint-validation'),
     ('poweredge-compute-data-provider', 'device-data-discovery', 'device-endpoint-validation'),
     ('vcenter-compute-data-provider', 'device-data-discovery', 'device-endpoint-validation')])
 @pytest.mark.core_services_mvp
