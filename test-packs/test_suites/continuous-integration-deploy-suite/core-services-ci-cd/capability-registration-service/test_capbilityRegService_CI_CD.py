@@ -82,7 +82,6 @@ def test_capabilityRegistry_servicerunning():
 
 @pytest.mark.parametrize('exchange, queue', [
     ('exchange.dell.cpsd.hdp.capability.registry.binding', 'queue.dell.cpsd.hdp.capability.registry.binding'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.cisco-network-data-provider'),
     ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.coprhd-adapter'),
     ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.endpoint-registry'),
     ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.poweredge-compute-data-provider'),
@@ -96,8 +95,7 @@ def test_capabilityRegistry_servicerunning():
     ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.coprhd-adapter'),
     ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.rackhd-adapter'),
     ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.vcenter-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.hal-orchestrator-service')
-])
+    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.hal-orchestrator-service')])
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_capability_registry_RMQ_bindings_core(exchange, queue):

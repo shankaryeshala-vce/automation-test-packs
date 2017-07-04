@@ -84,15 +84,15 @@ def test_preprocess_request_workflows():
         error_list = []
 
         if data['workflow'] != 'preProcessWorkflow':
-            error_list.append('workflow')
+            error_list.append(data['workflow'])
 
-        if data['status'] != 'SUBMITTED':
-            error_list.append('status')
+        if data['status'] != 'SUBMITTED' and data['status'] != 'IN_PROGRESS':
+            error_list.append(data['status'])
 
         if not data['workflowId']:
             error_list.append('workflowID')
 
-        assert not error_list, 'Error: missing fields from den/preprocess response'
+        assert not error_list, 'Error: missing fields from /dne/preprocess response'
 
         for link in data['links']:
             if link['rel'] is 'self':
@@ -301,15 +301,15 @@ def test_nodes_request_workflows():
         error_list = []
 
         if data['workflow'] != 'addNode':
-            error_list.append('workflow')
+            error_list.append(data['workflow'])
 
-        if data['status'] != 'SUBMITTED':
-            error_list.append('status')
+        if data['status'] != 'SUBMITTED' and data['status'] != 'IN_PROGRESS':
+            error_list.append(data['status'])
 
         if not data['workflowId']:
-            error_list.append('workflowID')
+            error_list.append(data['workflowId'])
 
-        assert not error_list, 'Error: missing fields from den/nodes response'
+        assert not error_list, 'Error: missing fields from dne/nodes response'
 
         for link in data['links']:
             if link['rel'] is 'self':
