@@ -1,4 +1,7 @@
 #!/usr/bin/python
+# Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+# Dell EMC Confidential/Proprietary Information
+#
 import af_support_tools
 import pytest
 
@@ -24,7 +27,7 @@ def core_services(setup):
     ''' Fixture to get names of core service containers'''
     core_dir = ["system-definition-service", "credentials", "hal-orchestrator-service", "identity-service",
                 "capability-registry-service", "endpoint-registration-service", "hal-mediation-services",
-                "hdp-poweredge-compute", "rackhd-adapter", "hal-data-provider-vcenter"]
+                "hdp-poweredge-compute", "rackhd-adapter", "hal-data-provider-vcenter","api-gateway"]
     core_list = []
 
     for service in core_dir:
