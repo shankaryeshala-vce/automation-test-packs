@@ -447,7 +447,7 @@ def test_nodes_step_workflow(stepName):
 @pytest.mark.parametrize('endpoint', [('/dne/nodes/'), ('/dne/preprocess/')])
 @pytest.mark.dne_paqx_parent
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_Defect_129314_invalid_jobid(endpoint):
+def test_GETjobid_using_invalid_jobid(endpoint):
     """
     Title           :       Verify the dne REST API handles invalid job-id's correctly
     Description     :       Send a GET to /dne/nodes/{job-Id} with an invalid job-id.
@@ -518,7 +518,7 @@ def test_Defect_129314_invalid_jobid(endpoint):
 @pytest.mark.parametrize('endpoint', [('/dne/nodes/'), ('/dne/preprocess/')])
 @pytest.mark.dne_paqx_parent
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_Defect_129314_valid_but_incorrect_jobid(endpoint):
+def test_GETjobid_using_valid_but_incorrect_jobid(endpoint):
     """
     Title           :       Verify the dne REST API handles valid, but incorrect, job-id's correctly
     Description     :       Send a GET to /dne/nodes/{job-Id} with a preprocess job-id.
@@ -593,7 +593,7 @@ def test_Defect_129314_valid_but_incorrect_jobid(endpoint):
 @pytest.mark.parametrize('endpoint', [('/dne/nodes/step/'), ('/dne/preprocess/step/')])
 @pytest.mark.dne_paqx_parent
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_Defect_129314_invalid_stepName(endpoint):
+def test_POSTstepname_using_invalid_stepName(endpoint):
     """
     Title           :       Verify the dne REST API handles invalid step-names correctly
     Description     :       Send a POST to /dne/nodes/step/{stepName} with an invalid stepName
