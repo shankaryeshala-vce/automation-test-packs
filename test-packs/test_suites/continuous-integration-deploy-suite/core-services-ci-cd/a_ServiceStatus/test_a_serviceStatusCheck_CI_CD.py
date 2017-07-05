@@ -27,7 +27,7 @@ def core_services(setup):
     ''' Fixture to get names of core service containers'''
     core_dir = ["system-definition-service", "credentials", "hal-orchestrator-service", "identity-service",
                 "capability-registry-service", "endpoint-registration-service", "hal-mediation-services",
-                "hdp-poweredge-compute", "rackhd-adapter", "hal-data-provider-vcenter","api-gateway"]
+                "hdp-poweredge-compute", "rackhd-adapter", "hal-data-provider-vcenter"]
     core_list = []
 
     for service in core_dir:
@@ -106,7 +106,7 @@ def test_coreamqpconnection(core_services, setup):
         response_list = [response1, response2]
 
         if any("ESTABLISHED" in s for s in response_list):
-            print("Rabbitmq connected within the container")
+            print(service + " :Rabbitmq connected within the container")
         else:
             err.append(service + " not connected to rabbitmq")
 
