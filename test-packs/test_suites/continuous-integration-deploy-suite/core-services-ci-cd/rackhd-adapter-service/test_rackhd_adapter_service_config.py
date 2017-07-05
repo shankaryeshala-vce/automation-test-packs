@@ -308,6 +308,7 @@ def test_rackHD_adapter_full_ListCapabilities():
     capabilities6 = 'rackhd-install-esxi'
     capabilities7 = 'rackhd-list-node-catalogs'
     capabilities8 = 'rackhd-set-node-obm-setting'
+    capabilities9 = 'rackhd-configure-idrac-network'
 
     error_list = []
 
@@ -329,6 +330,8 @@ def test_rackHD_adapter_full_ListCapabilities():
         error_list.append(capabilities7)
     if (capabilities8 not in return_message):
         error_list.append(capabilities8)
+    if (capabilities9 not in return_message):
+        error_list.append(capabilities9)
 
     assert not error_list, ('Missing some rackHD capabilities')
 
