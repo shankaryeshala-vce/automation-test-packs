@@ -1,9 +1,7 @@
 #!/usr/bin/python
-#
 # Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
 # Dell EMC Confidential/Proprietary Information
 #
-
 import af_support_tools
 import pytest
 
@@ -29,7 +27,7 @@ def core_services(setup):
     ''' Fixture to get names of core service containers'''
     core_dir = ["system-definition-service", "credentials", "hal-orchestrator-service", "identity-service",
                 "capability-registry-service", "endpoint-registration-service", "hal-mediation-services",
-                "hdp-poweredge-compute", "rackhd-adapter", "hal-data-provider-vcenter" ]
+                "hdp-poweredge-compute", "rackhd-adapter", "hal-data-provider-vcenter"]
     core_list = []
 
     for service in core_dir:
@@ -48,8 +46,6 @@ def core_services(setup):
 
     return core_list
 
-
-#
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
@@ -91,15 +87,33 @@ def test_coreamqpconnection(core_services, setup):
     err = []
     for service in core_services:
 
-        sendcommand_amqp = "docker exec " + service + " netstat -an 2>&1 | grep 5672 | awk '{print $6}'"
-        response = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
-                                                     password=setup['password'],
-                                                     command=sendcommand_amqp, return_output=True)
-        if "ESTABLISHED" not in response:
-            err.append(service + " rabbit connection not established")
+        cmd_1 = "docker exec " + service + " netstat -an 2>&1 | grep 5672 | awk '{print $6}'"
+        response1 = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
+                                                      password=setup['password'],
+                                                      command=cmd_1, return_output=True)
+        response1 = response1.splitlines()
+        if "ESTABLISHED" in response1:
+            print(service + " connected on port 5672")
+
+        cmd2 = "docker exec " + service + " netstat -an 2>&1 | grep 5671 | awk '{print $6}'"
+        response2 = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
+                                                      password=setup['password'],
+                                                      command=cmd2, return_output=True)
+        response2 = response2.splitlines()
+        if "ESTABLISHED" in response2:
+            print(service + " connected on port 5671")
+
+        response_list = [response1, response2]
+
+        if any("ESTABLISHED" in s for s in response_list):
+            print(service + " :Rabbitmq connected within the container")
+        else:
+            err.append(service + " not connected to rabbitmq")
 
     assert not err
 
+
+@pytest.mark.skip(reason="Disabled until every service uses port 5671")
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_coreamqptls(core_services, setup):
@@ -124,7 +138,10 @@ def test_coreamqptls(core_services, setup):
 
     assert not err
 
+
 @pytest.mark.skip(reason="Needs work")
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_core_stop(core_services, setup):
     """
         Title: Verify Core services containers can be restarted with docker stop/start
@@ -184,4 +201,3 @@ def test_core_start(core_services, setup):
             err.append(service + " has not started or has been removed")
 
     assert not err
-
