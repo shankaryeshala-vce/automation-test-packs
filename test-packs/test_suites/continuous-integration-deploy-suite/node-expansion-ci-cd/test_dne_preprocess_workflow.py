@@ -380,7 +380,7 @@ def test_nodes_status_workflow():
         raise Exception(err)
 
 
-@pytest.mark.parametrize('stepName', [('findAvailableNodes'), ('configIdrac')])
+@pytest.mark.parametrize('stepName', [('findAvailableNodes')])
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_nodes_step_workflow(stepName):
