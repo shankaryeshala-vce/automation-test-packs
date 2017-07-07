@@ -89,7 +89,7 @@ def cs_encrypt_credential_elements(my_json):
                 keys = new_item
                 for key in keys[0:-1]:
                     val = val[key]
-                val[keys[-1]] = 'Password_'
+                val[keys[-1]] = encrypted_password
 
             # Update 'community'
             my_return_value = get_item_value(my_json, item)            
@@ -105,7 +105,7 @@ def cs_encrypt_credential_elements(my_json):
                 keys = new_item
                 for key in keys[0:-1]:
                     val = val[key]
-                val[keys[-1]] = 'Community_'
+                val[keys[-1]] = encrypted_community
 
         if credential_elements == False:
             print('No Credential Elements Found')
