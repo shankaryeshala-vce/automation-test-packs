@@ -46,7 +46,7 @@ def cs_encrypt_credential_elements(my_json):
         # Ensure proper dictionary/json format
         if type(my_json) is not dict:
             my_json = json.loads(my_json)
-        
+    
         # Find Credential Elements objects
         my_credential_elements = find_in_obj(my_json, 'credentialElements', path=None)
         credential_elements = False
@@ -111,6 +111,7 @@ def cs_encrypt_credential_elements(my_json):
             print('No Credential Elements Found')
         
         my_json = json.dumps(my_json)
+        
         return(my_json)
     except Exception as e:
         print(e)
