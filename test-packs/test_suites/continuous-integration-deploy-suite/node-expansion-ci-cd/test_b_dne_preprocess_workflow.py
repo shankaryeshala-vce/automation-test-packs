@@ -163,6 +163,7 @@ def test_preprocess_status_workflow():
         raise Exception(err)
 
 
+@pytest.mark.skip(reason='These trigger steps that are being run too soon causing errors')
 @pytest.mark.parametrize('stepName', [('findAvailableNodes'), ('configIdrac'), ('findVCluster')])
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
@@ -380,6 +381,7 @@ def test_nodes_status_workflow():
         raise Exception(err)
 
 
+@pytest.mark.skip(reason='These trigger steps that are being run too soon causing errors')
 @pytest.mark.parametrize('stepName', [('findAvailableNodes')])
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
@@ -443,6 +445,9 @@ def test_nodes_step_workflow(stepName):
 
     print('\n=======================Add Node Work Flow Test End=======================\n')
 
+
+#####################################################################
+# These are Negative Tests tests.
 #####################################################################
 @pytest.mark.parametrize('endpoint', [('/dne/nodes/'), ('/dne/preprocess/')])
 @pytest.mark.dne_paqx_parent
@@ -513,7 +518,6 @@ def test_GETjobid_using_invalid_jobid(endpoint):
 
     print('\n======================= invalid jobId Test End=======================\n')
 
-#######################################################################################################
 
 @pytest.mark.parametrize('endpoint', [('/dne/nodes/'), ('/dne/preprocess/')])
 @pytest.mark.dne_paqx_parent
@@ -588,7 +592,6 @@ def test_GETjobid_using_valid_but_incorrect_jobid(endpoint):
 
     print('\n======================= valid jobId but incorrect Test End=======================\n')
 
-###################################################################################################
 
 @pytest.mark.parametrize('endpoint', [('/dne/nodes/step/'), ('/dne/preprocess/step/')])
 @pytest.mark.dne_paqx_parent
@@ -659,5 +662,5 @@ def test_POSTstepname_using_invalid_stepName(endpoint):
 
     print('\n======================= invalid stepname Test End=======================\n')
 
-###########################################################################################################
+#####################################################################
 
