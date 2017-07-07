@@ -110,6 +110,7 @@ def cs_encrypt_credential_elements(my_json):
         if credential_elements == False:
             print('No Credential Elements Found')
         
+        my_json = json.dumps(my_json)
         return(my_json)
     except Exception as e:
         print(e)
@@ -177,6 +178,15 @@ def cs_get_public_key():
     # Return Public Key
     return(my_public_key)
 
+def cs_generate_private_public_keys():
+    my_private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048,
+        backend=default_backend())
+    my_public_key = my_private_key.public_key()
+
+    return my_private_key, my_public_key
+	
 def cs_encrypt_text(my_text, my_public_key):
     # Encode Public Key
     keyBytes = base64.standard_b64decode(my_public_key)
