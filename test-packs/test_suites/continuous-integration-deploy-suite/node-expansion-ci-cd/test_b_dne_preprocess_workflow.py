@@ -163,7 +163,7 @@ def test_preprocess_status_workflow():
         raise Exception(err)
 
 
-@pytest.mark.skip(reason='These trigger steps that are being run to soon causing errors')
+@pytest.mark.skip(reason='These trigger steps that are being run too soon causing errors')
 @pytest.mark.parametrize('stepName', [('findAvailableNodes'), ('configIdrac'), ('findVCluster')])
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
@@ -381,7 +381,7 @@ def test_nodes_status_workflow():
         raise Exception(err)
 
 
-@pytest.mark.skip(reason='These trigger steps that are being run to soon causing errors')
+@pytest.mark.skip(reason='These trigger steps that are being run too soon causing errors')
 @pytest.mark.parametrize('stepName', [('findAvailableNodes')])
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
