@@ -450,7 +450,7 @@ def test_nodes_step_workflow(stepName):
 # These are Negative Tests tests.
 #####################################################################
 @pytest.mark.parametrize('endpoint', [('/dne/nodes/'), ('/dne/preprocess/')])
-@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_GETjobid_using_invalid_jobid(endpoint):
     """
@@ -520,7 +520,7 @@ def test_GETjobid_using_invalid_jobid(endpoint):
 
 
 @pytest.mark.parametrize('endpoint', [('/dne/nodes/'), ('/dne/preprocess/')])
-@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_GETjobid_using_valid_but_incorrect_jobid(endpoint):
     """
@@ -594,7 +594,7 @@ def test_GETjobid_using_valid_but_incorrect_jobid(endpoint):
 
 
 @pytest.mark.parametrize('endpoint', [('/dne/nodes/step/'), ('/dne/preprocess/step/')])
-@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_POSTstepname_using_invalid_stepName(endpoint):
     """
