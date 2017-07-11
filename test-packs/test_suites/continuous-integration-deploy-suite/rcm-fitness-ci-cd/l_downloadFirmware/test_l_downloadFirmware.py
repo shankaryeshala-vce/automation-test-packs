@@ -727,39 +727,39 @@ def checkFileSize(filename, path):
         print("File not found in expected location.")
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequest3():
     downloadFWFileRequestInvalid(messageInvalid, 'invalidDownloadFWRequest.json', 'invalidDownloadFWCredentials.json',
                                  'invalidDownloadFWResponse.json')
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes3():
     verifyConsumedAttributesInvalid(path + 'invalidDownloadFWRequest.json', path + 'invalidDownloadFWCredentials.json',
                                     path + 'invalidDownloadFWResponse.json', "SHA-256", "VCEVision")
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_downloadFWFileRequest():
     downloadFWFileRequest(messageThird, 'downloadFWRequest.json', 'downloadFWCredentials.json',
                           'downloadFWResponse.json')
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifyPublishedAttributes():
     verifyPublishedAttributes(path + 'downloadFWRequest.json')
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifyConsumedAttributes():
     verifyConsumedAttributes(path + 'downloadFWRequest.json', path + 'downloadFWCredentials.json',
                              path + 'downloadFWResponse.json', "SHA-256", "VCEVision")
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_checkFileSize():
     checkFileSize("SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE",
@@ -769,25 +769,25 @@ def test_checkFileSize():
 time.sleep(2)
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequest2():
     downloadFWFileRequest(messageThird, 'repeatDownloadFWRequest.json', 'repeatDownloadFWCredentials.json',
                           'repeatDownloadFWResponse.json')
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes2():
     verifyConsumedAttributes(path + 'repeatDownloadFWRequest.json', path + 'repeatDownloadFWCredentials.json',
                              path + 'repeatDownloadFWResponse.json', "SHA-256", "VCEVision")
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyProgressMessage():
     verifyProgressMessage(path + 'repeatDownloadFWRequest.json', path + 'repeatDownloadFWCredentials.json',
                           path + 'repeatDownloadFWResponse.json')
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_checkFileSize2():
     checkFileSize("SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE",
                   "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
@@ -796,18 +796,18 @@ def test_checkFileSize2():
 time.sleep(2)
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti():
     downloadFWFileMulti(message, messageSec, messageThird, 'multiDownloadFWRequest.json',
                         'multiDownloadFWCredentials.json', 'multiDownloadFWResponse.json')
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyMultiPublishedAttributes():
     verifyMultiPublishedAttributes(path + 'multiDownloadFWRequest.json')
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyMultiConsumedAttributes():
     verifyMultiConsumedAttributes(path + 'multiDownloadFWRequest.json', path + 'multiDownloadFWCredentials.json',
                                   path + 'multiDownloadFWResponse.json', "SHA-256", "VCEVision")
@@ -816,18 +816,18 @@ def test_verifyMultiConsumedAttributes():
 time.sleep(2)
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti2():
     downloadFWFileMulti(message, messageSec, messageThird, 'secMultiDownloadFWRequest.json',
                         'secMultiDownloadFWCredentials.json', 'secMultiDownloadFWResponse.json')
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyMultiPublishedAttributes2():
     verifyMultiPublishedAttributes(path + 'secMultiDownloadFWRequest.json')
 
 
-@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyMultiConsumedAttributes2():
     verifyMultiConsumedAttributes(path + 'secMultiDownloadFWRequest.json', path + 'secMultiDownloadFWCredentials.json',
                                   path + 'secMultiDownloadFWResponse.json', "SHA-256", "VCEVision")
