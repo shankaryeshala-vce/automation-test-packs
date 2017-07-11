@@ -73,6 +73,7 @@ def getSystemDefinition():
 
 
 # ("VXRACK", "FLEX", "VXRACKFLEX", "730", "R730XD", "SERVER", path + "complianceDataSystemPOWEREDGE.json", systemUUID)
+# "VXRACK", "FLEX", "VXRACKFLEX", "VCENTER", "VCENTER-WINDOWS", "VCENTER", "VCENTER-WINDOWS", path + "complianceDataSystemVCENTER.json", systemUUID
 
 def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceModel, deviceType, compDataFilename,
                             sysUUID):
@@ -170,16 +171,15 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
                 assert compData["devices"][deviceIndex]["auditData"][
                            "messageReceivedTime"] != "", "Response not detail Received Time."
 
-                if compData["devices"][deviceIndex]["elementData"]["modelFamily"] == deviceFamily:
+                if compData["devices"][deviceIndex]["elementData"]["model"] == deviceModel:
                     assert compData["devices"][deviceIndex]["uuid"] == deviceData["components"][compIndex][
                         "uuid"], "Response detailed an empty group UUID."
                     assert compData["devices"][deviceIndex]["parentGroupUuids"][0] == \
-                           deviceData["components"][compIndex]["parentGroupUuids"][
-                               0], "Response not detail parent Group UUID."
+                           deviceData["components"][compIndex]["parentGroupUuids"][0], "Response not detail parent Group UUID."
                     assert compData["devices"][deviceIndex]["elementData"][
                                "elementType"] == deviceType, "Response not detail Element Type."
                     assert compData["devices"][deviceIndex]["elementData"][
-                               "model"] == deviceModel, "Response not detail Model."
+                               "modelFamily"] == deviceFamily, "Response not detail Model."
                     assert compData["devices"][deviceIndex]["elementData"]["elementType"] == \
                            deviceData["components"][compIndex]["identity"][
                                "elementType"], "Response not detail Element Type."
@@ -421,32 +421,37 @@ def test_getComplianceDataSystem12():
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem13():
-    getComplianceDataSystem("VXRACK", "FLEX", "VXRACKFLEX", "VCENTER", "VCENTER", "VCENTER",
+    getComplianceDataSystem("VXRACK", "FLEX", "VXRACKFLEX", "VCENTER", "VCENTER-WINDOWS", "VCENTER",
                             path + "complianceDataSystemVCENTER.json", systemUUID)
-
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem14():
+    getComplianceDataSystem("VXRACK", "FLEX", "VXRACKFLEX", "VCENTER", "VCENTER-APPLIANCE", "VCENTER",
+                            path + "complianceDataSystemVCENTER.json", systemUUID)
+
+@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+def test_getComplianceDataSystem15():
     getComplianceDataSystemSubComps("ESXi", "lab.vce.com", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemVCENTER.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_getComplianceDataSystem15():
+def test_getComplianceDataSystem16():
     getComplianceDataSystem_INVALID(systemUUID[:8])
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_getComplianceDataSystem16():
+def test_getComplianceDataSystem17():
     getComplianceDataSystem_INVALID("----")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_getComplianceDataSystem17():
+def test_getComplianceDataSystem18():
     getComplianceDataSystem_INVALID(" ")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_getComplianceDataSystem18():
+def test_getComplianceDataSystem19():
     getComplianceDataSystem_NULL()
