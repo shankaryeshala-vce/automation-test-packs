@@ -227,7 +227,9 @@ def getComplianceData(product, family, model, deviceProduct, deviceType, filenam
                             # assert "productFamily" in compData["systems"][0], "Response not detail Product Family."
                             # assert compData["systems"][0]["productFamily"] == sysData["system"]["definition"]["productFamily"], "Response not detail Serial Number."
 
+                            #assert compData["device"]["elementData"]["model"] == deviceModel
                             assert compData["device"]["elementData"]["elementType"] == deviceType
+                            #assert compData["device"]["elementData"]["identifier"] == deviceID
                             i += 1
                     print("Key and Value assertions concluded.")
 
@@ -470,42 +472,47 @@ def test_getComplianceDataDevice12():
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice13():
-    getComplianceData("VXRACK", "FLEX", "VCENTER", "VCENTER", "VCENTER", path + "complianceDataDeviceVCENTER.json",
+    getComplianceData("VXRACK", "FLEX", "VCENTER-WINDOWS", "VCENTER", "VCENTER", path + "complianceDataDeviceVCENTER.json",
                       systemUUID, 3, 18)
-
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice14():
+    getComplianceData("VXRACK", "FLEX", "VCENTER-APPLIANCE", "VCENTER", "VCENTER", path + "complianceDataDeviceVCENTER.json",
+                      systemUUID, 3, 3)
+
+@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+def test_getComplianceDataDevice15():
     getComplianceDataDeviceSubComps("ESXI", "lab.vce.com", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDeviceVCENTER.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_getComplianceDataDevice15():
+def test_getComplianceDataDevice16():
     getComplianceData_INVALID(compUUID[:8])
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_getComplianceDataDevice16():
+def test_getComplianceDataDevice17():
     getComplianceData_INVALID("----")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_getComplianceDataDevice17():
+def test_getComplianceDataDevice18():
     getComplianceData_INVALID("0-0-0-0")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_getComplianceDataDevice18():
+def test_getComplianceDataDevice19():
     getComplianceData_INVALID("<>")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_getComplianceDataDevice19():
+def test_getComplianceDataDevice20():
     getComplianceData_INVALID("  ")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_getComplianceDataDevice20():
+def test_getComplianceDataDevice21():
     getComplianceData_NULL()
