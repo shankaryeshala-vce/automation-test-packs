@@ -29,7 +29,7 @@ def purgeOldOutput(dir, pattern):
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
     global path
-    path = "/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/getRCMs/"
+    path = "/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/d_getRCMDetails/"
     global ssl_options
     ssl_options = {"ca_certs": "/etc/rabbitmq/certs/testca/cacert.pem",
                    "certfile": "/etc/rabbitmq/certs/certs/client/cert.pem",
@@ -101,8 +101,8 @@ def load_test_data():
     deleteTestQueues('testGetRCMDetailsRequest', 'testGetRCMDetailsResponse')
 
     getAvailableRCMs("VxRack", "FLEX", "9.2", "9.2.33")
-    with open(path + "getRcmDetailsInputs.json", 'rt') as dataFileIN:
-        data = json.load(dataFileIN)
+    # with open(path + "getRcmDetailsInputs.json", 'rt') as dataFileIN:
+    #     data = json.load(dataFileIN)
 
     message = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
                                                         property=payload_data)

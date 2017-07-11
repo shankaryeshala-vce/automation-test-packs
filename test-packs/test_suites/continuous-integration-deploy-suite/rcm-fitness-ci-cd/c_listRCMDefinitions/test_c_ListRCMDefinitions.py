@@ -12,7 +12,7 @@ import re
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
     global path
-    path = "/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/listRCMs/"
+    path = "/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/c_listRCMDefinitions/"
     global ssl_options
     ssl_options = {"ca_certs": "/etc/rabbitmq/certs/testca/cacert.pem",
                    "certfile": "/etc/rabbitmq/certs/certs/client/cert.pem",
