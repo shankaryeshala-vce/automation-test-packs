@@ -11,15 +11,16 @@ import pytest
 import time
 import pika
 
-try:
-   env_file = 'env.ini'
-   ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-   cli_user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
-   cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
-
-except:
-   print('Possible configuration error')
-
+@pytest.fixture(scope="module", autouse=True)
+def load_test_data():
+    global env_file 
+    env_file = 'env.ini'
+    global ipaddress
+    ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+    global cli_user
+    cli_user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    global cli_password
+    cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 
 #ipaddress = '10.3.60.67'
 ########################################################################################################################

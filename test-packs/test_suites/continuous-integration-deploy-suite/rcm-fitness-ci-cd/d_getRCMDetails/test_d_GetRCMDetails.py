@@ -9,8 +9,6 @@ import pytest
 import os
 import re
 
-dataInput = dict()
-
 
 def ensurePathExists(dir):
     if not os.path.exists(dir):
@@ -28,6 +26,8 @@ def purgeOldOutput(dir, pattern):
 
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
+    global dataInput
+    dataInput = dict()
     global path
     path = "/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/d_getRCMDetails/"
     global ssl_options
@@ -376,7 +376,7 @@ def verifyCorrectCorrelationID(requestFile, responseFile):
     print("All verification steps executed successfully.....")
 
 
-print("Verifying each of the published message attributes.")
+# print("Verifying each of the published message attributes.")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
@@ -439,7 +439,7 @@ def test_verifyPublishedAttributes12():
     verifyPublishedAttributes(path + 'getRCMsRequest12.json')
 
 
-print("\n\nVerifying each of the response message attributes.")
+# print("\n\nVerifying each of the response message attributes.")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
@@ -514,7 +514,7 @@ def test_verifyConsumedAttributes12():
                              "VxRack")
 
 
-print("\n\nVerifying correlation IDs are consistent for each request and response pair.")
+# print("\n\nVerifying correlation IDs are consistent for each request and response pair.")
 
 
 @pytest.mark.rcm_fitness_mvp_extended

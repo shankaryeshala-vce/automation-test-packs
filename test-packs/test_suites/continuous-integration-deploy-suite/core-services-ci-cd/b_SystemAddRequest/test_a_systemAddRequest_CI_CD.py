@@ -41,7 +41,7 @@ def load_test_data():
     cli_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
     global cli_password
     cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
-	
+
     global rmq_username
     rmq_username = 'guest'
     global rmq_password
