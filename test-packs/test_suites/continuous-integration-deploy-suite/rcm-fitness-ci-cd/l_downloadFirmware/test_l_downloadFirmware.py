@@ -766,7 +766,7 @@ def test_checkFileSize():
                   "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
 
 
-time.sleep(2)
+# time.sleep(2)
 
 
 #@pytest.mark.rcm_fitness_mvp_extended
@@ -793,7 +793,7 @@ def test_checkFileSize2():
                   "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
 
 
-time.sleep(2)
+# time.sleep(2)
 
 
 #@pytest.mark.rcm_fitness_mvp_extended
@@ -813,7 +813,7 @@ def test_verifyMultiConsumedAttributes():
                                   path + 'multiDownloadFWResponse.json', "SHA-256", "VCEVision")
 
 
-time.sleep(2)
+# time.sleep(2)
 
 
 #@pytest.mark.rcm_fitness_mvp_extended
