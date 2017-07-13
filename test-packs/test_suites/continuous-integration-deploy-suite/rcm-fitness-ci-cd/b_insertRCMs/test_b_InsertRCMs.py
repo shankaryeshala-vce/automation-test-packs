@@ -11,11 +11,9 @@ from pprint import pprint
 import os
 import re
 
-
-
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
-    global bodyList
+    global bodyList    
     bodyList = []
     global dictUUID
     dictUUID = dict()

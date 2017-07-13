@@ -37,8 +37,8 @@ def load_test_data():
 def test_idrac_credential_store():
     """
     Description         :       This method tests whether the idrac credentials are stored in system definition service
-				it will asserts if :
-			        If IDRAC json file doesnt exists
+    			it will asserts if :
+    		        If IDRAC json file doesnt exists
                                 If AMQP tool is not able to execute the command properly
                                 If credential keys for IDRAC are not created properly
     Parameters  	:       None
@@ -56,7 +56,7 @@ def update_IDRAC_json(json_file_path, ipaddress, payload):
     """
     Description 	:       This method will update the json file with the host ip address 
     Parameters  	:       1. json_file_path     -       Name of the Json file (STRING)
-				2. ipaddress          -  hostname mentioned in the env.ini file
+    			2. ipaddress          -  hostname mentioned in the env.ini file
                                 3. payload            - payload for the json file
     Returns             :       0 or 1 (Boolean)
     """

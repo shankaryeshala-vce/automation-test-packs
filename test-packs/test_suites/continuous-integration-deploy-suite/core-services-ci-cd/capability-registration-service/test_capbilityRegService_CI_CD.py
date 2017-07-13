@@ -122,8 +122,7 @@ def test_capability_registry_RMQ_bindings_core(exchange, queue):
     ('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.node-discovery-paqx'),
     ('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.dne-paqx'),
     ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.dne-paqx'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.node-discovery-paqx')
-])
+    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.node-discovery-paqx')])
 @pytest.mark.dne_paqx_parent
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_capability_registry_RMQ_bindings_dne(exchange, queue):
@@ -147,8 +146,7 @@ def test_capability_registry_RMQ_bindings_dne(exchange, queue):
 
 @pytest.mark.parametrize('exchange, queue', [
     ('exchange.dell.cpsd.hdp.capability.registry.event','queue.dell.cpsd.hdp.capability.registry.event.fru-paqx'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.fru-paqx'),
-])
+    ('exchange.dell.cpsd.hdp.capability.registry.response','queue.dell.cpsd.hdp.capability.registry.response.fru-paqx'),])
 @pytest.mark.fru_paqx_parent
 @pytest.mark.fru_mvp
 def test_capability_registry_RMQ_bindings_fru(exchange, queue):

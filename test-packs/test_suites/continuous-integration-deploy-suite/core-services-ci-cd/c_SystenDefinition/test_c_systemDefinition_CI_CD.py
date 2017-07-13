@@ -6,16 +6,19 @@ import os
 import re
 import af_support_tools
 
-try:
+@pytest.fixture(scope="module", autouse=True)
+def load_test_data():
+    global env_file
     env_file = 'env.ini'
+    global host
     host = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+    global path
+    path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuousIntegration/c_systemDefinition/'
+    global ensurePathExists
+    ensurePathExists(path)
+    global purgeOldOutput
+    purgeOldOutput(path, "rcm")
 
-except:
-    print('Possible configuration error')
-
-
-#host = '10.3.8.54'
-path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuousIntegration/c_systemDefinition/'
 def ensurePathExists(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
@@ -27,9 +30,6 @@ def purgeOldOutput(dir, pattern):
             print("Old output files successfully deleted.")
         else:
             print('Unable to locate output files to remove.')
-
-ensurePathExists(path)
-purgeOldOutput(path, "rcm")
 
 def getSystemDefinition(product, family, model, type):
     url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/'

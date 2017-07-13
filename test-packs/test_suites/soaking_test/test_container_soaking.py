@@ -40,7 +40,7 @@ def test_maliska():
     print(containers)
     print(type(containers))
     assert 5 == 5
-	
+
 #######################################################################################################################
 @pytest.mark.soaking
 def test_containers_soaking():
@@ -58,7 +58,7 @@ def test_all_containers_up():
     container_up_num = 0
     container_down_num = 0
 
-  # Validate if containers are up
+    # Validate if containers are up
     if (len(containers)):
 
        for i in range(len(containers)):
@@ -83,7 +83,7 @@ def test_all_containers_up():
 
     print('Total ',container_up_num,' containers up list:',container_up,' \n')
     print('Total ',container_down_num,' containers down list:',container_down,' \n')
-	
+
     assert not container_down_num
 
 #######################################################################################################################
