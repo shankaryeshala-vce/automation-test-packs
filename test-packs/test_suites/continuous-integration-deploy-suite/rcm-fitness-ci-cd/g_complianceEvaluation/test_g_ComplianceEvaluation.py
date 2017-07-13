@@ -84,15 +84,17 @@ def version():
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.parametrize(("type", "model", "identifier", "fileName"), [
     ("iDRAC", "630", "Integrated Remote Access Controller", "iDRAC"),
-    ("NIC", "630", "Intel(R) Ethernet 10G 4P X520/I350 rNDC -", "Network"),
+    ("NIC", "630", "Intel(R) Gigabit 4P X520/I350 rNDC -", "Network"),
     ("NIC", "630", "Intel(R) Ethernet 10G 2P X520 Adapter -", "Network"),
     ("BIOS", "630", "BIOS", "BIOS"),
-    ("RAID", "630", "PERC H730P Mini", "RAID"),
+    ("NonRAID", "630", "Dell HBA330 Mini", "Non-RAID"),
     ("iDRAC", "730", "Integrated Remote Access Controller", "iDRAC"),
-    ("NIC", "730", "Intel(R) Ethernet 10G 4P X520/I350 rNDC -", "Network"),
+    ("NIC", "730", "Intel(R) Gigabit 4P X520/I350 rNDC -", "Network"),
     ("NIC", "730", "Intel(R) Ethernet 10G 2P X520 Adapter -", "Network"),
     ("BIOS", "730", "BIOS", "BIOS"),
-    ("RAID", "730", "PERC H730P Mini", "RAID")])
+    ("RAID", "730", "PERC H730 Mini", "RAID"),
+    ("VCENTER", "VCENTER-APPLIANCE", "VCENTER-APPLIANCE", "VMware-VCSA"),
+    ("VCENTER", "VCENTER-WINDOWS", "VCENTER-WINDOWS", "VMware-VIMSetup")])
 def test_post_eval(sys, rcmid, train, version, type, model, identifier, fileName):
     url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/evaluation/'
     body = {'systemUuid': sys[0], 'rcmUuid': rcmid}
@@ -109,25 +111,29 @@ def test_post_eval(sys, rcmid, train, version, type, model, identifier, fileName
     deviceIDlist = []
     instances = 0
 
-    while results < evals:
-        deviceIDlist.append(data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['deviceUuid'])
-        results += 1
-
-    print(deviceIDlist)
+    # while results < evals:
+    #     deviceIDlist.append(data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['deviceUuid'])
+    #     results += 1
+    #
+    # print(deviceIDlist)
 
     results = 0
 
-    deviceID = data['rcmEvaluationResults'][0]['evaluatedVersionDatum']['deviceUuid']
-    deviceID2 = data['rcmEvaluationResults'][1]['evaluatedVersionDatum']['deviceUuid']
-    print("Server ID: %s" % deviceID)
+
+    # print("Server ID: %s" % deviceID)
     print("Train: %s" % train)
     print("Version: %s" % version)
 
+
     while results < evals:
-        if data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition'][
-            'modelFamily'] == model and identifier in \
-                data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity']['identifier']:
+        if model in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition']['model'] and identifier in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity']['identifier']:
+            assert model in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition'][
+                'model'], "Model"
+            assert identifier in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity'][
+                'identifier'], "Identifier"
             if data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity']['elementType'] == type:
+                assert data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity'][
+                           'elementType'] == type, "Type"
                 # instances += 1
                 # print('Results for :', type, model)
                 assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']['rcmUuid'] == rcmid
@@ -135,20 +141,24 @@ def test_post_eval(sys, rcmid, train, version, type, model, identifier, fileName
                 assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']['rcmVersion'] == version
                 assert data['rcmEvaluationResults'][results]['elementUuid'] == \
                        data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['componentUuid']
-                assert type in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity'][
-                    'serialNumber']
+                if 'serialNumber' in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity']:
+                    assert type in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity']['serialNumber']
                 assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']['productFamily'] == \
                        data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition']['productFamily']
                 assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']['product'] == \
                        data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition']['product']
-                # assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']['modelFamily'] == data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition']['modelFamily']
-                # assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']['model'] == data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition']['model']
+                mFamily = data['rcmEvaluationResults'][results]['evaluatedRcmDatum']['modelFamily']
+                mFamily = mFamily[1:]
+                modelM = data['rcmEvaluationResults'][results]['evaluatedRcmDatum']['model']
+                modelM = modelM[2:-2]
+                assert mFamily in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition']['modelFamily']
+                assert modelM in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition']['model']
                 assert data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['versions'][0]['version'] == \
                        data['rcmEvaluationResults'][results]['actualValue']
                 assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']['versions'][0] == \
                        data['rcmEvaluationResults'][results]['expectedValues'][0]
-                assert data['rcmEvaluationResults'][results]['evaluatedVersionDatum'][
-                           'deviceUuid'] == deviceID or deviceID2
+                # assert data['rcmEvaluationResults'][results]['evaluatedVersionDatum'][
+                #            'deviceUuid'] == deviceID or deviceID2
                 actual = data['rcmEvaluationResults'][results]['actualValue']
                 expected = data['rcmEvaluationResults'][results]['expectedValues'][0]
                 print(
@@ -180,14 +190,16 @@ def test_post_eval(sys, rcmid, train, version, type, model, identifier, fileName
                            data['rcmEvaluationResults'][results]['evaluationResult']) == "mismatch", "Expect a mismatch"
 
                 if "versionFileName" in data['rcmEvaluationResults'][results]['evaluatedRcmDatum']:
-                    assert fileName in data['rcmEvaluationResults'][results]['evaluatedRcmDatum'][
-                        "versionFileName"], "Unexpected fileName returned."
-                    assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum'][
-                               "versionFileHash"] != "", "Unexpected fileHash returned."
+                    assert fileName in data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileName"], "Unexpected fileName returned."
+                    assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"] != "", "Unexpected fileHash returned."
+                if data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"] != "unknown":
+                    assert len(data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"]) >  24, "Unexpected fileHash rturned."
             instances += 1
         # instances == 0
 
         elif instances == 0:
             print('Specified type not found:', type)
+
+
 
         results += 1
