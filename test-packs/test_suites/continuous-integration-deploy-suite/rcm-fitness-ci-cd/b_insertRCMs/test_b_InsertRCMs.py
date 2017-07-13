@@ -396,28 +396,28 @@ def test_verifyPublishedAttributes8():
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes9():
-    verifyPublishedAttributes(path + 'insertRCMRequest9.json', "March 2019", 37, "9.2", "9.2.33", "VxRack", "FLEX",
+    verifyPublishedAttributes(path + 'insertRCMRequest9.json', "March 2019", 38, "9.2", "9.2.33", "VxRack", "FLEX",
                               "ORIGINAL")
 
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes10():
-    verifyPublishedAttributes(path + 'insertRCMRequest10.json', "March 2019", 37, "9.2", "9.2.33", "VxRack", "FLEX",
+    verifyPublishedAttributes(path + 'insertRCMRequest10.json', "March 2019", 38, "9.2", "9.2.33", "VxRack", "FLEX",
                               "MANUFACTURING")
 
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes11():
-    verifyPublishedAttributes(path + 'insertRCMRequest11.json', "March 2020", 37, "9.2", "9.2.33.1", "VxRack", "FLEX",
+    verifyPublishedAttributes(path + 'insertRCMRequest11.json', "March 2020", 38, "9.2", "9.2.33.1", "VxRack", "FLEX",
                               "ADDENDUM")
 
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyPublishedAttributes12():
-    verifyPublishedAttributes(path + 'insertRCMRequest12.json', "June 2021", 37, "9.2", "9.2.33.2", "VxRack", "FLEX",
+    verifyPublishedAttributes(path + 'insertRCMRequest12.json', "June 2021", 38, "9.2", "9.2.33.2", "VxRack", "FLEX",
                               "ADDENDUM")
 
 
