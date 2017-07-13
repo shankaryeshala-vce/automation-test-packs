@@ -15,8 +15,11 @@ import re
 
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
+    global bodyList
     bodyList = []
+    global dictUUID
     dictUUID = dict()
+    global dataInput
     dataInput = dict()
 
     global path
