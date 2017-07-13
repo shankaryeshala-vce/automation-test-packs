@@ -11,13 +11,14 @@ from pprint import pprint
 import os
 import re
 
-bodyList = []
-dictUUID = dict()
-dataInput = dict()
 
 
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
+    bodyList = []
+    dictUUID = dict()
+    dataInput = dict()
+
     global path
     path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/b_insertRCMs/'
     global ssl_options
