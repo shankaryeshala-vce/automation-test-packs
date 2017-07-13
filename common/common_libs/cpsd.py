@@ -164,7 +164,7 @@ def cs_get_public_key():
     # Publish Message Requesting Public Key
     my_return_value = af_support_tools.rmq_publish_message(host=props.base_hostname, port=props.rmq_port, rmq_username=props.rmq_username, rmq_password=props.rmq_password, exchange='exchange.dell.cpsd.cms.credentials.request', routing_key='dell.cpsd.credential.request.public.key', headers={'__TypeId__': 'com.dell.cpsd.credential.model.api.request.PublicKeyRequest'}, payload=the_payload, ssl_enabled=props.rmq_ssl_enabled)
     # Wait for Reply
-    my_return_value = af_support_tools.rmq_wait_for_messages_in_queue(host=props.base_hostname, port=props.rmq_port, rmq_username=props.rmq_username, rmq_password=props.rmq_password, queue='queue.dell.cpsd.credential.public.key.response', number_of_messages=1, wait_time=120, check_interval=15, ssl_enabled=props.rmq_ssl_enabled)
+    my_return_value = af_support_tools.rmq_wait_for_messages_in_queue(host=props.base_hostname, port=props.rmq_port, rmq_username=props.rmq_username, rmq_password=props.rmq_password, queue='queue.dell.cpsd.credential.public.key.response', number_of_messages=1, wait_time=300, check_interval=15, ssl_enabled=props.rmq_ssl_enabled)
 
     #Consume Message
     my_return_value = af_support_tools.rmq_consume_message(host=props.base_hostname, port=props.rmq_port, rmq_username=props.rmq_username, rmq_password=props.rmq_password, queue='queue.dell.cpsd.credential.public.key.response', ssl_enabled=props.rmq_ssl_enabled)
