@@ -8,6 +8,8 @@ import paramiko
 
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
+    global cpsd
+    import cpsd
     # Update config ini files at runtime
     my_data_file = os.environ.get(
         'AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/symphony-sds-VxRack.properties'
@@ -50,6 +52,11 @@ def load_test_data():
     global payload_property_hal
     payload_property_hal = 'ccv_payload'
 
+    # global amqp_tool_jar
+    # amqp_tool_jar = str(os.environ.get('AF_RESOURCES_PATH')) + '/system-definition/amqp-post-1.0-SNAPSHOT.jar'
+    # global jsonfilepath
+    # jsonfilepath = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/systemConfig-VxRack.json')
+
     # my_esrs_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/esrs-service.properties'
     my_esrs_file = 'cpsd-test-automation-framework:/home/autouser/PycharmProjects/auto-framework/resources/continuous-integration-deploy-suite/esrs-service.properties'
 
@@ -91,44 +98,48 @@ def serviceStart():
 #######################################################################################################################
 
 # *** THIS IS THE MAIN TEST *** Add a system
-# @pytest.mark.rcm_fitness_mvp
-# @pytest.mark.rcm_fitness_mvp_extended
-# def test_SystemAdditionRequested():
-#     cleanup()
-#
-#     bindSDSQueus()
-#
-#     # Get the payload data from the config symphony-sds.ini file.
-#     the_payload = af_support_tools.get_config_file_property(config_file=payload_file,
-#                                                             heading=payload_header,
-#                                                             property=payload_property_sys)
-#
-#     # Publish the message
-#     af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username, rmq_password=rmq_password,
-#                                          exchange='exchange.dell.cpsd.syds.system.definition.request',
-#                                          routing_key='dell.cpsd.syds.converged.system.addition.requested',
-#                                          headers={
-#                                              '__TypeId__': 'com.dell.cpsd.syds.converged.system.addition.requested'},
-#                                          payload=the_payload)
-#
-#     return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
-#                                                           rmq_password=rmq_password,
-#                                                           queue='test.system.list.request')
-#
-#     published_json = json.loads(the_payload, encoding='utf-8')
-#     return_json = json.loads(return_message, encoding='utf-8')
-#
-#     # Checking the "Message received" matches the "Message published"
-#     assert published_json == return_json
-#     print('\nTEST: Published Message Received: PASSED')
-#
-#     # Call the function to verify the generated credentials.addition.requested message is correct.
-#     verifyCSmessage()
-#
-#     # Call the function to verify the system exists. This is not a necessary step but it will return the system UUID.
-#     verify_SystemExists()
-#
-#     cleanup()
+@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+def test_SystemAdditionRequested():
+    cleanup()
+
+    bindSDSQueus()
+
+    # Get the payload data from the config symphony-sds.ini file.
+    the_payload = af_support_tools.get_config_file_property(config_file=payload_file,
+                                                            heading=payload_header,
+                                                            property=payload_property_sys)
+
+    encrypt_payload = cpsd.cs_encrypt_credential_elements(the_payload)
+    time.sleep(2)
+    assert encrypt_payload is not None
+
+    # Publish the message
+    af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username, rmq_password=rmq_password,
+                                         exchange='exchange.dell.cpsd.syds.system.definition.request',
+                                         routing_key='dell.cpsd.syds.converged.system.addition.requested',
+                                         headers={
+                                             '__TypeId__': 'com.dell.cpsd.syds.converged.system.addition.requested'},
+                                         payload=encrypt_payload)
+
+    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+                                                          rmq_password=rmq_password,
+                                                          queue='test.system.list.request')
+
+    published_json = json.loads(encrypt_payload, encoding='utf-8')
+    return_json = json.loads(return_message, encoding='utf-8')
+
+    # Checking the "Message received" matches the "Message published"
+    assert published_json == return_json
+    print('\nTEST: Published Message Received: PASSED')
+
+    # Call the function to verify the generated credentials.addition.requested message is correct.
+    verifyCSmessage()
+
+    # Call the function to verify the system exists. This is not a necessary step but it will return the system UUID.
+    verify_SystemExists()
+
+    cleanup()
 
 
 # *** Kick of the collectComponentVersion Msg
