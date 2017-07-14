@@ -122,19 +122,17 @@ def test_SystemAdditionRequested():
                                              '__TypeId__': 'com.dell.cpsd.syds.converged.system.addition.requested'},
                                          payload=encrypt_payload)
 
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    return_message = af_support_tools.rmq_consume_all_messages(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.system.list.request')
 
-    published_json = json.loads(encrypt_payload, encoding='utf-8')
-    return_json = json.loads(return_message, encoding='utf-8')
-
-    # Checking the "Message received" matches the "Message published"
-    assert published_json == return_json
-    print('\nTEST: Published Message Received: PASSED')
 
     # Call the function to verify the generated credentials.addition.requested message is correct.
+    time.sleep(30)
     verifyCSmessage()
+
+    mess_count = af_support_tools.rmq_message_count(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password, queue='test.system.definition.event')
+    assert mess_count >= 4, "Unexpected number of components defined."
 
     # Call the function to verify the system exists. This is not a necessary step but it will return the system UUID.
     verify_SystemExists()
@@ -297,17 +295,18 @@ def verifyCSmessage():
             cleanup()
             break
 
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
+    return_message = af_support_tools.rmq_consume_all_messages(host=ipaddress, port=port, rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.component.credential.request')
 
-    return_json = json.loads(return_message, encoding='utf-8')
+    return_json = json.loads(return_message[1], encoding='utf-8')
+    print(return_json)
 
-    if 'credentialUuid' not in return_message:
+    if 'credentialUuid' not in return_message[1]:
         print('\nTEST FAIL: Invalid "credentials.addition.requested" message structure. credentialUuid missing')
-    if 'endpointUuid' not in return_message:
+    if 'endpointUuid' not in return_message[1]:
         print('\nTEST FAIL: Invalid "credentials.addition.requested" message structure. endpointUuid missing')
-    if 'componentUuid' not in return_message:
+    if 'componentUuid' not in return_message[1]:
         print('\nTEST FAIL: Invalid "credentials.addition.requested" message structure. componentUuid missing')
 
     assert return_json['messageProperties']['correlationId']
@@ -332,17 +331,6 @@ def verify_SystemExists():
                                          headers={'__TypeId__': 'com.dell.cpsd.syds.converged.system.list.requested'},
                                          payload=the_payload,
                                          payload_type='json')
-
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.system.list.request')
-
-    published_json = json.loads(the_payload, encoding='utf-8')
-    return_json = json.loads(return_message, encoding='utf-8')
-
-    # Checking the "Message received" matches the "Message published"
-    assert published_json == return_json
-    print('\nTEST: Published Message Received: PASSED')
 
     q_len = 0
     timeout = 0
