@@ -246,58 +246,58 @@ def getSystemDefinitionNullUUID():
 
 
 #@pytest.mark.TC546466
-@pytest.mark.rcm_fitness_mvp
-def test_getSysDef1():
-    getSystemDefinition("VXRACK", "FLEX", "1000", "NETWORK")
-@pytest.mark.rcm_fitness_mvp
-def test_getSysDef2():
-    getSystemDefinitionByUUID("VXRACK", "FLEX", "1000", "NETWORK")
-@pytest.mark.rcm_fitness_mvp
-def test_getSysDef3():
-    getComponentBySystemUUID("NEXUS", "N3K", "SWITCH", "MGMT-", 2)
-@pytest.mark.rcm_fitness_mvp
-def test_getSysDef4():
-    getComponentBySystemUUID("NEXUS", "N5K", "SWITCH", "N5", 2)
-@pytest.mark.rcm_fitness_mvp
-def test_getSysDef4a():
-    getComponentBySystemUUID("NEXUS", "N9K", "SWITCH", "N9", 2)
-@pytest.mark.rcm_fitness_mvp
-def test_getSysDef5():
-    getComponentBySystemUUID("MDS", "MDS9000", "SWITCH", "M9", 2)
-# @pytest.mark.TC546466_Vblock
-# def test_getSysDef6():
-#     getComponentBySystemUUID("NSX", "NSX", "SWITCH", "NSX", 1)
-# @pytest.mark.TC546466_Vblock
-# def test_getSysDef7():
-#     getSystemDefinitionByUUID("VXBLOCK", "340", "VxB340", "STORAGE")
-# @pytest.mark.TC546466_Vblock
-# def test_getSysDef8():
-#     getComponentBySystemUUID("VNX", "VNX5400", "STORAGE_ARRAY", "ARRAY", 4)
-# @pytest.mark.TC546466_Vblock
-# def test_getSysDef9():
-#     getSystemDefinitionByUUID("VXBLOCK", "340", "VxB340", "MANAGEMENT_STORAGE")
-# @pytest.mark.TC546466_Vblock
-# def test_getSysDef10():
-#     getComponentBySystemUUID("VNXe", "VNXe3200", "STORAGE_ARRAY", "Array", 1)
-# @pytest.mark.TC546466_Vblock
-# def test_getSysDef11():
-#     getSystemDefinitionByUUID("VXBLOCK", "340", "VxB340", "COMPUTE")
-# @pytest.mark.TC546466_Vblock
-# def test_getSysDef12():
-#     getComponentBySystemUUID("UCS", "UCS1", "SERVER", "VMABO", 2)
-# @pytest.mark.TC546466_Vblock
-# def test_getSysDefInvalid():
-#     getSystemDefinitionInvalidUUID(systemUUID[:8])
-# @pytest.mark.TC546466_Vblock
-# def test_getSysDefInvalid2():
-#     getSystemDefinitionInvalidUUID("1111")
-# @pytest.mark.TC546466_Vblock
-# def test_getCompSysDefInvalid():
-#     getComponentByInvalidSystemUUID(systemUUID[:8])
-# @pytest.mark.TC546466_Vblock
-# def test_getCompSysDefInvalid2():
-#     getComponentByInvalidSystemUUID("1111")
-@pytest.mark.rcm_fitness_mvp
-def test_getSysDefNull():
-    getSystemDefinitionNullUUID()
+# @pytest.mark.rcm_fitness_mvp
+# def test_getSysDef1():
+#     getSystemDefinition("VXRACK", "FLEX", "1000", "NETWORK")
+# @pytest.mark.rcm_fitness_mvp
+# def test_getSysDef2():
+#     getSystemDefinitionByUUID("VXRACK", "FLEX", "1000", "NETWORK")
+# @pytest.mark.rcm_fitness_mvp
+# def test_getSysDef3():
+#     getComponentBySystemUUID("NEXUS", "N3K", "SWITCH", "MGMT-", 2)
+# @pytest.mark.rcm_fitness_mvp
+# def test_getSysDef4():
+#     getComponentBySystemUUID("NEXUS", "N5K", "SWITCH", "N5", 2)
+# @pytest.mark.rcm_fitness_mvp
+# def test_getSysDef4a():
+#     getComponentBySystemUUID("NEXUS", "N9K", "SWITCH", "N9", 2)
+# @pytest.mark.rcm_fitness_mvp
+# def test_getSysDef5():
+#     getComponentBySystemUUID("MDS", "MDS9000", "SWITCH", "M9", 2)
+# # @pytest.mark.TC546466_Vblock
+# # def test_getSysDef6():
+# #     getComponentBySystemUUID("NSX", "NSX", "SWITCH", "NSX", 1)
+# # @pytest.mark.TC546466_Vblock
+# # def test_getSysDef7():
+# #     getSystemDefinitionByUUID("VXBLOCK", "340", "VxB340", "STORAGE")
+# # @pytest.mark.TC546466_Vblock
+# # def test_getSysDef8():
+# #     getComponentBySystemUUID("VNX", "VNX5400", "STORAGE_ARRAY", "ARRAY", 4)
+# # @pytest.mark.TC546466_Vblock
+# # def test_getSysDef9():
+# #     getSystemDefinitionByUUID("VXBLOCK", "340", "VxB340", "MANAGEMENT_STORAGE")
+# # @pytest.mark.TC546466_Vblock
+# # def test_getSysDef10():
+# #     getComponentBySystemUUID("VNXe", "VNXe3200", "STORAGE_ARRAY", "Array", 1)
+# # @pytest.mark.TC546466_Vblock
+# # def test_getSysDef11():
+# #     getSystemDefinitionByUUID("VXBLOCK", "340", "VxB340", "COMPUTE")
+# # @pytest.mark.TC546466_Vblock
+# # def test_getSysDef12():
+# #     getComponentBySystemUUID("UCS", "UCS1", "SERVER", "VMABO", 2)
+# # @pytest.mark.TC546466_Vblock
+# # def test_getSysDefInvalid():
+# #     getSystemDefinitionInvalidUUID(systemUUID[:8])
+# # @pytest.mark.TC546466_Vblock
+# # def test_getSysDefInvalid2():
+# #     getSystemDefinitionInvalidUUID("1111")
+# # @pytest.mark.TC546466_Vblock
+# # def test_getCompSysDefInvalid():
+# #     getComponentByInvalidSystemUUID(systemUUID[:8])
+# # @pytest.mark.TC546466_Vblock
+# # def test_getCompSysDefInvalid2():
+# #     getComponentByInvalidSystemUUID("1111")
+# @pytest.mark.rcm_fitness_mvp
+# def test_getSysDefNull():
+#     getSystemDefinitionNullUUID()
 
