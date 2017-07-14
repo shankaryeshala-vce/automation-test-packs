@@ -153,10 +153,9 @@ def test_vcenter_adapter_RMQ_bindings_core(exchange, queue):
     print(exchange, '\nis bound to\n', queue, '\n')
 
 
-@pytest.mark.skip(reason='Defect: ESTS-128120')
 @pytest.mark.parametrize('exchange, queue', [
-    ('exchange.cpsd.controlplane.vcenter.response', 'queue.dell.cpsd.dne-paqx.response.dne-paqx')])
-@pytest.mark.dne_paqx_parent
+    ('exchange.cpsd.controlplane.vcenter.response', 'queue.dell.cpsd.dne-paqx.response')])
+@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_vcenter_adapter_RMQ_bindings_dne(exchange, queue):
     """
@@ -296,6 +295,12 @@ def test_vcenter_adapter_full_ListCapabilities():
     capabilities8 = 'vcenter-addhostvcenter'
     capabilities9 = 'vcenter-install-software-vib'
     capabilities10 = 'vcenter-configure-software-vib'
+    capabilities11 = 'vcenter-setPCIpassthrough'
+    capabilities12 = 'vcenter-addhostlicense'
+    capabilities13 = 'vcenter-deployvmfromtemplate'
+    capabilities14 = 'vcenter-enablePCIpassthroughHost'
+    capabilities15 = 'vcenter-addhostdvswitch'
+    capabilities16 = 'vcenter-rename-datastore'
 
     error_list = []
 
@@ -321,6 +326,18 @@ def test_vcenter_adapter_full_ListCapabilities():
         error_list.append(capabilities9)
     if (capabilities10 not in return_message):
         error_list.append(capabilities10)
+    if (capabilities11 not in return_message):
+        error_list.append(capabilities11)
+    if (capabilities12 not in return_message):
+        error_list.append(capabilities12)
+    if (capabilities13 not in return_message):
+        error_list.append(capabilities13)
+    if (capabilities14 not in return_message):
+        error_list.append(capabilities14)
+    if (capabilities15 not in return_message):
+        error_list.append(capabilities15)
+    if (capabilities16 not in return_message):
+        error_list.append(capabilities16)
 
     assert not error_list, ('Missing some vcenter-adapter capabilities')
 
