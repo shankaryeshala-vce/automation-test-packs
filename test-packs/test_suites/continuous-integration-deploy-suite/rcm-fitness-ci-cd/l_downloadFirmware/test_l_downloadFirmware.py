@@ -740,27 +740,27 @@ def test_verifyConsumedAttributes3():
 
 
 #@pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_downloadFWFileRequest():
     downloadFWFileRequest(messageThird, 'downloadFWRequest.json', 'downloadFWCredentials.json',
                           'downloadFWResponse.json')
 
 
 #@pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_verifyPublishedAttributes():
     verifyPublishedAttributes(path + 'downloadFWRequest.json')
 
 
 #@pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_verifyConsumedAttributes():
     verifyConsumedAttributes(path + 'downloadFWRequest.json', path + 'downloadFWCredentials.json',
                              path + 'downloadFWResponse.json', "SHA-256", "VCEVision")
 
 
 #@pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_checkFileSize():
     checkFileSize("SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE",
                   "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
