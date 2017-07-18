@@ -410,11 +410,12 @@ def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, 
             else:
                 print("Incorrect model family returned.")
                 # continue
-                # numResults += 1
+            numResults += 1
         else:
+            assert instances != 0, "No Evaluation for this component"
             print("Either product or identifier returned are not as expected.")
             # continue
-        numResults += 1
+        # numResults += 1
 
 
 @pytest.mark.rcm_fitness_mvp_extended
