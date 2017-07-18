@@ -106,7 +106,7 @@ def test_post_eval(sys, rcmid, train, version, type, model, identifier, fileName
     datas = json.dumps(data)
     # print(datas)
     evals = len(data['rcmEvaluationResults'])
-    assert evals != 0, "No evaluation results found, has Collectcomponentversion been executed??"
+    assert evals != 0, "Unexpected number of evaluation results found, has Collectcomponentversion been executed??"
     results = 0
     deviceIDlist = []
     instances = 0
@@ -123,7 +123,6 @@ def test_post_eval(sys, rcmid, train, version, type, model, identifier, fileName
     # print("Server ID: %s" % deviceID)
     print("Train: %s" % train)
     print("Version: %s" % version)
-
 
     while results < evals:
         if model in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition']['model'] and identifier in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity']['identifier']:
@@ -197,9 +196,9 @@ def test_post_eval(sys, rcmid, train, version, type, model, identifier, fileName
             instances += 1
         # instances == 0
 
-        elif instances == 0:
+        else:
+            assert instances != 0, "No Evaluation for this component"
             print('Specified type not found:', type)
-
 
 
         results += 1
