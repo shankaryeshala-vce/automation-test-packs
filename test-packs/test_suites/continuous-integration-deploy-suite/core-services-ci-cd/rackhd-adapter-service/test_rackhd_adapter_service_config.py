@@ -307,8 +307,11 @@ def test_rackHD_adapter_full_ListCapabilities():
     capabilities5 = 'node-discovered-event'
     capabilities6 = 'rackhd-install-esxi'
     capabilities7 = 'rackhd-list-node-catalogs'
-    capabilities8 = 'rackhd-set-node-obm-setting'
-    capabilities9 = 'rackhd-configure-idrac-network'
+    capabilities8 = 'rackhd-configure-idrac-network'
+    capabilities9 = 'rackhd-configure-boot-device-idrac'
+    capabilities10 = 'rackhd-set-node-obm-setting'
+    capabilities11 = 'rackhd-configure-bmc-settings'
+    capabilities12 = 'rackhd-set-idrac-credentials'
 
     error_list = []
 
@@ -332,6 +335,12 @@ def test_rackHD_adapter_full_ListCapabilities():
         error_list.append(capabilities8)
     if (capabilities9 not in return_message):
         error_list.append(capabilities9)
+    if (capabilities10 not in return_message):
+        error_list.append(capabilities10)
+    if (capabilities11 not in return_message):
+        error_list.append(capabilities11)
+    if (capabilities12 not in return_message):
+        error_list.append(capabilities12)
 
     assert not error_list, ('Missing some rackHD capabilities')
 
