@@ -107,6 +107,8 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
     with open(compDataFilename, 'a') as outfile:
         json.dump(compData, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
+    assert len(compData["devices"]) != "", "No devices discovered...."
+
     if len(compData["devices"]) != "":
 
         assert not compData["message"], "Expected message field to be NULL."
@@ -144,6 +146,8 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
                 assert compData["groups"][groupIndex]["type"] == "STORAGE" or "NETWORK" or "COMPUTE"
                 print("Done System type: %s" % compData["groups"][groupIndex]["type"])
                 i += 1
+            else:
+                assert compData["groups"][groupIndex]["uuid"] == data["system"]["groups"][i]["uuid"], "Group UUIDs not matching....."
             groupIndex += 1
         print("Verifying groups....")
         index = 0
@@ -205,12 +209,14 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
                                "collectionSentTime"] != "", "Response not detail Collection Sent Time."
                     assert compData["devices"][deviceIndex]["auditData"][
                                "messageReceivedTime"] != "", "Response not detail Received Time."
-                    print(compData["devices"][deviceIndex]["elementData"]["modelFamily"])
-                    print(compData["devices"][deviceIndex]["elementData"]["elementType"])
                     print("Done Device: %s\n" % compData["devices"][deviceIndex]["elementData"]["identifier"])
+                    return
+                else:
+                    compData["devices"][deviceIndex]["elementData"]["model"] == deviceModel, "Device UUIDs not matching....."
 
                 compIndex += 1
             deviceIndex += 1
+        assert False, "Device UUIDs not matching....."
         deviceIndex = 0
         print("Verifying Devices completed....\n")
 
@@ -244,52 +250,66 @@ def getComplianceDataSystemSubComps(elementType, identifier, sysDefFilename, com
 
     index = 0
 
+    assert len(compData["devices"]) != "", "No devices discovered......"
+
     if len(compData["devices"]) != "":
         totalSubComponents = len(compData["subComponents"])
+        assert len(compData["subComponents"]) != "", "No subcomponents discovered ...."
 
         while subIndex < totalSubComponents:
-            # print("Starting subComps: %d" % subIndex)
+            print(subIndex)
+            print(identifier)
             if identifier in compData["subComponents"][subIndex]["elementData"]["identifier"]:
-                if compData["subComponents"][subIndex]["parentDeviceUuid"] == compData["devices"][index]["uuid"]:
-                    assert "uuid" in compData["subComponents"][subIndex], "Response detailed an empty group UUID."
-                    assert "parentDeviceUuid" in compData["subComponents"][
-                        subIndex], "Response not detail parent Group UUID."
-                    assert "elementType" in compData["subComponents"][subIndex][
-                        "elementData"], "Response not detail Element Type."
-                    assert "identifier" in compData["subComponents"][subIndex][
-                        "elementData"], "Response not detail Identifier."
-                    assert "modelFamily" in compData["subComponents"][subIndex][
-                        "elementData"], "Response not detail Family."
-                    assert "model" in compData["subComponents"][subIndex]["elementData"], "Response not detail Model."
-                    assert "messageReceivedTime" in compData["subComponents"][subIndex][
-                        "auditData"], "Response not detail Received Time."
-                    assert "type" in compData["subComponents"][subIndex]["versionDatas"][0], "Response not detail Type."
-                    assert "version" in compData["subComponents"][subIndex]["versionDatas"][
-                        0], "Response not detail Version."
+                while index < len(compData["devices"]):
+                    if compData["subComponents"][subIndex]["parentDeviceUuid"] == compData["devices"][index]["uuid"]:
+                        assert "uuid" in compData["subComponents"][subIndex], "Response detailed an empty group UUID."
+                        assert "parentDeviceUuid" in compData["subComponents"][
+                            subIndex], "Response not detail parent Group UUID."
+                        assert "elementType" in compData["subComponents"][subIndex][
+                            "elementData"], "Response not detail Element Type."
+                        assert "identifier" in compData["subComponents"][subIndex][
+                            "elementData"], "Response not detail Identifier."
+                        assert "modelFamily" in compData["subComponents"][subIndex][
+                            "elementData"], "Response not detail Family."
+                        assert "model" in compData["subComponents"][subIndex]["elementData"], "Response not detail Model."
+                        assert "messageReceivedTime" in compData["subComponents"][subIndex][
+                            "auditData"], "Response not detail Received Time."
+                        assert "type" in compData["subComponents"][subIndex]["versionDatas"][0], "Response not detail Type."
+                        assert "version" in compData["subComponents"][subIndex]["versionDatas"][
+                            0], "Response not detail Version."
 
-                    assert compData["subComponents"][subIndex]["uuid"] != "", "Response not detail subcomponent UUID."
-                    assert compData["subComponents"][subIndex]["elementData"][
-                               "elementType"] == elementType, "Response returns incorrect Type."
-                    assert identifier in compData["subComponents"][subIndex]["elementData"][
-                        "identifier"], "Response returns incorrect Identifier."
-                    assert compData["subComponents"][subIndex]["parentDeviceUuid"] == compData["devices"][index][
-                        "uuid"], "Response not detail parent Group UUID."
-                    assert compData["subComponents"][subIndex]["auditData"][
-                               "messageReceivedTime"] != "", "No timestamp included."
-                    assert compData["subComponents"][subIndex]["versionDatas"][0]["type"] == "FIRMWARE"
-                    assert compData["subComponents"][subIndex]["versionDatas"][0]["version"] != ""
-                    print(compData["subComponents"][subIndex]["elementData"]["model"])
-                    print(compData["subComponents"][subIndex]["elementData"]["elementType"])
-                    print(compData["subComponents"][subIndex]["elementData"]["identifier"])
-                    print(compData["subComponents"][subIndex]["elementData"]["modelFamily"])
-                    if compData["subComponents"][subIndex]["elementData"]["elementType"] == "NIC":
-                        macAddress = compData["subComponents"][subIndex]["elementData"]["identifier"]
-                        countColon = macAddress.count(":")
-                        assert countColon == 5, "Unexpected MAC address format returned in Identifier value."
+                        assert compData["subComponents"][subIndex]["uuid"] != "", "Response not detail subcomponent UUID."
+                        assert compData["subComponents"][subIndex]["elementData"][
+                                   "elementType"] == elementType, "Response returns incorrect Type."
+                        assert identifier in compData["subComponents"][subIndex]["elementData"][
+                            "identifier"], "Response returns incorrect Identifier."
+                        assert compData["subComponents"][subIndex]["parentDeviceUuid"] == compData["devices"][index][
+                            "uuid"], "Response not detail parent Group UUID."
+                        assert compData["subComponents"][subIndex]["auditData"][
+                                   "messageReceivedTime"] != "", "No timestamp included."
+                        assert compData["subComponents"][subIndex]["versionDatas"][0]["type"] == "FIRMWARE"
+                        assert compData["subComponents"][subIndex]["versionDatas"][0]["version"] != ""
+                        print(compData["subComponents"][subIndex]["elementData"]["model"])
+                        print(compData["subComponents"][subIndex]["elementData"]["elementType"])
+                        print(compData["subComponents"][subIndex]["elementData"]["identifier"])
+                        print(compData["subComponents"][subIndex]["elementData"]["modelFamily"])
+                        if compData["subComponents"][subIndex]["elementData"]["elementType"] == "NIC":
+                            macAddress = compData["subComponents"][subIndex]["elementData"]["identifier"]
+                            countColon = macAddress.count(":")
+                            assert countColon == 5, "Unexpected MAC address format returned in Identifier value."
+                        subIndex += 1
+                        return
+
+                    else:
+                        assert compData["subComponents"][subIndex]["parentDeviceUuid"] == compData["devices"][index]["uuid"], "Unexpected Parent device UUID returned..."
                     index += 1
-
                 print("Done SubComp: %s\n" % elementType)
+
+                index = 0
+
             subIndex += 1
+        assert False, "Unexpected Identifier in response."
+
 
 
 def getComplianceDataSystem_INVALID(sysUUID):
@@ -433,7 +453,7 @@ def test_getComplianceDataSystem14():
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem15():
-    getComplianceDataSystemSubComps("ESXi", "lab.vce.com", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("ESXI", "lab.vce.com", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemVCENTER.json", systemUUID)
 
 
