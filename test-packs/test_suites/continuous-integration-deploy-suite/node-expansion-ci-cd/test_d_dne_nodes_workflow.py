@@ -17,8 +17,6 @@ def load_test_data():
     # Set config ini file name
     global env_file
     env_file = 'env.ini'
-    global config_file
-    config_file = 'idracSettings.ini'
     # Test VM Details
     global ipaddress
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
@@ -35,15 +33,22 @@ def load_test_data():
     protocol = 'http://'
     global dne_port
     dne_port = ':8071'
-    # Idrac Settings
+    # Update setup_config.properties file at runtime  
+    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/setup_config.properties'
+    af_support_tools.set_config_file_property_by_data_file(my_data_file)
+    # IDrac Server IP & Creds details
+    global setup_config_file    
+    setup_config_file = 'continuous-integration-deploy-suite/setup_config.ini'
+    global setup_config_header
+    setup_config_header = 'config_details'
     global idrac_hostname
-    idrac_hostname = af_support_tools.get_config_file_property(config_file=config_file, heading='IdracSettings', property='hostname')
+    idrac_hostname = af_support_tools.get_config_file_property(config_file=setup_config_file, heading=setup_config_header, property='idrac_ipaddress')
     global idrac_username
-    idrac_username = af_support_tools.get_config_file_property(config_file=config_file, heading='IdracSettings', property='username')
-    global idrac_factory_password
-    idrac_factory_password = af_support_tools.get_config_file_property(config_file=config_file, heading='IdracSettings', property='factory_password')
+    idrac_username = af_support_tools.get_config_file_property(config_file=setup_config_file, heading=setup_config_header, property='idrac_username')
     global idrac_common_password
-    idrac_common_password = af_support_tools.get_config_file_property(config_file=config_file, heading='IdracSettings', property='factory_password')
+    idrac_common_password = af_support_tools.get_config_file_property(config_file=setup_config_file, heading=setup_config_header, property='idrac_common_password')
+    global idrac_factory_password
+    idrac_factory_password = af_support_tools.get_config_file_property(config_file=setup_config_file, heading=setup_config_header, property='idrac_factory_password')
 def check_ssh(ip,usrname,passwd):
     """
     Title           :       Check SSH connection to the idrac server node
