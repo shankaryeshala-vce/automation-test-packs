@@ -140,15 +140,18 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
         assert totalSubComponents > 0, "response not including a list of Devices."
 
         while groupIndex < totalGroups:
+            print(compData["groups"][groupIndex]["uuid"])
+            print(data["system"]["groups"][i]["uuid"])
             if compData["groups"][groupIndex]["uuid"] == data["system"]["groups"][i]["uuid"]:
-                assert compData["groups"][groupIndex]["parentSystemUuids"][
-                           0] == systemUUID, "Response not detail parent System UUID."
+                print("You are here...")
+                assert compData["groups"][groupIndex]["parentSystemUuids"][0] == systemUUID, "Response not detail parent System UUID."
                 assert compData["groups"][groupIndex]["type"] == "STORAGE" or "NETWORK" or "COMPUTE"
                 print("Done System type: %s" % compData["groups"][groupIndex]["type"])
                 i += 1
-            else:
-                assert compData["groups"][groupIndex]["uuid"] == data["system"]["groups"][i]["uuid"], "Group UUIDs not matching....."
+                return
+
             groupIndex += 1
+        assert False, "Group UUIDs not matching....."
         print("Verifying groups....")
         index = 0
         while deviceIndex < totalDevices:
@@ -219,12 +222,12 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
         assert False, "Device UUIDs not matching....."
         deviceIndex = 0
         print("Verifying Devices completed....\n")
+    assert False, "No devices returned."
 
 
 # ("ESXi", "lab.vce.com", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemVCENTER.json", systemUUID)
 
 def getComplianceDataSystemSubComps(elementType, identifier, sysDefFilename, compDataFilename, sysUUID):
-    subIndex = 0
     getSystemDefinition()
 
     url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID
@@ -249,19 +252,26 @@ def getComplianceDataSystemSubComps(elementType, identifier, sysDefFilename, com
         json.dump(compData, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
     index = 0
-
+    print("Device count: %d" % len(compData["devices"]))
+    print("Subcomp count: %d" % len(compData["subComponents"]))
     assert len(compData["devices"]) != "", "No devices discovered......"
 
     if len(compData["devices"]) != "":
         totalSubComponents = len(compData["subComponents"])
         assert len(compData["subComponents"]) != "", "No subcomponents discovered ...."
-
+        subIndex = 0
         while subIndex < totalSubComponents:
+            print("Extreme......")
             print(subIndex)
             print(identifier)
             if identifier in compData["subComponents"][subIndex]["elementData"]["identifier"]:
+                print("Outside......")
                 while index < len(compData["devices"]):
+                    print("Middle......")
+                    print(compData["subComponents"][subIndex]["parentDeviceUuid"])
+                    print(compData["devices"][index]["uuid"])
                     if compData["subComponents"][subIndex]["parentDeviceUuid"] == compData["devices"][index]["uuid"]:
+                        print("Inside......")
                         assert "uuid" in compData["subComponents"][subIndex], "Response detailed an empty group UUID."
                         assert "parentDeviceUuid" in compData["subComponents"][
                             subIndex], "Response not detail parent Group UUID."
@@ -297,18 +307,20 @@ def getComplianceDataSystemSubComps(elementType, identifier, sysDefFilename, com
                             macAddress = compData["subComponents"][subIndex]["elementData"]["identifier"]
                             countColon = macAddress.count(":")
                             assert countColon == 5, "Unexpected MAC address format returned in Identifier value."
-                        subIndex += 1
+
                         return
 
-                    else:
-                        assert compData["subComponents"][subIndex]["parentDeviceUuid"] == compData["devices"][index]["uuid"], "Unexpected Parent device UUID returned..."
+                    # else:
+                    #     assert compData["subComponents"][subIndex]["parentDeviceUuid"] == compData["devices"][index]["uuid"], "Unexpected Parent device UUID returned..."
                     index += 1
                 print("Done SubComp: %s\n" % elementType)
 
                 index = 0
 
             subIndex += 1
+
         assert False, "Unexpected Identifier in response."
+    assert False, "No devices returned."
 
 
 
