@@ -65,12 +65,13 @@ def check_ssh(ip,usrname,passwd):
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(ip,username=usrname,password=passwd)
         print ("\n\nSucessfully connected to " + ip + "using password: " + passwd)
+        return True
     except:
         print ("could not connect to " + ip + "using password: " + passwd)
+        return False
 #####################################################################
 # These are the main tests.
 #####################################################################
-@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_nodes_GET_workflows():
     """
@@ -83,7 +84,7 @@ def test_nodes_GET_workflows():
     Returns         :       None
     """
     # Test ssh connection to idrac before starting the workflow with default password
-    check_ssh(idrac_hostname,idrac_username,idrac_factory_password)
+    assert check_ssh(idrac_hostname,idrac_username,idrac_factory_password), 'ERROR: unable to log-in to iDrac'
     time.sleep(5)
     print('\n=======================Add Node Work Flow Test Begin=======================\n')
     # Invoke /dne/nodes REST API call to gather the info that will be needed for add node.
@@ -104,7 +105,6 @@ def test_nodes_GET_workflows():
         print('\n')
         raise Exception(err)
 @pytest.mark.skip(reason='These requires a dedicated node to run on')
-@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_nodes_request_workflows():
     """
@@ -152,7 +152,6 @@ def test_nodes_request_workflows():
         print('\n')
         raise Exception(err)
 @pytest.mark.skip(reason='These requires a dedicated node to run on')
-@pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_nodes_status_workflow():
     """
@@ -195,5 +194,4 @@ def test_nodes_status_workflow():
         raise Exception(err)
     time.sleep(5)
     # Test ssh connection to idrac at the end of the workflow with new password
-    check_ssh(idrac_hostname,idrac_username,idrac_common_password)
-
+    assert check_ssh(idrac_hostname,idrac_username,idrac_common_password), 'ERROR: unable to log-in to iDrac'
