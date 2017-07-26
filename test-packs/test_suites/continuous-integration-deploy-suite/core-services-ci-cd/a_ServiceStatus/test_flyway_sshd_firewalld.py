@@ -24,8 +24,7 @@ def load_test_data():
 
 #ipaddress = '10.3.60.67'
 ########################################################################################################################
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_cd
+@pytest.mark.skip(reason="Not Needed at present")
 def test_flywayrunning():
     flyway_err = []
 
@@ -59,8 +58,7 @@ def test_sshdrunning():
 #####################################################END OF test_sshdrunning() TEST########################################################
 
 
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_cd
+@pytest.mark.skip(reason="Not Needed at present")
 def test_firewalldrunning():
     firewalld_err = []
 
