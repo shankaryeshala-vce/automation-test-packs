@@ -18,8 +18,6 @@ def load_test_data():
     payload_header = 'payload'
     global payload_property_sys
     payload_property_sys = 'sys_payload_idrac_node_exp'
-    global jsonfilepath
-    jsonfilepath = 'IDRAC.json'
     global amqptooljar
     amqptooljar = str(os.environ.get('AF_RESOURCES_PATH')) + '/system-definition/amqp-post-1.0-SNAPSHOT.jar'
     # Set Vars
