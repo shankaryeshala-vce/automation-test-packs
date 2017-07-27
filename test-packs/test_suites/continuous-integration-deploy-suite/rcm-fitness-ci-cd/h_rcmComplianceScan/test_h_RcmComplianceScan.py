@@ -275,23 +275,24 @@ def getAvailableRCMs(family, model, train, version, option, filename):
             assert data["rcmInventoryItems"][0]["systemProductFamily"] == family
             assert data["rcmInventoryItems"][0]["rcmTrain"] == train
             assert data["rcmInventoryItems"][0]["rcmVersion"] == version
-            assert (data["rcmInventoryItems"][0]["viewOption"] == option) or (
-            data["rcmInventoryItems"][0]["viewOption"] == optionAdd) or (
-                   data["rcmInventoryItems"][0]["viewOption"] == optionManu)
+
+            while numRCMs < len(data["rcmInventoryItems"]):
+                if data["rcmInventoryItems"][numRCMs]["viewOption"] == option:
+                    global rcmUUID
+                    rcmUUID = (data["rcmInventoryItems"][numRCMs]["uuid"])
+                    print("Requested rcmUUID: %s" % rcmUUID)
+                    print("Requested version: %s" % data["rcmInventoryItems"][numRCMs]["rcmVersion"])
+                    return
+                numRCMs += 1
+            numRCMs = 0
+
         else:
             combo = str(family + "/" + model + "/" + train + "/" + version)
             print("\nNo RCMs found for product/train/model combination: %s" % combo)
             print(data["message"])
             assert exception in data["message"], "No RCMs not returned for train:" + train
 
-    while numRCMs < len(data["rcmInventoryItems"]):
-        if data["rcmInventoryItems"][numRCMs]["viewOption"] == option:
-            global rcmUUID
-            rcmUUID = (data["rcmInventoryItems"][numRCMs]["uuid"])
-            print("Requested rcmUUID: %s" % rcmUUID)
-            print("Requested version: %s" % data["rcmInventoryItems"][0]["rcmVersion"])
-        numRCMs += 1
-    numRCMs = 0
+    assert False, "No RCMs returned for Train and Version specified."
 
 
 #    getRCMDefinition("Dell BIOS Firmware", path + "rcmRCMDefinitionDetails-VxRack.json")
@@ -334,7 +335,11 @@ def getRCMDefinition(component, filename, option):
 
                         print("\nComponent: %s" % data["rcmDefinition"]["rcmContents"][contentIndex]["component"])
                         print("Expected version: %s" % firmwareVersion)
+
+                        return
                     contentIndex += 1
+
+    assert False, "No RCM definition returned."
 
 
 def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, product, model, filename, sysUUID):
