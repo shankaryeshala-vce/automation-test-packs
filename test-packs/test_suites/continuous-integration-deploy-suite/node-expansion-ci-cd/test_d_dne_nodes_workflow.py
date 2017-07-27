@@ -72,7 +72,7 @@ def check_ssh(ip,usrname,passwd):
 #####################################################################
 # These are the main tests.
 #####################################################################
-@pytest.mark.dne_paqx_parent_mvp_extended
+#@pytest.mark.dne_paqx_parent_mvp_extended
 def test_nodes_GET_workflows():
     """
     Title           :       Verify the GET function on /dne/nodes API
@@ -104,8 +104,8 @@ def test_nodes_GET_workflows():
         print(err)
         print('\n')
         raise Exception(err)
-@pytest.mark.skip(reason='These requires a dedicated node to run on')
-@pytest.mark.dne_paqx_parent_mvp_extended
+#@pytest.mark.skip(reason='These requires a dedicated node to run on')
+#@pytest.mark.dne_paqx_parent_mvp_extended
 def test_nodes_request_workflows():
     """
     Title           :       Verify the POST function on /dne/nodes API
@@ -151,8 +151,8 @@ def test_nodes_request_workflows():
         print(err)
         print('\n')
         raise Exception(err)
-@pytest.mark.skip(reason='These requires a dedicated node to run on')
-@pytest.mark.dne_paqx_parent_mvp_extended
+#@pytest.mark.skip(reason='These requires a dedicated node to run on')
+#@pytest.mark.dne_paqx_parent_mvp_extended
 def test_nodes_status_workflow():
     """
     Title           :       Verify the GET function on /dne/nodes/<jobId> API
