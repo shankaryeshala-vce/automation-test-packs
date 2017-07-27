@@ -31,6 +31,10 @@ def load_test_data():
 
     getSystemDefinition()
 
+    global fileList
+    fileList = []
+    global fileHash
+    fileHash = []
 
 # path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuousDeployment/restLevelTests/rcmComplianceScan/'
 
@@ -48,8 +52,6 @@ def purgeOldOutput(dir, pattern):
             print('Unable to locate output files to remove.')
 
 
-fileList = []
-fileHash = []
 
 
 def getSystemDefinition():
