@@ -56,8 +56,8 @@ def check_ssh(ip,usrname,passwd):
                             It will fail if :
                                 Unable to establish the ssh connection with the given credentials
     Parameters      :       1. ip of the idrac server node
-  			    2. username of the idrac server
-  			    3. password of the idrac server
+    		    2. username of the idrac server
+    		    3. password of the idrac server
     Returns         :       None
     """
     try:
