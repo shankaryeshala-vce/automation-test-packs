@@ -37,7 +37,7 @@ def load_test_data():
     my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/setup_config.properties'
     af_support_tools.set_config_file_property_by_data_file(my_data_file)
     # IDrac Server IP & Creds details
-    global setup_config_file    
+    global setup_config_file
     setup_config_file = 'continuous-integration-deploy-suite/setup_config.ini'
     global setup_config_header
     setup_config_header = 'config_details'
