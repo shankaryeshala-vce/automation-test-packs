@@ -1,6 +1,6 @@
 #!/usr/bin/python
-# Author: cullia
-# Revision: 1.3
+# Author:
+# Revision:
 # Code Reviewed by:
 # Description: Testing the RackHD-Adapter Container.
 #
@@ -108,19 +108,92 @@ def test_rackHD_adapter_servicerunning():
     assert my_return_status == 'Up', (service_name + " not running")
 
 
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_registerRackHD():
+    # Until consul is  working properly & integrated with the rackhd adapter in the same environment we need to register
+    # it manually by sending this message.  This test is a prerequisite to getting the full list of
+
+    cleanup('test.controlplane.rackhd.response')
+    cleanup('test.endpoint.registration.event')
+    bindQueues('exchange.dell.cpsd.controlplane.rackhd.response', 'test.controlplane.rackhd.response')
+    bindQueues('exchange.dell.cpsd.endpoint.registration.event', 'test.endpoint.registration.event')
+
+    time.sleep(2)
+
+    af_support_tools.rmq_purge_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                     rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+                                     ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                     queue='test.controlplane.rackhd.response')
+
+    af_support_tools.rmq_purge_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                     rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+                                     ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                     queue='test.endpoint.registration.event')
+
+    the_payload = '{"messageProperties":{"timestamp":"2017-06-14T12:00:00Z","correlationId":"manually-reg-rackhd-3fb0-9696-3f7d28e17f72"},"registrationInfo":{"address":"http://' + rackHD_IP + ':8080/swagger-ui/","username":"' + rackHD_username + '","password":"' + rackHD_password + '"}}'
+    print(the_payload)
+
+    af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                         rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+                                         exchange='exchange.dell.cpsd.controlplane.rackhd.request',
+                                         routing_key='controlplane.rackhd.endpoint.register',
+                                         headers={
+                                             '__TypeId__': 'com.dell.cpsd.rackhd.registration.info.request'},
+                                         payload=the_payload, ssl_enabled=cpsd.props.rmq_ssl_enabled)
+
+    # Verify the RackHD account can be validated
+    assert waitForMsg('test.controlplane.rackhd.response'), 'Error: No RackHD validation message received'
+    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                                          rmq_username=cpsd.props.rmq_username,
+                                                          rmq_password=cpsd.props.rmq_password,
+                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                                          queue='test.controlplane.rackhd.response',
+                                                          remove_message=True)
+    return_json = json.loads(return_message, encoding='utf-8')
+    print (return_json)
+    assert return_json['responseInfo']['message'] == 'SUCCESS', 'ERROR: RackHD validation failure'
+
+    # Verify that an event to register the rackHD with endpoint registry is triggered
+    assert waitForMsg('test.endpoint.registration.event'), 'Error: No message to register with Consul sent by system'
+    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                                          rmq_username=cpsd.props.rmq_username,
+                                                          rmq_password=cpsd.props.rmq_password,
+                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                                          queue='test.endpoint.registration.event',
+                                                          remove_message=True)
+
+    return_json = json.loads(return_message, encoding='utf-8')
+    print (return_json)
+    assert return_json['endpoint']['type'] == 'rackhd', 'rackhd not registered with endpoint'
+
+    cleanup('test.controlplane.rackhd.response')
+    cleanup('test.endpoint.registration.event')
+
+    time.sleep(3)
+
+
 @pytest.mark.parametrize('exchange, queue', [
     ('exchange.dell.cpsd.controlplane.rackhd.response', 'queue.controlplane.hardware.list.node.catalogs.response'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'controlplane.hardware.list.nodes'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'dell.cpsd.service.rcm.capability.update.firmware.requested'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.esxi.install'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.list.node.catalogs'),
+    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.set.node.BMC.config'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.set.node.obm.setting'),
+    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.cpsd.service.configure.idrac.network.settings.requested'),
+    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.change.idrac.credentials.request'),
+    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.hardware.idrac.configure.request'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.rackhd.register'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.rackhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.rackhd-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response', 'queue.dell.cpsd.hdp.capability.registry.response.rackhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.control',
+     'queue.dell.cpsd.hdp.capability.registry.control.rackhd-adapter'),
+    (
+    'exchange.dell.cpsd.hdp.capability.registry.event', 'queue.dell.cpsd.hdp.capability.registry.event.rackhd-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response',
+     'queue.dell.cpsd.hdp.capability.registry.response.rackhd-adapter'),
     ('exchange.dell.cpsd.syds.system.definition.response', 'queue.dell.cpsd.controlplane.rackhd.system.list.found'),
-    ('exchange.dell.cpsd.syds.system.definition.response', 'queue.dell.cpsd.controlplane.rackhd.component.configuration.found'),
+    ('exchange.dell.cpsd.syds.system.definition.response',
+     'queue.dell.cpsd.controlplane.rackhd.component.configuration.found'),
     ('exchange.dell.cpsd.cms.credentials.response', 'queue.dell.cpsd.controlplane.rackhd.credentials.response'),
     ('exchange.dell.cpsd.endpoint.registration.event', 'queue.dell.cpsd.controlplane.rackhd.endpoint-events'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.rackhd.register')])
@@ -189,71 +262,6 @@ def test_rackHD_RMQ_bindings_fru(exchange, queue):
 
     assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
     print(exchange, '\nis bound to\n', queue, '\n')
-
-
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
-def test_registerRackHD():
-    # Until consul is  working properly & integrated with the rackhd adapter in the same environment we need to register
-    # it manually by sending this message.  This test is a prerequisite to getting the full list of
-
-    cleanup('test.controlplane.rackhd.response')
-    cleanup('test.endpoint.registration.event')
-    bindQueues('exchange.dell.cpsd.controlplane.rackhd.response', 'test.controlplane.rackhd.response')
-    bindQueues('exchange.dell.cpsd.endpoint.registration.event', 'test.endpoint.registration.event')
-
-    time.sleep(2)
-
-    af_support_tools.rmq_purge_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                     rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                     ssl_enabled=cpsd.props.rmq_ssl_enabled,
-                                     queue='test.controlplane.rackhd.response')
-
-    af_support_tools.rmq_purge_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                     rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                     ssl_enabled=cpsd.props.rmq_ssl_enabled,
-                                     queue='test.endpoint.registration.event')
-
-    the_payload = '{"messageProperties":{"timestamp":"2017-06-14T12:00:00Z","correlationId":"manually-reg-rackhd-3fb0-9696-3f7d28e17f72"},"registrationInfo":{"address":"http://' + rackHD_IP + ':8080/swagger-ui/","username":"' + rackHD_username + '","password":"' + rackHD_password + '"}}'
-    print(the_payload)
-
-    af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                         rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                         exchange='exchange.dell.cpsd.controlplane.rackhd.request',
-                                         routing_key='controlplane.rackhd.endpoint.register',
-                                         headers={
-                                             '__TypeId__': 'com.dell.cpsd.rackhd.registration.info.request'},
-                                         payload=the_payload, ssl_enabled=cpsd.props.rmq_ssl_enabled)
-
-    # Verify the RackHD account can be validated
-    assert waitForMsg('test.controlplane.rackhd.response'), 'Error: No RackHD validation message received'
-    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                                          rmq_username=cpsd.props.rmq_username,
-                                                          rmq_password=cpsd.props.rmq_password,
-                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
-                                                          queue='test.controlplane.rackhd.response',
-                                                          remove_message=True)
-    return_json = json.loads(return_message, encoding='utf-8')
-    print (return_json)
-    assert return_json['responseInfo']['message'] == 'SUCCESS', 'ERROR: RackHD validation failure'
-
-    # Verify that an event to register the rackHD with endpoint registry is triggered
-    assert waitForMsg('test.endpoint.registration.event'), 'Error: No message to register with Consul sent by system'
-    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                                          rmq_username=cpsd.props.rmq_username,
-                                                          rmq_password=cpsd.props.rmq_password,
-                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
-                                                          queue='test.endpoint.registration.event',
-                                                          remove_message=True)
-
-    return_json = json.loads(return_message, encoding='utf-8')
-    print (return_json)
-    assert return_json['endpoint']['type'] == 'rackhd', 'rackhd not registered with endpoint'
-
-    cleanup('test.controlplane.rackhd.response')
-    cleanup('test.endpoint.registration.event')
-    
-    time.sleep(3)
 
 
 @pytest.mark.core_services_mvp
