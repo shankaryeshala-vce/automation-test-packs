@@ -108,74 +108,6 @@ def test_vcenter_adapter_servicerunning():
     assert my_return_status == 'Up', (service_name + " not running")
 
 
-@pytest.mark.parametrize('exchange, queue', [
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.cluster.discover'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.clusteroperation'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.discover'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.host.enter-maintenance'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.host.powercommand'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.register'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIB'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIBConfigure'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.vm.destroy'),
-    ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request',
-     'queue.dell.cpsd.hdp.hal.data.provider.device.data.discovery.request.vcenter-compute-data-provider'),
-    ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request',
-     'queue.dell.cpsd.hdp.hal.data.provider.endpoint.validation.request.vcenter-compute-data-provider'),
-    ('exchange.dell.cpsd.syds.system.definition.response',
-     'queue.dell.cpsd.adapter.vcenter.component.configuration.found'),
-    ('exchange.dell.cpsd.cms.credentials.response', 'queue.dell.cpsd.adapter.vcenter.component.credentials.found'),
-    ('exchange.dell.cpsd.endpoint.registration.event', 'queue.dell.cpsd.controlplane.vcenter.endpoint-events'),
-    ('exchange.dell.cpsd.hdp.capability.registry.control',
-     'queue.dell.cpsd.hdp.capability.registry.control.vcenter-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.event',
-     'queue.dell.cpsd.hdp.capability.registry.event.vcenter-adapter'),
-    ('exchange.dell.cpsd.hdp.capability.registry.response',
-     'queue.dell.cpsd.hdp.capability.registry.response.vcenter-adapter')])
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
-def test_vcenter_adapter_RMQ_bindings_core(exchange, queue):
-    """
-    Title           :       Verify the RMQ bindings
-    Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
-                            It uses the RMQ API to check.
-                            It will fail if :
-                                The RMQ binding does not exist
-    Parameters      :       1. RMQ Exchange. 2. RQM Queue
-    Returns         :       None
-    """
-
-    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
-                             exchange=exchange)
-    queues = json.dumps(queues)
-
-    assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
-    print(exchange, '\nis bound to\n', queue, '\n')
-
-@pytest.mark.skip(reason='need to figure out sequence')
-@pytest.mark.parametrize('exchange, queue', [
-    ('exchange.cpsd.controlplane.vcenter.response', 'queue.dell.cpsd.dne-paqx.response')])
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
-def test_vcenter_adapter_RMQ_bindings_dne(exchange, queue):
-    """
-    Title           :       Verify the RMQ bindings
-    Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
-                            It uses the RMQ API to check.
-                            It will fail if :
-                                The RMQ binding does not exist
-    Parameters      :       1. RMQ Exchange. 2. RQM Queue
-    Returns         :       None
-    """
-
-    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
-                             exchange=exchange)
-    queues = json.dumps(queues)
-
-    assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
-    print(exchange, '\nis bound to\n', queue, '\n')
-
-
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_registerVcenter():
@@ -239,6 +171,80 @@ def test_registerVcenter():
     cleanup('test.endpoint.registration.event')
 
     time.sleep(3)
+
+
+@pytest.mark.parametrize('exchange, queue', [
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.add.host.license'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.addhostdvswitch'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.cluster.discover'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.clusteroperation'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.deployVMFromTemplate'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.discover'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.host.enter-maintenance'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.host.powercommand'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.pci.enable.passthrough'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.pci.passthrough'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.register'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIB'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIBConfigure'),
+    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.vm.destroy'),
+    ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request',
+     'queue.dell.cpsd.hdp.hal.data.provider.device.data.discovery.request.vcenter-compute-data-provider'),
+    ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request',
+     'queue.dell.cpsd.hdp.hal.data.provider.endpoint.validation.request.vcenter-compute-data-provider'),
+    ('exchange.dell.cpsd.syds.system.definition.response',
+     'queue.dell.cpsd.adapter.vcenter.component.configuration.found'),
+    ('exchange.dell.cpsd.cms.credentials.response', 'queue.dell.cpsd.adapter.vcenter.component.credentials.found'),
+    ('exchange.dell.cpsd.endpoint.registration.event', 'queue.dell.cpsd.controlplane.vcenter.endpoint-events'),
+    ('exchange.dell.cpsd.hdp.capability.registry.control',
+     'queue.dell.cpsd.hdp.capability.registry.control.vcenter-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.event',
+     'queue.dell.cpsd.hdp.capability.registry.event.vcenter-adapter'),
+    ('exchange.dell.cpsd.hdp.capability.registry.response',
+     'queue.dell.cpsd.hdp.capability.registry.response.vcenter-adapter')])
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_vcenter_adapter_RMQ_bindings_core(exchange, queue):
+    """
+    Title           :       Verify the RMQ bindings
+    Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
+                            It uses the RMQ API to check.
+                            It will fail if :
+                                The RMQ binding does not exist
+    Parameters      :       1. RMQ Exchange. 2. RQM Queue
+    Returns         :       None
+    """
+
+    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
+                             exchange=exchange)
+    queues = json.dumps(queues)
+
+    assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
+    print(exchange, '\nis bound to\n', queue, '\n')
+
+
+@pytest.mark.skip(reason='need to figure out sequence')
+@pytest.mark.parametrize('exchange, queue', [
+    ('exchange.cpsd.controlplane.vcenter.response', 'queue.dell.cpsd.dne-paqx.response')])
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_vcenter_adapter_RMQ_bindings_dne(exchange, queue):
+    """
+    Title           :       Verify the RMQ bindings
+    Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
+                            It uses the RMQ API to check.
+                            It will fail if :
+                                The RMQ binding does not exist
+    Parameters      :       1. RMQ Exchange. 2. RQM Queue
+    Returns         :       None
+    """
+
+    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
+                             exchange=exchange)
+    queues = json.dumps(queues)
+
+    assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
+    print(exchange, '\nis bound to\n', queue, '\n')
 
 
 @pytest.mark.core_services_mvp
