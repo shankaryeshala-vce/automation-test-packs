@@ -123,7 +123,7 @@ def test_nodes_GET_workflows():
         assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
         data = response.json()
 
-        assert data['nodeStatus'] == 'DISCOVERED', 'Error: Node not in a doscovered state'
+        assert data[0]['nodeStatus'] == 'DISCOVERED', 'Error: Node not in a discovered state'
 
         print('Valid /dne/nodes Response received')
         time.sleep(1)
@@ -150,7 +150,7 @@ def test_nodes_request_workflows():
     """
 
     # Step 2: Invoke POST /dne/nodes REST API to provission the node
-    print('Send POST /dne/nodes REST API call to provision an unallocated node...\n')
+    print('\nSend POST /dne/nodes REST API call to provision an unallocated node...\n')
 
     global nodes_workflow_id  # set this value as global as it will be used in the next test.
 
@@ -168,7 +168,7 @@ def test_nodes_request_workflows():
         data = response.json()
 
         nodes_workflow_id = data['workflowId']
-        print (nodes_workflow_id)
+        print ('WorkflowID: ',nodes_workflow_id)
 
         error_list = []
 
@@ -250,13 +250,15 @@ def test_nodes_status_workflow():
                         assert data['workflowTasksResponseList'][0]['results'][
                                    'nodeStatus'] == 'DISCOVERED', 'Error: Node not is a discovered state'
                         print('Step 1: New node discoverd')
+                        print ('(Note: Task took', timeout, 'seconds to complete)\n')
                         time.sleep(5)
                         break
                         # Validate a SUCCEEDED message by checking the status on the node.
 
                     if data['workflowTasksResponseList'][0]['workFlowTaskStatus'] == 'FAILED':
+                        print ('(Note: Task took', timeout, 'seconds to fail)\n')
                         assert data['workflowTasksResponseList'][0][
-                                   'workFlowTaskStatus'] == 'FAILED', 'Error: Failed to doscover a new node'
+                                   'workFlowTaskStatus'] == 'FAILED', 'Error in Step 1: Failed to doscover a new node'
                         # If the task has failed then fail the entire test.
 
 
@@ -266,7 +268,7 @@ def test_nodes_status_workflow():
                            'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Change Out of Band Management Credentials" Failed'
 
                 timeout = 0
-                while timeout < 100:
+                while timeout < 610:
                     # Get the latest state from the API
                     response = requests.get(url_body)
                     data = response.text
@@ -284,13 +286,15 @@ def test_nodes_status_workflow():
                         assert not check_ssh(idrac_hostname, idrac_username,
                                              idrac_factory_password), 'ERROR: still able to log-in to iDrac with Factory Creds'
                         print ('Step2: Change Out of Band Management Credentials has Succeeded\n')
+                        print ('(Note: Task took', timeout, 'seconds to complete)\n')
                         time.sleep(5)
                         break
                         # Validate a SUCCEEDED message by checking ssh connection to idrac at the end of the workflow with new password
 
                     if data['workflowTasksResponseList'][1]['workFlowTaskStatus'] == 'FAILED':
+                        print ('(Note: Task took', timeout, 'seconds to fail)\n')
                         assert data['workflowTasksResponseList'][1][
-                                   'workFlowTaskStatus'] != 'FAILED', 'Error: failed to change iDrac credentials'
+                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step 2: Failed to change iDrac credentials'
                         # If the task has failed then fail the entire test.
 
 
@@ -300,7 +304,7 @@ def test_nodes_status_workflow():
                            'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Update System Definition" Failed'
 
                 timeout = 0
-                while timeout < 100:
+                while timeout < 300:
                     # Get the latest state from the API
                     response = requests.get(url_body)
                     data = response.text
@@ -315,12 +319,14 @@ def test_nodes_status_workflow():
                     if data['workflowTasksResponseList'][2]['workFlowTaskStatus'] == 'SUCCEEDED':
                         # TODO need to figure out how to test this
                         print ('Step n-1: Update System Definition has Succeeded\n')
+                        print ('(Note: Task took', timeout, 'seconds to complete)\n')
                         break
                         # Validate a SUCCEEDED message by checking something??
 
                     if data['workflowTasksResponseList'][2]['workFlowTaskStatus'] == 'FAILED':
+                        print ('(Note: Task took', timeout, 'seconds to fail)\n')
                         assert data['workflowTasksResponseList'][2][
-                                   'workFlowTaskStatus'] != 'FAILED', 'Error: failed to update system defnition'
+                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step n-1: Failed to update system defnition'
                         # If the task has failed then fail the entire test.
 
 
@@ -349,12 +355,14 @@ def test_nodes_status_workflow():
                         data2 = response.text
                         data2 = json.loads(data2, encoding='utf-8')
 
-                        assert data2[0]['nodeStatus'] == 'ADDED', 'Error: Node status has not been updated'
+                        assert data2[0]['nodeStatus'] == 'ADDED', 'Error in Step n: Node status has not been updated'
                         print ('Step n: Node status has changed to "ADDED"\n')
+                        print ('(Note: Task took', timeout, 'seconds to complete)\n')
                         break
                         # Validate a SUCCEEDED message by checking the node state has changed to ADDED
 
                     if data['workflowTasksResponseList'][3]['workFlowTaskStatus'] == 'FAILED':
+                        print ('(Note: Task took', timeout, 'seconds to fail)\n')
                         assert data['workflowTasksResponseList'][3][
                                    'workFlowTaskStatus'] != 'FAILED', 'Error: failed to update system defnition'
                         # If the task has failed then fail the entire test.
@@ -394,5 +402,5 @@ def check_ssh(ip, usrname, passwd):
         print ("\nSucessfully connected to " + ip + " using password: " + passwd)
         return True
     except:
-        print ("could not connect to " + ip + "using password: " + passwd)
+        print ("Unable to connect to " + ip + " using password: " + passwd)
         return False
