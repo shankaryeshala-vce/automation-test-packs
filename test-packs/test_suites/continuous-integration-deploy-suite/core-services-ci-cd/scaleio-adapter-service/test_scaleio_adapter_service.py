@@ -415,7 +415,6 @@ def test_scaleio_adapter_log_files_free_of_exceptions():
     excep4 = 'BeanCreationException'
 
     # Verify the log files exist
-    #sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" ls ' + filePath + '") }\''
     sendCommand = 'ls ' + filePath
 
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
