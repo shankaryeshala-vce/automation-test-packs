@@ -2,12 +2,16 @@ import pytest
 import selenium
 import af_vapi
 import af_support_tools
-    
-try:
-    config_file = 'performance/selenium_config.ini'
-    env_file = 'env.ini'
-except:
-    print('Possible Configuration Error')
+
+@pytest.fixture(scope="module", autouse=True)
+def load_test_data():
+    try:
+        global config_file
+        config_file = 'performance/selenium_config.ini'
+        global env_file 
+        env_file = 'env.ini'
+    except:
+        print('Possible Configuration Error')
     
 @pytest.mark.performance1
 def test_sample_selenium():

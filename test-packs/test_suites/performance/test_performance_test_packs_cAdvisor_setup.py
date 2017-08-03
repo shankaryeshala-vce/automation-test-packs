@@ -1,46 +1,36 @@
 #!/usr/bin/python
-
 # Author: SherryFeng
-
 # Revision: 2.0
-
 # Code Reviewed by:
-
 # Description: Configure cAdvisor container on Symphony ova vm for soaking test enviroment.
-
 
 import af_support_tools
 import pytest
 import time
-
 import paramiko
 
-
-try:
-
-    env_file = 'env.ini'
-
+@pytest.fixture(scope="module", autouse=True)
+def load_test_data():
+    try:
+        env_file = 'env.ini'
         # READ IN MACHINE INFO
+        global perf_hostname
+        perf_hostname = af_support_tools.get_config_file_property(config_file=env_file, heading='PBase_OS', property='hostname')
+        global perf_username
+        perf_username = af_support_tools.get_config_file_property(config_file=env_file, heading='PBase_OS', property='username')
+        global perf_password
+        perf_password = af_support_tools.get_config_file_property(config_file=env_file, heading='PBase_OS', property='password')
+        global symphony_hostname
+        symphony_hostname = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+        global symphony_username
+        symphony_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+        global symphony_password
+        symphony_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
+    except:
+        print('Possible configuration error')
 
-    perf_hostname = af_support_tools.get_config_file_property(config_file=env_file, heading='PBase_OS', property='hostname')
-
-    perf_username = af_support_tools.get_config_file_property(config_file=env_file, heading='PBase_OS', property='username')
-
-    perf_password = af_support_tools.get_config_file_property(config_file=env_file, heading='PBase_OS', property='password')
-
-    symphony_hostname = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-
-    symphony_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
-
-    symphony_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
-
-
-except:
-
-    print('Possible configuration error')
-
-
-port = 9820
+    global port
+    port = 9820
 
 
 #######################################################################################################################
@@ -134,7 +124,7 @@ def test_cAdvisor_Setup():
         print('cAdvisor configuration is already configured')
 
 
-  # Validate if cadvisor container is up
+    # Validate if cadvisor container is up
 
 
     my_return = af_support_tools.send_ssh_command(host=symphony_hostname, username=symphony_username, password=symphony_password,

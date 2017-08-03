@@ -25,6 +25,7 @@ def load_test_data():
 @pytest.mark.automation_test_packs
 @pytest.mark.taf_mvp
 @pytest.mark.taf_mvp_extended
+@pytest.mark.daily_status
 def test_sample_read_config_file_pass():
     """
     This sample test is designed to demonstrate a data driven test by reading properties from a configuration file.
