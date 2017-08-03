@@ -11,6 +11,11 @@ import af_support_tools
 
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
+    global fileList
+    fileList = []
+    global fileHash
+    fileHash = []
+
     global path
     path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/restLevelTests/rcmComplianceScan/'
     ensurePathExists(path)
@@ -50,8 +55,6 @@ def purgeOldOutput(dir, pattern):
             print("Old output files successfully deleted.")
         else:
             print('Unable to locate output files to remove.')
-
-
 
 
 def getSystemDefinition():

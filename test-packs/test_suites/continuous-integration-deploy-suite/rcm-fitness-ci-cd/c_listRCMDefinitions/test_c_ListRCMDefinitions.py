@@ -185,7 +185,7 @@ def resetTestQueues(testRequest, testResponse):
                                     ssl_enabled=False)
 
 
-print("Publishing listRCM request....")
+# print("Publishing listRCM request....")
 
 
 def insertListRequest(payLoad, requestFile, responseFile):
@@ -480,7 +480,7 @@ def verifyCorrectCorrelationID(requestFile, responseFile):
     print("All verification steps executed successfully.....")
 
 
-print (" [x] Sent JSON data to RabbitMQ......")
+# print (" [x] Sent JSON data to RabbitMQ......")
 
 
 @pytest.mark.rcm_fitness_mvp_extended

@@ -139,8 +139,6 @@ def test_coreamqptls(core_services, setup):
     assert not err
 
 
-@pytest.mark.skip(reason="Needs work")
-@pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_core_stop(core_services, setup):
     """
@@ -155,24 +153,30 @@ def test_core_stop(core_services, setup):
     err = []
 
     for service in core_services:
+        sendcommand = "docker ps --filter name=" + service + "  --format '{{.Status}}' | awk '{print $1}'"
+        my_return_status = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
+                                                             password=setup['password'],
+                                                             command=sendcommand, return_output=True)
+        if "Up" not in my_return_status:
+            err.append(service + " not running")
+        else:
 
-        cmd = "docker stop " + service
-        response = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
-                                                     password=setup['password'],
-                                                     command=cmd, return_output=False)
-        assert response == 0, 'docker stop did not execute correctly on ' + service
+            cmd = "docker stop " + service
+            response = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
+                                                         password=setup['password'],
+                                                         command=cmd, return_output=False)
 
-        cmd2 = "docker ps -a --filter name=" + service + "  --format '{{.Status}}' | awk '{print $1}'"
-        response2 = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
-                                                      password=setup['password'],
-                                                      command=cmd2, return_output=True)
-        if "Exited" not in response2:
-            err.append(service + " has not stopped or has been removed")
+            cmd2 = "docker ps -a --filter name=" + service + "  --format '{{.Status}}' | awk '{print $1}'"
+            response2 = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
+                                                          password=setup['password'],
+                                                          command=cmd2, return_output=True)
+            if "Exited" not in response2:
+                err.append(service + " has not stopped or has been removed")
 
     assert not err
 
 
-@pytest.mark.skip(reason="Needs work")
+@pytest.mark.core_services_mvp_extended
 def test_core_start(core_services, setup):
     """
             Title: Verify Core services containers can be restarted with docker stop/start
@@ -187,16 +191,21 @@ def test_core_start(core_services, setup):
 
     for service in core_services:
 
-        cmd4 = "docker start " + service
-        response = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
-                                                     password=setup['password'],
-                                                     command=cmd4, return_output=False)
-        assert response == 0, 'docker start did not execute correctly' + service
+        sendcommand = "docker ps -a --filter name=" + service + "  --format '{{.Status}}' | awk '{print $1}'"
+        my_return_status = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
+                                                             password=setup['password'],
+                                                             command=sendcommand, return_output=True)
+        if "Exited" in my_return_status:
 
-        cmd3 = "docker ps -a --filter name=" + service + "  --format '{{.Status}}' | awk '{print $1}'"
-        response3 = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
-                                                      password=setup['password'],
-                                                      command=cmd3, return_output=True)
+            cmd4 = "docker start " + service
+            response = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
+                                                         password=setup['password'],
+                                                         command=cmd4, return_output=False)
+
+            cmd3 = "docker ps -a --filter name=" + service + "  --format '{{.Status}}' | awk '{print $1}'"
+            response3 = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
+                                                          password=setup['password'],
+                                                          command=cmd3, return_output=True)
         if "Up" not in response3:
             err.append(service + " has not started or has been removed")
 

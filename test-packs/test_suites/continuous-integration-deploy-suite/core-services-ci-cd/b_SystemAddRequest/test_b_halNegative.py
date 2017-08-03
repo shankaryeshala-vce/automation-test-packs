@@ -10,23 +10,30 @@ import json
 import time
 import paramiko
 
-try:
+@pytest.fixture(scope="module", autouse=True)
+def load_test_data():
+    global payload_file
     payload_file = 'continuous-integration-deploy-suite/symphony-sds.ini'
+    global payload_header
     payload_header = 'payload'
+    global payload_property_hal_neg_invalid_json
     payload_property_hal_neg_invalid_json = 'invalid_json_hal'
+    global payload_property_hal_neg_invalid_msg_properties
     payload_property_hal_neg_invalid_msg_properties = 'invalid_msg_properties_hal'
+    global env_file
     env_file = 'env.ini'
+    global ipaddress
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
+    global cli_username
     cli_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
+    global cli_password
     cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
-
-except:
-    print('Possible configuration error')
-
-rmq_username = 'guest'
-rmq_password = 'guest'
-port = 5672
-
+    global rmq_username
+    rmq_username = 'guest'
+    global rmq_password
+    rmq_password = 'guest'
+    global port
+    port = 5672
 
 #######################################################################################################################
 

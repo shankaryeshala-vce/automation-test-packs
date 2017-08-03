@@ -1,7 +1,7 @@
-TEST_SUITE_NAME='Test Automation Framework MVP'
-REPORT_NAME='taf_mvp_test_suite_report'
+TEST_SUITE_NAME='Daily Status'
+REPORT_NAME='daily_status_report'
 SEARCH_PATH=$AF_TEST_SUITE_PATH/
-MARKER='taf_mvp'
+MARKER='daily_status'
 
 . $HOME/af_env.sh
 py3clean .
