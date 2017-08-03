@@ -365,7 +365,6 @@ def verify_SystemExists():
     assert return_json['messageProperties']['replyTo']
     assert return_json['messageProperties']['timestamp']
     assert return_json['convergedSystems']
-
     assert return_json['convergedSystems'][0]['uuid']
     assert not return_json['convergedSystems'][0]['groups']
     assert not return_json['convergedSystems'][0]['endpoints']
