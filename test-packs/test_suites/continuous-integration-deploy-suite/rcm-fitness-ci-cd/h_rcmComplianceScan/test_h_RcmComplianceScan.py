@@ -36,6 +36,10 @@ def load_test_data():
 
     getSystemDefinition()
 
+    global fileList
+    fileList = []
+    global fileHash
+    fileHash = []
 
 # path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuousDeployment/restLevelTests/rcmComplianceScan/'
 
@@ -276,23 +280,24 @@ def getAvailableRCMs(family, model, train, version, option, filename):
             assert data["rcmInventoryItems"][0]["systemProductFamily"] == family
             assert data["rcmInventoryItems"][0]["rcmTrain"] == train
             assert data["rcmInventoryItems"][0]["rcmVersion"] == version
-            assert (data["rcmInventoryItems"][0]["viewOption"] == option) or (
-            data["rcmInventoryItems"][0]["viewOption"] == optionAdd) or (
-                   data["rcmInventoryItems"][0]["viewOption"] == optionManu)
+
+            while numRCMs < len(data["rcmInventoryItems"]):
+                if data["rcmInventoryItems"][numRCMs]["viewOption"] == option:
+                    global rcmUUID
+                    rcmUUID = (data["rcmInventoryItems"][numRCMs]["uuid"])
+                    print("Requested rcmUUID: %s" % rcmUUID)
+                    print("Requested version: %s" % data["rcmInventoryItems"][numRCMs]["rcmVersion"])
+                    return
+                numRCMs += 1
+            numRCMs = 0
+
         else:
             combo = str(family + "/" + model + "/" + train + "/" + version)
             print("\nNo RCMs found for product/train/model combination: %s" % combo)
             print(data["message"])
             assert exception in data["message"], "No RCMs not returned for train:" + train
 
-    while numRCMs < len(data["rcmInventoryItems"]):
-        if data["rcmInventoryItems"][numRCMs]["viewOption"] == option:
-            global rcmUUID
-            rcmUUID = (data["rcmInventoryItems"][numRCMs]["uuid"])
-            print("Requested rcmUUID: %s" % rcmUUID)
-            print("Requested version: %s" % data["rcmInventoryItems"][0]["rcmVersion"])
-        numRCMs += 1
-    numRCMs = 0
+    assert False, "No RCMs returned for Train and Version specified."
 
 
 #    getRCMDefinition("Dell BIOS Firmware", path + "rcmRCMDefinitionDetails-VxRack.json")
@@ -335,7 +340,11 @@ def getRCMDefinition(component, filename, option):
 
                         print("\nComponent: %s" % data["rcmDefinition"]["rcmContents"][contentIndex]["component"])
                         print("Expected version: %s" % firmwareVersion)
+
+                        return
                     contentIndex += 1
+
+    assert False, "No RCM definition returned."
 
 
 def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, product, model, filename, sysUUID):
@@ -359,9 +368,7 @@ def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, 
         json.dump(response, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
     while numResults < len(response["rcmEvaluationResults"]):
-        if response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"]["product"] == product and \
-                        response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"]["component"] == component:
-            # identifier in response["rcmEvaluationResults"][numResults]["evaluatedVersionDatum"]["identity"]["identifier"]:
+        if identifier in response["rcmEvaluationResults"][numResults]["evaluatedVersionDatum"]["identity"]["identifier"] and response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"]["component"] == component:
             if response["rcmEvaluationResults"][numResults]["evaluatedVersionDatum"]["definition"]["model"] == model:
                 versionFound = (response["rcmEvaluationResults"][numResults]["actualValue"])
                 versionExpected = (response["rcmEvaluationResults"][numResults]["expectedValues"][0])
@@ -380,6 +387,7 @@ def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, 
                 assert modelFamily in response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"][
                     "systemModelFamily"]
                 assert vendor in response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"]["vendor"]
+                assert response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"]["product"] == product
 
                 if versionFound == versionExpected:
                     assert (response["rcmEvaluationResults"][numResults][
@@ -394,6 +402,7 @@ def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, 
                            response["rcmEvaluationResults"][numResults]["actualValue"]
                 print("Version found: %s" % versionFound)
                 print("Version expected: %s" % versionExpected)
+
                 assert response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"][
                            "component"] == component, "Unexpected component value returned."
                 if "versionFileName" in response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"]:
@@ -404,19 +413,12 @@ def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, 
                                "versionFileHash"] in fileHash, "No filename specified in definition."
                     print(response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"]["versionFileName"])
                     print(response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"]["versionFileHash"])
-                else:
-                    print("Expected filename not returned.")
-                    # continue
-                    #  numResults += 1
-            else:
-                print("Incorrect model family returned.")
-                # continue
-            numResults += 1
-        else:
-            assert instances != 0, "No Evaluation for this component"
-            print("Either product or identifier returned are not as expected.")
-            # continue
-        # numResults += 1
+
+                return
+
+        numResults += 1
+    assert False, "No Evaluation for this component"
+    print("Either product or identifier returned are not as expected.")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
@@ -475,7 +477,7 @@ def test_getRCMDefinition10():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval11():
-    getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "2P X520 Adapter", "VxRack", "FLEX", "DELL",
+    getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "Intel(R) Ethernet 10G 2P X520 Adapter", "VxRack", "FLEX", "DELL",
                      "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
@@ -486,7 +488,7 @@ def test_getRCMDefinition12():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval13():
-    getRCMEvaluation("Dell PERC H730P Firmware", "PERC H730P Mini", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD",
+    getRCMEvaluation("Dell PERC H730P Firmware", "PERC H730 Mini", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD",
                      path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
@@ -531,7 +533,7 @@ def test_getRCMDefinition20():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval21():
-    getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "4P X520/I350 rNDC", "VxRack", "FLEX", "DELL",
+    getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "Intel(R) Gigabit 4P X520/I350 rNDC", "VxRack", "FLEX", "DELL",
                      "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
@@ -542,7 +544,7 @@ def test_getRCMDefinition22():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval23():
-    getRCMEvaluation("Dell PERC H730P Firmware", "PERC H730P Mini", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD",
+    getRCMEvaluation("Dell PERC H730P Firmware", "PERC H730 Mini", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD",
                      path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
@@ -592,16 +594,16 @@ def test_getRCMDefinition31():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval132():
-    getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "2P X520 Adapter", "VxRack", "FLEX", "DELL",
+    getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "Intel(R) Ethernet 10G 2P X520 Adapter", "VxRack", "FLEX", "DELL",
                      "POWEREDGE", "R630", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition33():
-    getRCMDefinition("Dell PERC H730P Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ORIGINAL")
+    getRCMDefinition("Dell PERC HBA330 Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ORIGINAL")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval34():
-    getRCMEvaluation("Dell PERC H730P Firmware", "PERC H730P Mini", "VxRack", "FLEX", "DELL", "POWEREDGE", "R630",
+    getRCMEvaluation("Dell PERC HBA330 Firmware", "Dell HBA330 Mini", "VxRack", "FLEX", "DELL", "POWEREDGE", "R630",
                      path + "rcmEvaluationDetails-VxRack.json", systemUUID)

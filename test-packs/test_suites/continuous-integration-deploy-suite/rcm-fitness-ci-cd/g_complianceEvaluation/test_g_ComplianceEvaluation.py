@@ -84,7 +84,7 @@ def version():
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.parametrize(("type", "model", "identifier", "fileName"), [
     ("iDRAC", "630", "Integrated Remote Access Controller", "iDRAC"),
-    ("NIC", "630", "Intel(R) Gigabit 4P X520/I350 rNDC -", "Network"),
+    ("NIC", "630", "Intel(R) Ethernet 10G 4P X520/I350 rNDC -", "Network"),
     ("NIC", "630", "Intel(R) Ethernet 10G 2P X520 Adapter -", "Network"),
     ("BIOS", "630", "BIOS", "BIOS"),
     ("NonRAID", "630", "Dell HBA330 Mini", "Non-RAID"),
@@ -193,12 +193,13 @@ def test_post_eval(sys, rcmid, train, version, type, model, identifier, fileName
                     assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"] != "", "Unexpected fileHash returned."
                 if data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"] != "unknown":
                     assert len(data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"]) >  24, "Unexpected fileHash rturned."
+
+                return
             instances += 1
         # instances == 0
-
-        else:
-            assert instances != 0, "No Evaluation for this component"
-            print('Specified type not found:', type)
-
-
         results += 1
+
+    assert False, "No Evaluation for this component"
+    print('Specified type not found:', type)
+
+
