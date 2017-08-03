@@ -128,7 +128,7 @@ def test_SystemAdditionRequested():
 
 
     # Call the function to verify the generated credentials.addition.requested message is correct.
-    time.sleep(30)
+    time.sleep(60)
     verifyCSmessage()
 
     mess_count = af_support_tools.rmq_message_count(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password, queue='test.system.definition.event')
@@ -208,7 +208,7 @@ def test_HAL_CollectComponentVersion():
 
     print('\nTEST: CollectComponentVersions run: PASSED')
 
-    # cleanup()
+    cleanup()
 
 
 #######################################################################################################################
@@ -324,6 +324,9 @@ def verify_SystemExists():
     the_payload = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
                                                             property=payload_property_req)
 
+    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password, queue='test.system.list.found')
+    af_support_tools.rmq_purge_queue(host=ipaddress, port=port, rmq_username=rmq_username, rmq_password=rmq_password, queue='test.system.list.found')
+
     af_support_tools.rmq_publish_message(host=ipaddress,
                                          port=port, rmq_username=rmq_username, rmq_password=rmq_password,
                                          exchange='exchange.dell.cpsd.syds.system.definition.request',
@@ -350,12 +353,12 @@ def verify_SystemExists():
             cleanup()
             break
 
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, port=port,
+    return_message = af_support_tools.rmq_consume_all_messages(host=ipaddress, port=port,
                                                           rmq_username=rmq_username,
                                                           rmq_password=rmq_password,
                                                           queue='test.system.list.found')
 
-    return_json = json.loads(return_message, encoding='utf-8')
+    return_json = json.loads(return_message[0], encoding='utf-8')
 
     # Here we verify that a system is returned. Cannot be overly specific checking parameters as values will vary.
     assert return_json['messageProperties']['correlationId']
@@ -368,7 +371,7 @@ def verify_SystemExists():
     assert not return_json['convergedSystems'][0]['subSystems']
     assert not return_json['convergedSystems'][0]['components']
 
-    config = json.loads(return_message, encoding='utf-8')
+    config = json.loads(return_message[0], encoding='utf-8')
     my_systemUuid = config['convergedSystems'][0]['uuid']
     print('\nTEST: System Exists - System UUID: ', my_systemUuid)
 
