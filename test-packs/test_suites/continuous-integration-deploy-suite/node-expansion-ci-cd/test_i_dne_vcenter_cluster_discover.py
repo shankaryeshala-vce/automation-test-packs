@@ -20,6 +20,7 @@ import json
 import time
 import pytest
 import os
+import uuid
 
 
 #######################################################################################################################
@@ -105,6 +106,7 @@ def test_vcenter_discover_cluters():
     cleanup('test.vcenter.response')
     cleanup('test.endpoint.registration.event')
     cleanup('test.controlplane.vcenter.response')
+
     bindQueues('exchange.cpsd.controlplane.vcenter.response', 'test.vcenter.response')
     bindQueues('exchange.dell.cpsd.endpoint.registration.event', 'test.endpoint.registration.event')
     bindQueues('exchange.cpsd.controlplane.vcenter.response', 'test.controlplane.vcenter.response')
@@ -162,6 +164,22 @@ def test_vcenter_discover_cluters():
 
     print('\nSymphony RMQ Data matches Source data')
 
+
+    ################################################
+    print("\nValidate vcenter cluster with ESS:")
+    validated_clusters = applyESSRules(apiResponseData_json)
+    validedclusters = validated_clusters['validateClusterResponse']['clusters']
+    faliedclusters = validated_clusters['validateClusterResponse']['failedCluster']
+    validatedClusterCount = 0
+    for validatedCluster in validedclusters:
+        assert validatedCluster in actualvCenterClusterList, 'Error: valid cluster but unexpected'
+        print (cluster, 'Verified with Enginerring Standards')
+        validatedClusterCount += 1
+
+    assert validatedClusterCount == countNumOfClusters, "Not All cluster passed ESS rules"
+    assert len(faliedclusters) == 0, len(faliedclusters) + "Clusters failed ESS validation rules"
+
+    print('\nNumber of cluster falied ESS rules: '+len(faliedclusters) + " out of valid cluster: " + validatedClusterCount)
 
     cleanup('test.vcenter.response')
     cleanup('test.endpoint.registration.event')
@@ -230,6 +248,38 @@ def listvCenterClustersAPI():
         raise Exception(err)
 
     return the_response
+
+
+# This function apply ESS rules from
+def applyESSRules(clusters_json):
+    cleanup('test.ess.service.response')
+    bindQueues('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
+
+    print('\n Validate vcenter cluster request message:')
+    print('\n publishing vcenter cluster request message:')
+    ess_routing_key = 'ess.service.request.' + str(uuid.uuid4())
+    the_payload = clusters_json
+
+    af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                         rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+                                         exchange='exchange.dell.cpsd.service.ess.request',
+                                         routing_key=ess_routing_key,
+                                         headers={'__TypeId__': 'com.dell.cpsd.vcenter.validateClusterRequest'},
+                                         payload=the_payload,
+                                         payload_type='json',
+                                         ssl_enabled=cpsd.props.rmq_ssl_enabled)
+    cleanup('test.ess.service.response')
+    # Consume the published ess message and compare this also to the actual data
+    assert waitForMsg('test.ess.service.response'), 'ERROR: No response message received from ess queues'
+    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                                          rmq_username=cpsd.props.rmq_username,
+                                                          rmq_password=cpsd.props.rmq_password,
+                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                                          queue='test.ess.service.response', remove_message=False)
+    cluster_json = json.loads(return_message, encoding='utf-8')
+
+    print(json.dumps(cluster_json))
+    return cluster_json
 
 
 #######################################################################################################################
