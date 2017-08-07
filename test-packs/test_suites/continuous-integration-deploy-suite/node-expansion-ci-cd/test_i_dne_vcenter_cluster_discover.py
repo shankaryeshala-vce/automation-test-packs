@@ -167,7 +167,7 @@ def test_vcenter_discover_cluters():
 
     ################################################
     print("\nValidate vcenter cluster with ESS:")
-    validated_clusters = applyESSRules(apiResponseData_json)
+    validated_clusters = applyESSRules(return_json)
     validedclusters = validated_clusters['validateClusterResponse']['clusters']
     faliedclusters = validated_clusters['validateClusterResponse']['failedCluster']
 
@@ -252,14 +252,14 @@ def listvCenterClustersAPI():
 
 
 # This function apply ESS rules from
-def applyESSRules(clusters_json):
+def applyESSRules(return_json):
     cleanup('test.ess.service.response')
     bindQueues('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
     print('\n Validate vcenter cluster request message:')
     print('\n publishing vcenter cluster request message:')
     ess_routing_key = 'ess.service.request.' + str(uuid.uuid4())
-    the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"90015098-3cd2-3fb0-9696-3f7d28e17f74","replyTo":"test"},"discoverClusterResponseInfo":{"clusters":['+clusters_json+ '"]}}'
+    the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"90015098-3cd2-3fb0-9696-3f7d28e17f74","replyTo":"test"},"'+return_json+ '"}}'
     print(the_payload)
 
     af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
