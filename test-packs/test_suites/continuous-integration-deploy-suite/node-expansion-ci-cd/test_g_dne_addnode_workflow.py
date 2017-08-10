@@ -71,12 +71,13 @@ def load_test_data():
                                                                        heading=setup_config_header,
                                                                        property='idrac_factory_password')
 
+    global jsonfilepath
+    jsonfilepath = 'IDRAC.json'
 
 #####################################################################
 # These are the main tests.
 #####################################################################
 
-@pytest.mark.skip(reason='These requires a dedicated node to run on')
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_pre_test_verification():
     """
@@ -97,7 +98,6 @@ def test_pre_test_verification():
     time.sleep(3)
 
 
-@pytest.mark.skip(reason='These requires a dedicated node to run on')
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_nodes_GET_workflows():
     """
@@ -123,8 +123,15 @@ def test_nodes_GET_workflows():
         assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
         data = response.json()
 
+        global symphonyUuid
+        symphonyUuid = data[0]['symphonyUuid']
+
+        global node_id
+        node_id = data[0]['nodeId']
+
         assert data[0]['nodeStatus'] == 'DISCOVERED', 'Error: Node not in a discovered state'
 
+        print ('Node Discoverd ID: ',node_id)
         print('Valid /dne/nodes Response received')
         time.sleep(1)
 
@@ -136,7 +143,6 @@ def test_nodes_GET_workflows():
         raise Exception(err)
 
 
-@pytest.mark.skip(reason='These requires a dedicated node to run on')
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_nodes_request_workflows():
     """
@@ -149,7 +155,13 @@ def test_nodes_request_workflows():
     Returns         :       None
     """
 
-    # Step 2: Invoke POST /dne/nodes REST API to provission the node
+    #########################
+    #Prepare the request message body with valid details, SymphonyUUID & nodeID
+
+    assert update_addnode_params_json(), 'Error: Unable to update the POST message body'
+
+    #########################
+    # Step 3: Invoke POST /dne/nodes REST API to provission the node
     print('\nSend POST /dne/nodes REST API call to provision an unallocated node...\n')
 
     global nodes_workflow_id  # set this value as global as it will be used in the next test.
@@ -194,7 +206,7 @@ def test_nodes_request_workflows():
         raise Exception(err)
 
 
-@pytest.mark.skip(reason='These requires a dedicated node to run on')
+#@pytest.mark.skip(reason='These requires a dedicated node to run on')
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_nodes_status_workflow():
     """
@@ -212,8 +224,11 @@ def test_nodes_status_workflow():
     Parameters      :       none
     Returns         :       None
     """
-    # Step 3: Invoke /dne/nodes/{jobId} REST API call to get the status
-    print("\n\nSend GET /dne/nodes/<jobId> REST API call to get the addnodes job status...\n")
+
+
+    # Step 4: Invoke /dne/nodes/{jobId} REST API call to get the status
+    print('\n\n*******************************************************\n')
+    print("\nSend GET /dne/nodes/<jobId> REST API call to get the addnodes job status...\n")
 
     workflow_status = ''
     while workflow_status != 'SUCCEEDED':
@@ -229,13 +244,15 @@ def test_nodes_status_workflow():
             # If the process has failed immediately then fail the test outright
             assert data['status'] != 'FAILED', 'ERROR: The addnode workflow overall status = Failed'
 
-            ######################### Finding discovered Nodes
-            if data['workflowTasksResponseList'][0]['workFlowTaskName'] == 'Finding discovered Nodes':
-                assert data['workflowTasksResponseList'][0][
-                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Finding discovered Nodes" Failed'
 
+            ######################### Change Out of Band Management Credentials
+            if data['workflowTasksResponseList'][0]['workFlowTaskName'] == 'Change Out of Band Management Credentials':
+                assert data['workflowTasksResponseList'][0][
+                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Change Out of Band Management Credentials" Failed'
+
+                print('Step 2: Change Out of Band Management Credentials')
                 timeout = 0
-                while timeout < 100:
+                while timeout < 610:
                     # Get the latest state from the API
                     response = requests.get(url_body)
                     data = response.text
@@ -246,29 +263,33 @@ def test_nodes_status_workflow():
                         timeout += 1
                         # If the task is still in progress wait and then refresh the API data
 
+                    # Check that new credentials do allow user to log into server
                     if data['workflowTasksResponseList'][0]['workFlowTaskStatus'] == 'SUCCEEDED':
-                        assert data['workflowTasksResponseList'][0]['results'][
-                                   'nodeStatus'] == 'DISCOVERED', 'Error: Node not is a discovered state'
-                        print('Step 1: New node discoverd')
-                        print ('(Note: Task took', timeout, 'seconds to complete)\n')
+                        assert check_ssh(idrac_hostname, idrac_username,
+                                         idrac_common_password), 'ERROR: unable to log-in to iDrac'
+                        assert not check_ssh(idrac_hostname, idrac_username,
+                                             idrac_factory_password), 'ERROR: still able to log-in to iDrac with Factory Creds'
+                        print ('(Note: Task took', timeout, 'seconds to complete)')
+                        print('\n*******************************************************\n')
                         time.sleep(5)
                         break
-                        # Validate a SUCCEEDED message by checking the status on the node.
+                        # Validate a SUCCEEDED message by checking ssh connection to idrac at the end of the workflow with new password
 
                     if data['workflowTasksResponseList'][0]['workFlowTaskStatus'] == 'FAILED':
                         print ('(Note: Task took', timeout, 'seconds to fail)\n')
                         assert data['workflowTasksResponseList'][0][
-                                   'workFlowTaskStatus'] == 'FAILED', 'Error in Step 1: Failed to doscover a new node'
+                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step 2: Failed to change iDrac credentials'
                         # If the task has failed then fail the entire test.
 
 
-            ######################### Change Out of Band Management Credentials
-            if data['workflowTasksResponseList'][1]['workFlowTaskName'] == 'Change Out of Band Management Credentials':
+            ######################### Update System Definition
+            if data['workflowTasksResponseList'][1]['workFlowTaskName'] == 'Update System Definition':
                 assert data['workflowTasksResponseList'][1][
-                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Change Out of Band Management Credentials" Failed'
+                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Update System Definition" Failed'
 
+                print ('Step n-1: Update System Definition')
                 timeout = 0
-                while timeout < 610:
+                while timeout < 300:
                     # Get the latest state from the API
                     response = requests.get(url_body)
                     data = response.text
@@ -279,32 +300,29 @@ def test_nodes_status_workflow():
                         timeout += 1
                         # If the task is still in progress wait and then refresh the API data
 
-                    # Check that new credentials do allow user to log into server
+                    # Check something
                     if data['workflowTasksResponseList'][1]['workFlowTaskStatus'] == 'SUCCEEDED':
-                        assert check_ssh(idrac_hostname, idrac_username,
-                                         idrac_common_password), 'ERROR: unable to log-in to iDrac'
-                        assert not check_ssh(idrac_hostname, idrac_username,
-                                             idrac_factory_password), 'ERROR: still able to log-in to iDrac with Factory Creds'
-                        print ('Step2: Change Out of Band Management Credentials has Succeeded\n')
-                        print ('(Note: Task took', timeout, 'seconds to complete)\n')
-                        time.sleep(5)
+                        # TODO need to figure out how to test this
+                        print ('(Note: Task took', timeout, 'seconds to complete)')
+                        print('\n*******************************************************\n')
                         break
-                        # Validate a SUCCEEDED message by checking ssh connection to idrac at the end of the workflow with new password
+                        # Validate a SUCCEEDED message by checking something??
 
                     if data['workflowTasksResponseList'][1]['workFlowTaskStatus'] == 'FAILED':
                         print ('(Note: Task took', timeout, 'seconds to fail)\n')
                         assert data['workflowTasksResponseList'][1][
-                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step 2: Failed to change iDrac credentials'
+                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step n-1: Failed to update system defnition'
                         # If the task has failed then fail the entire test.
 
 
-            ######################### Update System Definition
-            if data['workflowTasksResponseList'][2]['workFlowTaskName'] == 'Update System Definition':
+            ######################### Notify Node Discovery To Update Status
+            if data['workflowTasksResponseList'][2]['workFlowTaskName'] == 'Notify Node Discovery To Update Status':
                 assert data['workflowTasksResponseList'][2][
-                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Update System Definition" Failed'
+                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Notify Node Discovery To Update Status" Failed'
 
+                print ('Step n: Notify Node Discovery To Update Status')
                 timeout = 0
-                while timeout < 300:
+                while timeout < 100:
                     # Get the latest state from the API
                     response = requests.get(url_body)
                     data = response.text
@@ -315,55 +333,26 @@ def test_nodes_status_workflow():
                         timeout += 1
                         # If the task is still in progress wait and then refresh the API data
 
-                    # Check something
+                    # Check the status of the node is now "ADDED" in GET /dne/nodes
                     if data['workflowTasksResponseList'][2]['workFlowTaskStatus'] == 'SUCCEEDED':
-                        # TODO need to figure out how to test this
-                        print ('Step n-1: Update System Definition has Succeeded\n')
-                        print ('(Note: Task took', timeout, 'seconds to complete)\n')
+                        endpoint2 = '/dne/nodes'
+                        url_body2 = protocol + ipaddress + dne_port + endpoint2
+                        response = requests.get(url_body2)
+                        data2 = response.text
+                        data2 = json.loads(data2, encoding='utf-8')
+
+                        for node in data2:
+                            if node['nodeId'] == node_id:
+                                assert node['nodeStatus'] == 'ADDED', 'Error in Step n: Node status has not been updated'
+                                print ('(Note: Task took', timeout, 'seconds to complete)')
+                                print('\n*******************************************************\n')
+                                break
+                                # Validate a SUCCEEDED message by checking the node state has changed to ADDED
                         break
-                        # Validate a SUCCEEDED message by checking something??
 
                     if data['workflowTasksResponseList'][2]['workFlowTaskStatus'] == 'FAILED':
                         print ('(Note: Task took', timeout, 'seconds to fail)\n')
                         assert data['workflowTasksResponseList'][2][
-                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step n-1: Failed to update system defnition'
-                        # If the task has failed then fail the entire test.
-
-
-            ######################### Notify Node Discovery To Update Status
-            if data['workflowTasksResponseList'][3]['workFlowTaskName'] == 'Notify Node Discovery To Update Status':
-                assert data['workflowTasksResponseList'][3][
-                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Notify Node Discovery To Update Status" Failed'
-
-                timeout = 0
-                while timeout < 100:
-                    # Get the latest state from the API
-                    response = requests.get(url_body)
-                    data = response.text
-                    data = json.loads(data, encoding='utf-8')
-
-                    if data['workflowTasksResponseList'][3]['workFlowTaskStatus'] == 'IN_PROGRESS':
-                        time.sleep(1)
-                        timeout += 1
-                        # If the task is still in progress wait and then refresh the API data
-
-                    # Check the status of the node is now "ADDED" in GET /dne/nodes
-                    if data['workflowTasksResponseList'][3]['workFlowTaskStatus'] == 'SUCCEEDED':
-                        endpoint = '/dne/nodes'
-                        url_body = protocol + ipaddress + dne_port + endpoint
-                        response = requests.get(url_body)
-                        data2 = response.text
-                        data2 = json.loads(data2, encoding='utf-8')
-
-                        assert data2[0]['nodeStatus'] == 'ADDED', 'Error in Step n: Node status has not been updated'
-                        print ('Step n: Node status has changed to "ADDED"\n')
-                        print ('(Note: Task took', timeout, 'seconds to complete)\n')
-                        break
-                        # Validate a SUCCEEDED message by checking the node state has changed to ADDED
-
-                    if data['workflowTasksResponseList'][3]['workFlowTaskStatus'] == 'FAILED':
-                        print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][3][
                                    'workFlowTaskStatus'] != 'FAILED', 'Error: failed to update system defnition'
                         # If the task has failed then fail the entire test.
 
@@ -404,3 +393,30 @@ def check_ssh(ip, usrname, passwd):
     except:
         print ("Unable to connect to " + ip + " using password: " + passwd)
         return False
+
+
+def update_addnode_params_json():
+    """
+    Description:    This method will update the json file with the symphonyUuid & nodeId values. Others wil be added as needed
+    Parameters:     None
+    Returns:        0 or 1 (Boolean)
+    """
+
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
+
+    if (os.path.isfile(filePath) == 0):
+        return 0
+
+    with open(filePath) as json_file:
+        data = json.load(json_file)
+    data['nodeId'] = node_id
+    data['symphonyUuid'] = symphonyUuid
+
+
+    with open(filePath,'w') as outfile:
+        json.dump(data,outfile)
+
+    print (data)
+
+    return 1
