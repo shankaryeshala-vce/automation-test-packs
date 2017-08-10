@@ -141,6 +141,7 @@ def test_vcenter_discover_cluters():
     ###################################################
     # Consume the published vcenter.cluster.discover.response message and compare this also to the actual data
     assert waitForMsg('test.vcenter.response'), 'ERROR: No responce message reveived listing clusters'
+
     return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                                           rmq_username=cpsd.props.rmq_username,
                                                           rmq_password=cpsd.props.rmq_password,ssl_enabled=cpsd.props.rmq_ssl_enabled,
@@ -164,10 +165,21 @@ def test_vcenter_discover_cluters():
 
     print('\nSymphony RMQ Data matches Source data')
 
+    cleanup('test.vcenter.response')
+    cleanup('test.endpoint.registration.event')
+    cleanup('test.controlplane.vcenter.response')
 
-    ################################################
-    # apply Engineering Standard rules to all discovered clusters
-    # This will return all - valid clusters and failed clusters
+
+################################################
+# Test case to apply ESS rules to all discovered clusters
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_ess_vcenter_rules():
+    actualvCenterClusterList = getRealVcenterInfo()
+    numOfClustersInList = len(actualvCenterClusterList)
+
+    return_message = readVcenterResponse()
+
     print("\nValidate vcenter cluster with ESS rules:")
     validated_clusters = applyESSRules(return_message)
     validedclusters = validated_clusters['clusters']
@@ -176,17 +188,36 @@ def test_vcenter_discover_cluters():
     validatedClusterCount = 0
     for validatedCluster in validedclusters:
         assert validatedCluster in actualvCenterClusterList, 'Error: valid cluster but unexpected'
-        print (cluster, '\nVerified with Enginerring Standards')
+        print (validatedCluster, '\nVerified with Enginerring Standards')
         validatedClusterCount += 1
 
     assert len(faliedclusters) == 0, len(faliedclusters) + "Clusters failed ESS validation rules"
-    assert validatedClusterCount == countNumOfClusters, "Not All cluster passed ESS rules"
+    assert validatedClusterCount == numOfClustersInList, "Not All cluster passed ESS rules"
 
     print('\nNumber of cluster falied ESS rules: '+ str(len(faliedclusters)) + " out of valid cluster: " + str(validatedClusterCount))
 
+
+# Read Vcenter response
+def readVcenterResponse():
     cleanup('test.vcenter.response')
-    cleanup('test.endpoint.registration.event')
-    cleanup('test.controlplane.vcenter.response')
+    bindQueues('exchange.cpsd.controlplane.vcenter.response', 'test.vcenter.response')
+    # Purge the queue to ensure the test response query is empty
+    af_support_tools.rmq_purge_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                     rmq_username=cpsd.props.rmq_username,
+                                     rmq_password=cpsd.props.rmq_password, ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                     queue='test.vcenter.response')
+    # /dne/clusters this triggers the VCenter Discover Cluster Message
+    listvCenterClustersAPI()
+    ###################################################
+    # Consume the published vcenter.cluster.discover.response message and compare this also to the actual data
+    assert waitForMsg('test.vcenter.response'), 'ERROR: No responce message reveived listing clusters'
+    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                                          rmq_username=cpsd.props.rmq_username,
+                                                          rmq_password=cpsd.props.rmq_password,
+                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                                          queue='test.vcenter.response', remove_message=False)
+    cleanup('test.vcenter.response')
+    return return_message
 
 
 #######################################################################################################################
@@ -253,7 +284,8 @@ def listvCenterClustersAPI():
     return the_response
 
 
-# This function apply ESS rules for clusters
+# apply Engineering Standard rules to all discovered clusters
+# This will return all - valid clusters and failed clusters
 def applyESSRules(return_message):
     cleanup('test.ess.service.response')
     bindQueues('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
