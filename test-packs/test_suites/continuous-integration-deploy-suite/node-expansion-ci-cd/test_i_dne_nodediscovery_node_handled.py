@@ -86,7 +86,7 @@ def load_test_data():
 #####################################################################
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_DellNodeExp():
+def test_dne_discovered_node_handled():
     """
     Title           :       Verify that dne/nodes API has disocvered Dell nodes
     Description     :       A dummy node discovered message is published to trigger the node discovery process
