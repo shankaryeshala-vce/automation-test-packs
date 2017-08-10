@@ -206,7 +206,6 @@ def test_nodes_request_workflows():
         raise Exception(err)
 
 
-#@pytest.mark.skip(reason='These requires a dedicated node to run on')
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_nodes_status_workflow():
     """
@@ -371,8 +370,219 @@ def test_nodes_status_workflow():
 
     print('\n=======================Add Node Work Flow Test Complete=======================\n')
 
+#####################################################################
+# These are Negative Tests tests.
+#####################################################################
+
+@pytest.mark.parametrize('endpoint', [('/dne/nodes/')])
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_GETjobid_using_invalid_jobid(endpoint):
+    """
+    Title           :       Verify the dne REST API handles invalid job-id's correctly
+    Description     :       Send a GET to /dne/nodes/{job-Id} with an invalid job-id.
+                            It will fail if :
+                                The returned error exposes  java NPE details
+    Parameters      :       none
+    Returns         :       None
+    """
+
+    print("\n======================= invalid jobId  Test Start =======================\n")
+
+    # Step 1: Invoke a REST API call with invalid jobId .
+    print("GET /dne/nodes/{job-Id} REST API call with invalid jobId\n")
+
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
+    with open(filePath) as fixture:
+        request_body = json.loads(fixture.read())
+
+    try:
+        invalid_job_id = "abcd-12345"
+        url_body = protocol + ipaddress + dne_port + endpoint + invalid_job_id
+        print(url_body)
+
+        response = requests.get(url_body, json=request_body, headers=headers)
+        # verify the status_code
+        assert response.status_code == 404 or response.status_code == 400, \
+            'Error: Did not get a 400-series error on ' + endpoint + '{invalid-job-Id}'
+        data = response.json()
+        print(data)
+
+        error_list = []
+
+        if not data['error']:
+            error_list.append(data['error'])
+
+        if 'exception' in data:
+            if 'java' in data['exception']:
+                error_list.append('\"java\" text should not be displayed')
+
+        if 'message' not in data:
+            error_list.append(data['message'])
+        else:
+            if 'java' in data['message']:
+                error_list.append('\"java\" text should not be displayed')
+
+        if not data['path'] :
+            error_list.append(data['path'])
+        else:
+            if not invalid_job_id in data['path']:
+                error_list.append('the invalid job id should be listed in the path field')
+
+        assert not error_list, 'Error: Issue found with ' + endpoint + '{invalid-jobId} Response'
+
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+    print('\n======================= invalid jobId Test End=======================\n')
+
+
+@pytest.mark.parametrize('endpoint', [('/dne/nodes/')])
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_GETjobid_using_valid_but_incorrect_jobid(endpoint):
+    """
+    Title           :       Verify the dne REST API handles valid, but incorrect, job-id's correctly
+    Description     :       Send a GET to /dne/nodes/{job-Id} with a preprocess job-id.
+                            It will fail if :
+                                The returned error exposes  java NPE details
+    Parameters      :       none
+    Returns         :       None
+    """
+
+    print("\n======================= valid jobId but incorrect Test Start =======================\n")
+
+    # Step 1: Invoke a REST API call with invalid jobId .
+    print("GET /dne/nodes/{job-Id} REST API call with an incorrect jobId\n")
+
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
+    with open(filePath) as fixture:
+        request_body = json.loads(fixture.read())
+
+    try:
+        jobId = '14cf9e3f-b651-4e14-8f35-e0c012cb0e9c'
+
+        url_body = protocol + ipaddress + dne_port + endpoint + jobId
+        print(url_body)
+
+        response = requests.get(url_body, json=request_body, headers=headers)
+        # verify the status_code
+        assert response.status_code == 400 or response.status_code == 404, \
+            'Error: Did not get a 400-series error ' + endpoint + '{incorrect-job-Id}'
+        data = response.json()
+        print(data)
+
+        error_list = []
+
+        if not data['error']:
+            error_list.append(data['error'])
+
+        if 'exception' in data:
+            if 'java' in data['exception']:
+                error_list.append('\"java\" text should not be displayed')
+
+        if 'message' not in data:
+            error_list.append(data['message'])
+        else:
+            if 'java' in data['message']:
+                error_list.append('\"java\" text should not be displayed')
+
+        if not data['path'] :
+            error_list.append(data['path'])
+        else:
+            if not jobId in data['path']:
+                error_list.append('the incorrect job id should be listed in the path field')
+
+        assert not error_list, 'Error: Issue found with ' + endpoint + '{incorrect-jobId} Response'
+
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+    print('\n======================= valid jobId but incorrect Test End=======================\n')
+
+
+@pytest.mark.parametrize('endpoint', [('/dne/nodes/step/')])
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_POSTstepname_using_invalid_stepName(endpoint):
+    """
+    Title           :       Verify the dne REST API handles invalid step-names correctly
+    Description     :       Send a POST to /dne/nodes/step/{stepName} with an invalid stepName
+                            It will fail if :
+                                The returned error exposes  java NPE details
+    Parameters      :       none
+    Returns         :       None
+    """
+
+    print("\n======================= invalid stepname Test Start =======================\n")
+
+    # Step 1: Invoke /dne/nodes/step/{stepName} REST API call with invalid step name .
+    print("POST /dne/../step/{step-id}} REST API call with invalid step name\n")
+
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
+    with open(filePath) as fixture:
+        request_body = json.loads(fixture.read())
+
+    try:
+        invalid_step_name = "invalidStep"
+        url_body = protocol + ipaddress + dne_port + endpoint + invalid_step_name
+        print(url_body)
+
+        response = requests.post(url_body, json=request_body, headers=headers)
+        # verify the status_code
+        assert response.status_code == 404 or response.status_code == 400, \
+            'Error: Did not get a 400-series on ' + endpoint +  '{invalid_step_name}'
+        data = response.json()
+        print(data)
+
+        error_list = []
+
+        if not data['error']:
+            error_list.append(data['error'])
+
+        if 'exception' in data :
+            if 'java' in data['exception']:
+                error_list.append('\"java\" text should not be displayed')
+
+        if 'message' not in data:
+            error_list.append(data['message'])
+        else:
+            if 'java' in data['message']:
+                error_list.append('\"java\" text should not be displayed')
+
+        if not data['path'] :
+            error_list.append(data['path'])
+        else :
+            if not invalid_step_name in data['path']:
+                error_list.append('the invalid step name should be listed in the path field')
+
+        assert not error_list, 'Error: Issue found with  ' + endpoint +  '{invalid-step-name} Response'
+
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+    print('\n======================= invalid stepname Test End=======================\n')
 
 #####################################################################
+
 def check_ssh(ip, usrname, passwd):
     """
     Title           : Check SSH connection to the idrac server node
