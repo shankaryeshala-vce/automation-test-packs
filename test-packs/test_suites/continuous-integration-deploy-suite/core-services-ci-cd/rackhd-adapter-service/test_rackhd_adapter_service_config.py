@@ -314,12 +314,13 @@ def test_rackHD_adapter_full_ListCapabilities():
     capabilities4 = 'rackhd-upgrade-firmware-dell-idrac'
     capabilities5 = 'node-discovered-event'
     capabilities6 = 'rackhd-install-esxi'
-    capabilities7 = 'rackhd-list-node-catalogs'
-    capabilities8 = 'rackhd-configure-idrac-network'
-    capabilities9 = 'rackhd-configure-boot-device-idrac'
-    capabilities10 = 'rackhd-set-node-obm-setting'
-    capabilities11 = 'rackhd-configure-bmc-settings'
-    capabilities12 = 'rackhd-set-idrac-credentials'
+    capabilities7 = 'rackhd-configure-raid-controller'
+    capabilities8 = 'rackhd-list-node-catalogs'
+    capabilities9 = 'rackhd-configure-idrac-network'
+    capabilities10 = 'rackhd-configure-boot-device-idrac'
+    capabilities11 = 'rackhd-set-node-obm-setting'
+    capabilities12 = 'rackhd-configure-bmc-settings'
+    capabilities13 = 'rackhd-set-idrac-credentials'
 
     error_list = []
 
@@ -349,6 +350,8 @@ def test_rackHD_adapter_full_ListCapabilities():
         error_list.append(capabilities11)
     if (capabilities12 not in return_message):
         error_list.append(capabilities12)
+    if (capabilities13 not in return_message):
+        error_list.append(capabilities13)
 
     assert not error_list, ('Missing some rackHD capabilities')
 

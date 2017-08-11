@@ -307,6 +307,7 @@ def test_vcenter_adapter_full_ListCapabilities():
     capabilities14 = 'vcenter-enablePCIpassthroughHost'
     capabilities15 = 'vcenter-addhostdvswitch'
     capabilities16 = 'vcenter-rename-datastore'
+    capabilities17= 'vcenter-list-components'
 
     error_list = []
 
@@ -344,6 +345,8 @@ def test_vcenter_adapter_full_ListCapabilities():
         error_list.append(capabilities15)
     if (capabilities16 not in return_message):
         error_list.append(capabilities16)
+    if (capabilities17 not in return_message):
+        error_list.append(capabilities17)
 
     assert not error_list, ('Missing some vcenter-adapter capabilities')
 
