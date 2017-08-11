@@ -84,7 +84,7 @@ def version():
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.parametrize(("type", "model", "identifier", "fileName"), [
     ("iDRAC", "630", "Integrated Remote Access Controller", "iDRAC"),
-    ("NIC", "630", "Intel(R) Ethernet 10G 4P X520/I350 rNDC -", "Network"),
+    ("NIC", "630", "Intel(R) Gigabit 4P X520/I350 rNDC -", "Network"),
     ("NIC", "630", "Intel(R) Ethernet 10G 2P X520 Adapter -", "Network"),
     ("BIOS", "630", "BIOS", "BIOS"),
     ("NonRAID", "630", "Dell HBA330 Mini", "Non-RAID"),
