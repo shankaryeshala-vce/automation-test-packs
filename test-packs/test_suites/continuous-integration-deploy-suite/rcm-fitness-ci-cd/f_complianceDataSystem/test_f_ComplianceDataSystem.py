@@ -227,7 +227,7 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
 
 # ("ESXi", "lab.vce.com", path + "rcmSystemDefinition-VxRack.json", path + "complianceDataSystemVCENTER.json", systemUUID)
 
-def getComplianceDataSystemSubComps(elementType, identifier, sysDefFilename, compDataFilename, sysUUID):
+def getComplianceDataSystemSubComps(model, elementType, identifier, sysDefFilename, compDataFilename, sysUUID):
     getSystemDefinition()
 
     url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID
@@ -264,7 +264,7 @@ def getComplianceDataSystemSubComps(elementType, identifier, sysDefFilename, com
             print("Extreme......")
             print(subIndex)
             print(identifier)
-            if identifier in compData["subComponents"][subIndex]["elementData"]["identifier"]:
+            if identifier in compData["subComponents"][subIndex]["elementData"]["identifier"] and model in compData["subComponents"][subIndex]["elementData"]["model"]:
                 print("Outside......")
                 while index < len(compData["devices"]):
                     print("Middle......")
@@ -382,35 +382,35 @@ def test_getComplianceDataSystem1():
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem2():
-    getComplianceDataSystemSubComps("NIC", "Ethernet 10G 2P", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("R730XD", "NIC", "Ethernet 10G 2P", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem3():
-    getComplianceDataSystemSubComps("NIC", "Ethernet 10G 4P", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("R730XD", "NIC", "Gigabit 4P", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem4():
-    getComplianceDataSystemSubComps("BIOS", "BIOS", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("R730XD", "BIOS", "BIOS", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem5():
-    getComplianceDataSystemSubComps("iDRAC", "Remote Access", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("R730XD", "iDRAC", "Remote Access", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem6():
-    getComplianceDataSystemSubComps("RAID", "PERC H730", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("R730XD", "RAID", "PERC H730", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
 
@@ -422,31 +422,31 @@ def test_getComplianceDataSystem7():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem8():
-    getComplianceDataSystemSubComps("NIC", "Ethernet 10G 2P", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("R630", "NIC", "Ethernet 10G 2P", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem9():
-    getComplianceDataSystemSubComps("NIC", "Ethernet 10G 4P", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("R630", "NIC", "Gigabit 4P", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem10():
-    getComplianceDataSystemSubComps("BIOS", "BIOS", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("R630", "BIOS", "BIOS", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem11():
-    getComplianceDataSystemSubComps("iDRAC", "Remote Access", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("R630", "iDRAC", "Remote Access", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem12():
-    getComplianceDataSystemSubComps("RAID", "PERC H730", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("R630", "NonRAID", "Dell HBA330", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
 
@@ -465,7 +465,7 @@ def test_getComplianceDataSystem14():
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem15():
-    getComplianceDataSystemSubComps("ESXI", "lab.vce.com", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("VCENTER-WINDOWS", "ESXI", "lab.vce.com", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemVCENTER.json", systemUUID)
 
 
