@@ -229,7 +229,7 @@ def test_preprocess_step_workflow(stepName):
 #####################################################################
 # These are Negative Tests tests.
 #####################################################################
-@pytest.mark.parametrize('endpoint', [('/dne/nodes/'), ('/dne/preprocess/')])
+@pytest.mark.parametrize('endpoint', [('/dne/preprocess/')])
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_GETjobid_using_invalid_jobid(endpoint):
@@ -299,10 +299,10 @@ def test_GETjobid_using_invalid_jobid(endpoint):
     print('\n======================= invalid jobId Test End=======================\n')
 
 
-@pytest.mark.parametrize('endpoint', [('/dne/nodes/'), ('/dne/preprocess/')])
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
-def test_GETjobid_using_valid_but_incorrect_jobid(endpoint):
+@pytest.mark.parametrize('endpoint', [('/dne/preprocess/')])
+#@pytest.mark.dne_paqx_parent_mvp
+#@pytest.mark.dne_paqx_parent_mvp_extended
+def xtest_GETjobid_using_valid_but_incorrect_jobid(endpoint):
     """
     Title           :       Verify the dne REST API handles valid, but incorrect, job-id's correctly
     Description     :       Send a GET to /dne/nodes/{job-Id} with a preprocess job-id.
@@ -324,12 +324,12 @@ def test_GETjobid_using_valid_but_incorrect_jobid(endpoint):
         request_body = json.loads(fixture.read())
 
     try:
-        if 'node' in endpoint :
-            jobId = preprocess_workflow_id
-        else:
-            jobId = nodes_workflow_id
+        # if 'node' in endpoint :
+        #     jobId = preprocess_workflow_id
+        # #else:
+        #     #jobId = nodes_workflow_id
 
-        url_body = protocol + ipaddress + dne_port + endpoint + jobId
+        url_body = protocol + ipaddress + dne_port + endpoint + preprocess_workflow_id
         print(url_body)
 
         response = requests.get(url_body, json=request_body, headers=headers)
@@ -373,7 +373,7 @@ def test_GETjobid_using_valid_but_incorrect_jobid(endpoint):
     print('\n======================= valid jobId but incorrect Test End=======================\n')
 
 
-@pytest.mark.parametrize('endpoint', [('/dne/nodes/step/'), ('/dne/preprocess/step/')])
+@pytest.mark.parametrize('endpoint', [('/dne/preprocess/step/')])
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_POSTstepname_using_invalid_stepName(endpoint):
