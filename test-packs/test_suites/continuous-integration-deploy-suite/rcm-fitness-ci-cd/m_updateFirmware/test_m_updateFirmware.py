@@ -883,44 +883,44 @@ def verifyRESTupdateResponse(filename):
 
 
 
-#@pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_updateFWRequest():
     updateFWRequest(message_update, "out_updateRequest.json", "out_requestCreds.json", "out_responseCreds.json", "out_updateResponse.json", "out_systemDefReq.json", "out_systemDefResp.json")
 
-#@pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_verifyPublishedAttributes():
     verifyPublishedAttributes("out_updateRequest.json")
 
-#@pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_verifyConsumedAttributes():
     verifyConsumedAttributes("out_updateRequest.json", "out_updateResponse.json")
 
-#@pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_verifySystemDefRequest():
     verifySystemDefRequest("out_systemDefReq.json", "VXRACKFLEX")
 
 
-#@pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_verifySystemDefResponse():
     verifySystemDefResponse("out_systemDefResp.json", "VXRACKFLEX")
 
-#@pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_verifyCredentialRequest():
     verifyCredentialRequest("out_updateRequest.json", "out_requestCreds.json", "RACKHD")
 
-#@pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_verifyCredentialResponse():
     verifyCredentialResponse("out_updateRequest.json", "out_requestCreds.json", "out_responseCreds.json", "RACKHD")
 
-#@pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_verifyCorrelationIDs():
     verifyCorrelationIDs()
 
