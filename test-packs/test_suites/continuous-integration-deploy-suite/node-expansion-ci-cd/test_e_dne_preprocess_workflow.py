@@ -2,7 +2,7 @@
 # Author:
 # Revision: 1.0
 # Code Reviewed by:
-# Description:
+# Description: This test should only be run once a day.
 #
 # Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
 # Dell EMC Confidential/Proprietary Information
