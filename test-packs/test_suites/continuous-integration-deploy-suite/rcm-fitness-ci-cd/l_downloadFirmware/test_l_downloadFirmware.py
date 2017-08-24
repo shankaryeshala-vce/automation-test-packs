@@ -1018,13 +1018,11 @@ def test_downloadFWFileRequest():
 def test_verifyPublishedAttributes():
     verifyPublishedAttributes(path + 'downloadFWRequest.json')
 
-
 #@pytest.mark.rcm_fitness_mvp_extended
 #@pytest.mark.rcm_fitness_mvp
 def test_verifyConsumedAttributes():
     verifyConsumedAttributes("BIOS_PFWCY_WN64_2.2.5.EXE", path + 'downloadFWRequest.json', path + 'downloadFWCredentials.json',
                              path + 'downloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
-
 
 #@pytest.mark.rcm_fitness_mvp_extended
 #@pytest.mark.rcm_fitness_mvp
