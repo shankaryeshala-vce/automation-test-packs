@@ -911,6 +911,7 @@ def profileESRSResponseTimes(payLoad):
 
         timeDelta = (t2 - t1).total_seconds()
         print(timeDelta)
+        assert timeDelta < 5, "Significant delay in response from ESRS."
         listDelta.append(timeDelta)
         averageDelta = sum(listDelta[0:(len(listDelta)-1)])/(len(listDelta))
         count += 1
@@ -925,8 +926,6 @@ def profileESRSResponseTimes(payLoad):
             print("Average delta: %0.3f" % averageDelta)
         else:
             continue
-
-        assert timeDelta < 5, "Significant delay in response from ESRS."
 
         return
     assert False, "No messages published to profile."
@@ -963,7 +962,7 @@ def test_downloadFWFileRequestInvalid4():
     downloadFWFileRequestInvalid(messageInvalidAll, 'invalidAllFWRequest.json', 'invalidAllFWCredentials.json',
                                  'invalidAllFWResponse.json')
 
-#
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes4():
     verifyConsumedAttributesInvalid(path + 'invalidAllFWRequest.json', path + 'invalidAllFWCredentials.json',
                                     path + 'invalidAllFWResponse.json', "SHA-256", "VCEVision")
@@ -973,7 +972,7 @@ def test_downloadFWFileRequestInvalid5():
     downloadFWFileRequestInvalid(messageNoFile, 'noFileFWRequest.json', 'noFileFWCredentials.json',
                                  'noFileFWResponse.json')
 
-
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes5():
     verifyConsumedAttributesInvalid(path + 'noFileFWRequest.json', path + 'noFileFWCredentials.json',
                                     path + 'noFileFWResponse.json', "SHA-256", "VCEVision")
@@ -993,6 +992,7 @@ def test_downloadFWFileRequestInvalid8():
     downloadFWFileRequestInvalid(messageNoAll, 'noAllFWRequest.json', 'noAllFWCredentials.json',
                                  'noAllFWResponse.json')
 
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes8():
     verifyConsumedAttributesInvalid(path + 'noAllFWRequest.json', path + 'noAllFWCredentials.json',
                                     path + 'noAllFWResponse.json', "SHA-256", "VCEVision")
@@ -1002,7 +1002,7 @@ def test_verifyConsumedAttributes8():
 # #     verifyConsumedAttributesInvalid(path + 'noSwidFWRequest.json', path + 'noSwidFWCredentials.json',
 # #                                     path + 'noSwidFWResponse.json', "SHA-256", "VCEVision")
 # #
-
+#@pytest.mark.rcm_fitness_mvp_extended
 def test_profileESRSResponseTimes():
     profileESRSResponseTimes(message)
 
