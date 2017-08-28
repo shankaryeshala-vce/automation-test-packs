@@ -1,9 +1,4 @@
 {
-  "esxiKernelIpAddress1": "string",
-  "esxiKernelIpAddress2": "string",
-  "idracIpAddress": "string",
-  "managementIpAddress": "string",
-  "scaleIOSVMDataIpAddress1": "string",
-  "scaleIOSVMDataIpAddress2": "string",
-  "scaleIOSVMManagementIpAddress": "string"
+  "nodeId": "string",
+  "symphonyUuid": "string"
 }
