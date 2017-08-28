@@ -172,19 +172,19 @@ def test_pre_test_verification():
 
     print (New_Node)
 
-    ####################
-    # Export the current bios configuration of the node to a temporary file and store the DNE relevant attributes
-    # These will be used as comparison later
-    response = get_BIOS_settings(Current_Node)
-    assert response.status_code == 200, 'Error, pre-test BIOS Configuration export failed '
-    time.sleep(60)
-    # 'HddSeq' is one of the attributes that will be changed during the 'Configure Boot Device Idrac' step.
-    # Here we record it's initial value when exported.
-    initial_HddSeq_value = get_exported_bios_setting('HddSeq')
-    initial_BiosBootSeq_value = get_exported_bios_setting('BiosBootSeq')
-    print('initial_HddSeq_value', initial_HddSeq_value)
-    print('initial_BiosBootSeq_value', initial_BiosBootSeq_value)
-    ####################
+    # ####################
+    # # Export the current bios configuration of the node to a temporary file and store the DNE relevant attributes
+    # # These will be used as comparison later
+    # response = get_BIOS_settings(Current_Node)
+    # assert response.status_code == 200, 'Error, pre-test BIOS Configuration export failed '
+    # time.sleep(60)
+    # # 'HddSeq' is one of the attributes that will be changed during the 'Configure Boot Device Idrac' step.
+    # # Here we record it's initial value when exported.
+    # initial_HddSeq_value = get_exported_bios_setting('HddSeq')
+    # initial_BiosBootSeq_value = get_exported_bios_setting('BiosBootSeq')
+    # print('initial_HddSeq_value', initial_HddSeq_value)
+    # print('initial_BiosBootSeq_value', initial_BiosBootSeq_value)
+    # ####################
 
 
 @pytest.mark.dne_paqx_parent_mvp_extended
@@ -248,7 +248,7 @@ def test_preporcess_POST_workflow():
         raise Exception(err)
 
 
-@pytest.mark.skip(reason="Test not ready")
+#@pytest.mark.skip(reason="Test not ready")
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_preprocess_GET_workflow_status():
     """
@@ -280,17 +280,46 @@ def test_preprocess_GET_workflow_status():
             assert data['status'] != 'FAILED', 'ERROR: The preprocess workflow overall status = Failed'
 
             workflow_step1 = 'Finding discovered Nodes'
+            json_number_step1 = 0
+            verify_function_step1 = ''
+
             workflow_step2 = 'List ScaleIO Components'
+            json_number_step2 = 1
+            verify_function_step2 = ''
+
             workflow_step3 = 'List VCenter Components'
+            json_number_step3 = 2
+            verify_function_step3 = ''
+
+            # Disabled
             workflow_step4 = 'Discover ScaleIO'
+            json_number_step4 = 3
+            verify_function_step4 = ''
+
             workflow_step5 = 'Discover VCenter'
+            json_number_step5 = 3
+            verify_function_step5 = ''
+
             workflow_step6 = 'Configuring Out of Band Management'
-            workflow_step7 = 'Configure Boot Device Idrac'
-            workflow_step8 = 'Find vcluster'
+            json_number_step6 = 4
+            verify_function_step6 = ''
+
+            workflow_step7 = 'Ping iDRAC IP Address'
+            json_number_step7 = 5
+            verify_function_step7 = ''
+
+            #Disabled
+            workflow_step8 = 'Configure Boot Device Idrac'
+            json_number_step8 = 6
+            verify_function_step8 = ''
+
+            workflow_step9 = 'Find vcluster'
+            json_number_step9 = 6
+            verify_function_step9 = ''
 
             ######################### First task : Finding Discovered Nodes
-            if data['workflowTasksResponseList'][0]['workFlowTaskName'] == workflow_step1:
-                assert data['workflowTasksResponseList'][0][
+            if data['workflowTasksResponseList'][json_number_step1]['workFlowTaskName'] == workflow_step1:
+                assert data['workflowTasksResponseList'][json_number_step1][
                            'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow Failed: "' + workflow_step1
 
                 print(workflow_step1)
@@ -300,14 +329,14 @@ def test_preprocess_GET_workflow_status():
                     # Get the latest state of the workflow from the API
                     data = get_latest_api_response(url_body)
 
-                    if data['workflowTasksResponseList'][0]['workFlowTaskStatus'] == 'IN_PROGRESS':
+                    if data['workflowTasksResponseList'][json_number_step1]['workFlowTaskStatus'] == 'IN_PROGRESS':
                         time.sleep(1)
                         timeout += 1
                         # If the task is still in progress wait and then refresh the API data
 
-                    if data['workflowTasksResponseList'][0]['workFlowTaskStatus'] == 'SUCCEEDED':
+                    if data['workflowTasksResponseList'][json_number_step1]['workFlowTaskStatus'] == 'SUCCEEDED':
                         # Call a function to verify this step actually did something. IE node is in the DISCOVERED state
-                        assert check_step1_findNode(data, 0), 'Check on ' + workflow_step1 + ' failed'
+                        assert check_step1_findNode(data, json_number_step1), 'Check on ' + workflow_step1 + ' failed'
 
                         print(workflow_step1 + ' successful. (Note: Task took', timeout, 'seconds to complete)')
                         print('\n*******************************************************\n')
@@ -315,15 +344,15 @@ def test_preprocess_GET_workflow_status():
                         time.sleep(2)
                         break
 
-                    if data['workflowTasksResponseList'][0]['workFlowTaskStatus'] == 'FAILED':
+                    if data['workflowTasksResponseList'][json_number_step1]['workFlowTaskStatus'] == 'FAILED':
                         print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][0][
+                        assert data['workflowTasksResponseList'][json_number_step1][
                                    'workFlowTaskStatus'] != 'FAILED', 'Error in Step 1: ' + workflow_step1 + ' failed'
                         # If the task has failed then fail the entire test.
 
             ######################### Second  task : List ScaleIO Components
-            if data['workflowTasksResponseList'][1]['workFlowTaskName'] == workflow_step2:
-                assert data['workflowTasksResponseList'][1][
+            if data['workflowTasksResponseList'][json_number_step2]['workFlowTaskName'] == workflow_step2:
+                assert data['workflowTasksResponseList'][json_number_step2][
                            'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow Failed: "' + workflow_step2
 
                 print(workflow_step2)
@@ -333,13 +362,13 @@ def test_preprocess_GET_workflow_status():
                     # Get the latest state from the API
                     data = get_latest_api_response(url_body)
 
-                    if data['workflowTasksResponseList'][1]['workFlowTaskStatus'] == 'IN_PROGRESS':
+                    if data['workflowTasksResponseList'][json_number_step2]['workFlowTaskStatus'] == 'IN_PROGRESS':
                         time.sleep(1)
                         timeout += 1
                         # If the task is still in progress wait and then refresh the API data
 
                     # Check ...
-                    if data['workflowTasksResponseList'][1]['workFlowTaskStatus'] == 'SUCCEEDED':
+                    if data['workflowTasksResponseList'][json_number_step2]['workFlowTaskStatus'] == 'SUCCEEDED':
                         # Call a function to verify this step actually did something.
                         # TODO create this function
 
@@ -350,15 +379,15 @@ def test_preprocess_GET_workflow_status():
                         break
                         # Validate a SUCCEEDED message by ...
 
-                    if data['workflowTasksResponseList'][1]['workFlowTaskStatus'] == 'FAILED':
+                    if data['workflowTasksResponseList'][json_number_step2]['workFlowTaskStatus'] == 'FAILED':
                         print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][1][
+                        assert data['workflowTasksResponseList'][json_number_step2][
                                    'workFlowTaskStatus'] != 'FAILED', 'Error in Step 2: ' + workflow_step1 + ' failed'
                         # If the task has failed then fail the entire test.
 
             ######################### Third  task : List VCenter Components
-            if data['workflowTasksResponseList'][2]['workFlowTaskName'] == workflow_step3:
-                assert data['workflowTasksResponseList'][2][
+            if data['workflowTasksResponseList'][json_number_step3]['workFlowTaskName'] == workflow_step3:
+                assert data['workflowTasksResponseList'][json_number_step3][
                            'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow Failed: "' + workflow_step3
 
                 print(workflow_step3)
@@ -368,13 +397,13 @@ def test_preprocess_GET_workflow_status():
                     # Get the latest state from the API
                     data = get_latest_api_response(url_body)
 
-                    if data['workflowTasksResponseList'][2]['workFlowTaskStatus'] == 'IN_PROGRESS':
+                    if data['workflowTasksResponseList'][json_number_step3]['workFlowTaskStatus'] == 'IN_PROGRESS':
                         time.sleep(1)
                         timeout += 1
                         # If the task is still in progress wait and then refresh the API data
 
                     # Check ...
-                    if data['workflowTasksResponseList'][2]['workFlowTaskStatus'] == 'SUCCEEDED':
+                    if data['workflowTasksResponseList'][json_number_step3]['workFlowTaskStatus'] == 'SUCCEEDED':
                         # Call a function to verify this step actually did something.
                         # TODO create this function
 
@@ -385,50 +414,50 @@ def test_preprocess_GET_workflow_status():
                         break
                         # Validate a SUCCEEDED message by ...
 
-                    if data['workflowTasksResponseList'][2]['workFlowTaskStatus'] == 'FAILED':
+                    if data['workflowTasksResponseList'][json_number_step3]['workFlowTaskStatus'] == 'FAILED':
                         print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][2][
+                        assert data['workflowTasksResponseList'][json_number_step3][
                                    'workFlowTaskStatus'] != 'FAILED', 'Error in Step 3: ' + workflow_step3 + ' failed'
                         # If the task has failed then fail the entire test.
 
-            ######################### Forth task : Discover ScaleIO
-            if data['workflowTasksResponseList'][3]['workFlowTaskName'] == workflow_step4:
-                assert data['workflowTasksResponseList'][3][
-                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow Failed: "' + workflow_step4
-
-                print(workflow_step4)
-                timeout = 0
-                while timeout < 610:
-
-                    # Get the latest state from the API
-                    data = get_latest_api_response(url_body)
-
-                    if data['workflowTasksResponseList'][3]['workFlowTaskStatus'] == 'IN_PROGRESS':
-                        time.sleep(1)
-                        timeout += 1
-                        # If the task is still in progress wait and then refresh the API data
-
-                    # Check ...
-                    if data['workflowTasksResponseList'][3]['workFlowTaskStatus'] == 'SUCCEEDED':
-                        # Call a function to verify this step actually did something.
-                        # TODO create this function
-
-                        print(workflow_step4 + ' successful. (Note: Task took', timeout, 'seconds to complete)')
-                        print('\n*******************************************************\n')
-
-                        time.sleep(2)
-                        break
-                        # Validate a SUCCEEDED message by ...
-
-                    if data['workflowTasksResponseList'][3]['workFlowTaskStatus'] == 'FAILED':
-                        print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][3][
-                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step : ' + workflow_step4 + ' failed'
-                        # If the task has failed then fail the entire test.
+            # ######################### Forth task : Discover ScaleIO
+            # if data['workflowTasksResponseList'][json_number_step4]['workFlowTaskName'] == workflow_step4:
+            #     assert data['workflowTasksResponseList'][json_number_step4][
+            #                'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow Failed: "' + workflow_step4
+            #
+            #     print(workflow_step4)
+            #     timeout = 0
+            #     while timeout < 610:
+            #
+            #         # Get the latest state from the API
+            #         data = get_latest_api_response(url_body)
+            #
+            #         if data['workflowTasksResponseList'][json_number_step4]['workFlowTaskStatus'] == 'IN_PROGRESS':
+            #             time.sleep(1)
+            #             timeout += 1
+            #             # If the task is still in progress wait and then refresh the API data
+            #
+            #         # Check ...
+            #         if data['workflowTasksResponseList'][json_number_step4]['workFlowTaskStatus'] == 'SUCCEEDED':
+            #             # Call a function to verify this step actually did something.
+            #             # TODO create this function
+            #
+            #             print(workflow_step4 + ' successful. (Note: Task took', timeout, 'seconds to complete)')
+            #             print('\n*******************************************************\n')
+            #
+            #             time.sleep(2)
+            #             break
+            #             # Validate a SUCCEEDED message by ...
+            #
+            #         if data['workflowTasksResponseList'][json_number_step4]['workFlowTaskStatus'] == 'FAILED':
+            #             print ('(Note: Task took', timeout, 'seconds to fail)\n')
+            #             assert data['workflowTasksResponseList'][json_number_step4][
+            #                        'workFlowTaskStatus'] != 'FAILED', 'Error in Step : ' + workflow_step4 + ' failed'
+            #             # If the task has failed then fail the entire test.
 
             ######################### Fifth task : Discover VCenter
-            if data['workflowTasksResponseList'][4]['workFlowTaskName'] == workflow_step5:
-                assert data['workflowTasksResponseList'][4][
+            if data['workflowTasksResponseList'][json_number_step5]['workFlowTaskName'] == workflow_step5:
+                assert data['workflowTasksResponseList'][json_number_step5][
                            'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow Failed: "' + workflow_step5
 
                 print(workflow_step5)
@@ -438,13 +467,13 @@ def test_preprocess_GET_workflow_status():
                     # Get the latest state from the API
                     data = get_latest_api_response(url_body)
 
-                    if data['workflowTasksResponseList'][4]['workFlowTaskStatus'] == 'IN_PROGRESS':
+                    if data['workflowTasksResponseList'][json_number_step5]['workFlowTaskStatus'] == 'IN_PROGRESS':
                         time.sleep(1)
                         timeout += 1
                         # If the task is still in progress wait and then refresh the API data
 
                     # Check ...
-                    if data['workflowTasksResponseList'][4]['workFlowTaskStatus'] == 'SUCCEEDED':
+                    if data['workflowTasksResponseList'][json_number_step5]['workFlowTaskStatus'] == 'SUCCEEDED':
                         # Call a function to verify this step actually did something.
                         # TODO create this function
 
@@ -455,15 +484,15 @@ def test_preprocess_GET_workflow_status():
                         break
                         # Validate a SUCCEEDED message by ...
 
-                    if data['workflowTasksResponseList'][4]['workFlowTaskStatus'] == 'FAILED':
+                    if data['workflowTasksResponseList'][json_number_step5]['workFlowTaskStatus'] == 'FAILED':
                         print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][4][
+                        assert data['workflowTasksResponseList'][json_number_step5][
                                    'workFlowTaskStatus'] != 'FAILED', 'Error in Step 5: ' + workflow_step5 + ' failed'
                         # If the task has failed then fail the entire test.
 
             ######################### Sixth task : Configuring Out of Band Management
-            if data['workflowTasksResponseList'][5]['workFlowTaskName'] == workflow_step6:
-                assert data['workflowTasksResponseList'][5][
+            if data['workflowTasksResponseList'][json_number_step6]['workFlowTaskName'] == workflow_step6:
+                assert data['workflowTasksResponseList'][json_number_step6][
                            'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow Failed: "' + workflow_step6
 
                 print(workflow_step6)
@@ -473,15 +502,16 @@ def test_preprocess_GET_workflow_status():
                     # Get the latest state from the API
                     data = get_latest_api_response(url_body)
 
-                    if data['workflowTasksResponseList'][5]['workFlowTaskStatus'] == 'IN_PROGRESS':
+                    if data['workflowTasksResponseList'][json_number_step6]['workFlowTaskStatus'] == 'IN_PROGRESS':
                         time.sleep(1)
                         timeout += 1
                         # If the task is still in progress wait and then refresh the API data
 
                     # Check ...
-                    if data['workflowTasksResponseList'][5]['workFlowTaskStatus'] == 'SUCCEEDED':
+                    if data['workflowTasksResponseList'][json_number_step6]['workFlowTaskStatus'] == 'SUCCEEDED':
                         # Call a function to verify this step actually did something. IE Verify IP change
-                        assert check_step6_oobmIP(New_Node), 'Check on ' + workflow_step6 + ' failed'
+                        #assert check_step6_oobmIP(New_Node), 'Check on ' + workflow_step6 + ' failed'
+                        assert check_step6_IPchange(data)
 
                         print(workflow_step6 + ' successful. (Note: Task took', timeout, 'seconds to complete)')
                         print('\n*******************************************************\n')
@@ -490,15 +520,15 @@ def test_preprocess_GET_workflow_status():
                         break
                         # Validate a SUCCEEDED message by ...
 
-                    if data['workflowTasksResponseList'][5]['workFlowTaskStatus'] == 'FAILED':
+                    if data['workflowTasksResponseList'][json_number_step6]['workFlowTaskStatus'] == 'FAILED':
                         print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][5][
+                        assert data['workflowTasksResponseList'][json_number_step6][
                                    'workFlowTaskStatus'] != 'FAILED', 'Error in Step 6: ' + workflow_step6 + ' failed'
                         # If the task has failed then fail the entire test.
 
-            ######################### Seventh task : Configure Boot Device Idrac
-            if data['workflowTasksResponseList'][6]['workFlowTaskName'] == workflow_step7:
-                assert data['workflowTasksResponseList'][6][
+            ######################### Seventh task : Ping iDRAC IP Address
+            if data['workflowTasksResponseList'][json_number_step7]['workFlowTaskName'] == workflow_step7:
+                assert data['workflowTasksResponseList'][json_number_step7][
                            'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow Failed: "' + workflow_step7
 
                 print(workflow_step7)
@@ -508,15 +538,15 @@ def test_preprocess_GET_workflow_status():
                     # Get the latest state from the API
                     data = get_latest_api_response(url_body)
 
-                    if data['workflowTasksResponseList'][6]['workFlowTaskStatus'] == 'IN_PROGRESS':
+                    if data['workflowTasksResponseList'][json_number_step7]['workFlowTaskStatus'] == 'IN_PROGRESS':
                         time.sleep(1)
                         timeout += 1
                         # If the task is still in progress wait and then refresh the API data
 
                     # Check ...
-                    if data['workflowTasksResponseList'][6]['workFlowTaskStatus'] == 'SUCCEEDED':
-                        # Call a function to verify this step actually did something. IE Verify bios change
-                        assert check_step7_biosChange(New_Node), 'Check on ' + workflow_step7 + ' failed'
+                    if data['workflowTasksResponseList'][json_number_step7]['workFlowTaskStatus'] == 'SUCCEEDED':
+                        # Call a function to verify this step actually did something.
+                        assert check_step6_oobmIP(New_Node), 'Check on ' + workflow_step6 + ' failed'
 
                         print(workflow_step7 + ' successful. (Note: Task took', timeout, 'seconds to complete)')
                         print('\n*******************************************************\n')
@@ -525,45 +555,80 @@ def test_preprocess_GET_workflow_status():
                         break
                         # Validate a SUCCEEDED message by ...
 
-                    if data['workflowTasksResponseList'][6]['workFlowTaskStatus'] == 'FAILED':
+                    if data['workflowTasksResponseList'][json_number_step7]['workFlowTaskStatus'] == 'FAILED':
                         print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][6][
-                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step 7: ' + workflow_step7 + ' failed'
+                        assert data['workflowTasksResponseList'][json_number_step7][
+                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step : ' + workflow_step7 + ' failed'
                         # If the task has failed then fail the entire test.
 
-            ######################### Eight task : Discover VCenter
-            if data['workflowTasksResponseList'][7]['workFlowTaskName'] == workflow_step8:
-                assert data['workflowTasksResponseList'][7][
-                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow Failed: "' + workflow_step8
+            # ######################### Eight task : Configure Boot Device Idrac
+            # if data['workflowTasksResponseList'][json_number_step8]['workFlowTaskName'] == workflow_step8:
+            #     assert data['workflowTasksResponseList'][json_number_step8][
+            #                'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow Failed: "' + workflow_step8
+            #
+            #     print(workflow_step8)
+            #     timeout = 0
+            #     while timeout < 610:
+            #
+            #         # Get the latest state from the API
+            #         data = get_latest_api_response(url_body)
+            #
+            #         if data['workflowTasksResponseList'][json_number_step8]['workFlowTaskStatus'] == 'IN_PROGRESS':
+            #             time.sleep(1)
+            #             timeout += 1
+            #             # If the task is still in progress wait and then refresh the API data
+            #
+            #         # Check ...
+            #         if data['workflowTasksResponseList'][json_number_step8]['workFlowTaskStatus'] == 'SUCCEEDED':
+            #             # Call a function to verify this step actually did something. IE Verify bios change
+            #             assert check_step8_biosChange(New_Node), 'Check on ' + workflow_step8 + ' failed'
+            #
+            #             print(workflow_step8 + ' successful. (Note: Task took', timeout, 'seconds to complete)')
+            #             print('\n*******************************************************\n')
+            #
+            #             time.sleep(2)
+            #             break
+            #             # Validate a SUCCEEDED message by ...
+            #
+            #         if data['workflowTasksResponseList'][json_number_step8]['workFlowTaskStatus'] == 'FAILED':
+            #             print ('(Note: Task took', timeout, 'seconds to fail)\n')
+            #             assert data['workflowTasksResponseList'][json_number_step8][
+            #                        'workFlowTaskStatus'] != 'FAILED', 'Error in Step 7: ' + workflow_step8 + ' failed'
+            #             # If the task has failed then fail the entire test.
 
-                print(workflow_step8)
+            ######################### Ninth task : Discover VCenter
+            if data['workflowTasksResponseList'][json_number_step9]['workFlowTaskName'] == workflow_step9:
+                assert data['workflowTasksResponseList'][json_number_step9][
+                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow Failed: "' + workflow_step9
+
+                print(workflow_step9)
                 timeout = 0
                 while timeout < 610:
 
                     # Get the latest state from the API
                     data = get_latest_api_response(url_body)
 
-                    if data['workflowTasksResponseList'][7]['workFlowTaskStatus'] == 'IN_PROGRESS':
+                    if data['workflowTasksResponseList'][json_number_step9]['workFlowTaskStatus'] == 'IN_PROGRESS':
                         time.sleep(1)
                         timeout += 1
                         # If the task is still in progress wait and then refresh the API data
 
                     # Check ...
-                    if data['workflowTasksResponseList'][7]['workFlowTaskStatus'] == 'SUCCEEDED':
+                    if data['workflowTasksResponseList'][json_number_step9]['workFlowTaskStatus'] == 'SUCCEEDED':
                         # Call a function to verify this step actually did something.
                         # TODO create this function
 
-                        print(workflow_step8 + ' successful. (Note: Task took', timeout, 'seconds to complete)')
+                        print(workflow_step9 + ' successful. (Note: Task took', timeout, 'seconds to complete)')
                         print('\n*******************************************************\n')
 
                         time.sleep(2)
                         break
                         # Validate a SUCCEEDED message by ...
 
-                    if data['workflowTasksResponseList'][7]['workFlowTaskStatus'] == 'FAILED':
+                    if data['workflowTasksResponseList'][json_number_step9]['workFlowTaskStatus'] == 'FAILED':
                         print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][7][
-                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step 8: ' + workflow_step8 + ' failed'
+                        assert data['workflowTasksResponseList'][json_number_step9][
+                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step 8: ' + workflow_step9 + ' failed'
                         # If the task has failed then fail the entire test.
 
             ######################### Done
@@ -635,20 +700,15 @@ def check_step1_findNode(data, json_num):
         return 0
 
 
-# Verify the IP address has been changed
-def check_step6_oobmIP(New_Node):
-    # Contact the new IP address and check the network settings
-    returned_settings = get_network_settings_from_iDRAC(New_Node)
+def check_step6_IPchange(data):
 
-    # verify that out new settings were correctly returned from the iDRAC
+    ip = New_Node['Node_IP']
+
     error_list = []
-    if returned_settings['IP Address'] != New_Node['Node_IP']:
-        error_list.append('Error : The new IP has not been set correctly')
-    if returned_settings['Subnet Mask'] != New_Node['Node_Mask']:
-        error_list.append('Error : The new Subnet Mask has not been set correctly')
-    if returned_settings['Default Gateway IP'] != New_Node['Node_GW']:
-        error_list.append('Error : The new Gateway IP has not been set correctly')
-
+    for step in data['workflowTasksResponseList']:
+        if step['workFlowTaskName'] == 'Configuring Out of Band Management':
+            if step['results']['idracIpAddress'] != New_Node['Node_IP']:
+                error_list.append('Error : The new IP has not been set correctly')
     if error_list == []:
         print('IP crednetials have been correctly configured')
         return 1
@@ -656,8 +716,48 @@ def check_step6_oobmIP(New_Node):
         return 0
 
 
+# Verify the IP address has been changed
+def check_step6_oobmIP(New_Node):
+    # Contact the new IP address and check the network settings
+    error_list = []
+    ipaddres = New_Node['Node_IP']
+    sendCommand = 'ping '+ipaddres+ ' -c 2'
+
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+                                                         command=sendCommand, return_output=True)
+
+    nonresponsive = '2 packets transmitted, 0 received, 100% packet loss,'
+
+    if nonresponsive in my_return_status:
+        error_list.append('Error : System not pining')
+        return 0
+    else:
+        print ('System is pinging')
+        return 1
+
+# Verify the IP address has been changed
+# def check_step6_oobmIP(New_Node):
+#     # Contact the new IP address and check the network settings
+#     returned_settings = get_network_settings_from_iDRAC(New_Node)
+#
+#     # verify that out new settings were correctly returned from the iDRAC
+#     error_list = []
+#     if returned_settings['IP Address'] != New_Node['Node_IP']:
+#         error_list.append('Error : The new IP has not been set correctly')
+#     if returned_settings['Subnet Mask'] != New_Node['Node_Mask']:
+#         error_list.append('Error : The new Subnet Mask has not been set correctly')
+#     if returned_settings['Default Gateway IP'] != New_Node['Node_GW']:
+#         error_list.append('Error : The new Gateway IP has not been set correctly')
+#
+#     if error_list == []:
+#         print('IP crednetials have been correctly configured')
+#         return 1
+#     else:
+#         return 0
+#
+
 # Verify the bios setting has changed.
-def check_step7_biosChange(New_Node):
+def check_step8_biosChange(New_Node):
     # export the bios configuration again and check the DNE relevant attributes have been updated
     response = get_BIOS_settings(New_Node)
     assert response.status_code == 200, 'Error, '
