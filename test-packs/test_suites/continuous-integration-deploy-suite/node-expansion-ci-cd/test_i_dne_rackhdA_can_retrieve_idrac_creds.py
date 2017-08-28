@@ -58,8 +58,7 @@ def load_test_data():
 # These are the main tests.
 #####################################################################
 
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
+
 def test_dne_rackhdadapter_can_retrieve_idrac_credentials():
     """
         Title           :       RackHD can retrieve iDrac creds from Vault
