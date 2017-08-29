@@ -1031,9 +1031,6 @@ def test_checkFileSize():
                   "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
 
 
-time.sleep(2)
-
-
 #@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequest2():
     downloadFWFileRequest(messageSec, 'repeatDownloadFWRequest.json', 'repeatDownloadFWCredentials.json',
@@ -1057,7 +1054,6 @@ def test_checkFileSize2():
     checkFileSize("DAS_Cache_Linux.zip",
                   "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
 
-time.sleep(2)
 
 #@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti():
@@ -1075,7 +1071,6 @@ def test_verifyMultiConsumedAttributes():
     verifyMultiConsumedAttributes(path + 'multiDownloadFWRequest.json', path + 'multiDownloadFWCredentials.json',
                                   path + 'multiDownloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
 
-time.sleep(2)
 
 #@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti2():
