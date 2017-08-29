@@ -55,31 +55,6 @@ def load_test_data():
     port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ',
                                                      property='ssl_port')
 
-    # Update setup_config.ini file at runtime
-    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/setup_config.properties'
-    af_support_tools.set_config_file_property_by_data_file(my_data_file)
-
-    # RackHD VM IP & Creds details
-    global setup_config_file
-    setup_config_file = 'continuous-integration-deploy-suite/setup_config.ini'
-
-    global setup_config_header
-    setup_config_header = 'config_details'
-
-    global rackHD_IP
-    rackHD_IP = af_support_tools.get_config_file_property(config_file=setup_config_file, heading=setup_config_header,
-                                                          property='rackhd_integration_ipaddress')
-
-    global rackHD_username
-    rackHD_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                heading=setup_config_header,
-                                                                property='rackhd_username')
-
-    global rackHD_password
-    rackHD_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                heading=setup_config_header,
-                                                                property='rackhd_password')
-
 
 #####################################################################
 # These are the main tests.
@@ -99,15 +74,6 @@ def test_dne_discovered_node_handled():
     """
 
     print('\nRunning Test on system: ', ipaddress)
-
-    # Prerequisite check - ensure the 'node-discover' capability is present, if its not call the function to manually
-    # send in a message to register the rackHD
-    readyToTest = False
-    counter = 0
-    while readyToTest == False and counter < 5:
-        if rackHD_adapter_full_ListCapabilities() == True:
-            counter = +1
-            readyToTest = True
 
     cleanup('test.rackhd.node.discovered.event')
     cleanup('test.eids.identity.request')
@@ -144,7 +110,7 @@ def test_dne_discovered_node_handled():
 
     error_list = []
 
-    if (nodeID not in currentNodes):
+    if (nodeID in currentNodes):
         error_list.append(nodeID)
 
     if (uuid not in currentNodes):
@@ -234,130 +200,6 @@ def verifyEidsMessage():
     uuid = return_json['elementIdentifications'][0]['elementUuid']
 
     return uuid
-
-
-def rackHD_adapter_full_ListCapabilities():
-    """
-    Title           :       Verify the registry.list.capability Message returns all rackhd-adapter capabilities
-    Description     :       A registry.list.capability message is sent.  It is expected that a response is returned that
-                            includes a list of all the rackhd-adapter capabilities.
-                            It will fail if :
-                               No capability.registry.response is received.
-                               The rackhd-adapter is not in the response.
-                               The rackhd-adapter capabilites are not in the response.
-    Parameters      :       none
-    Returns         :       None
-    """
-    cleanup('test.capability.registry.response')
-    bindQueues('exchange.dell.cpsd.hdp.capability.registry.response', 'test.capability.registry.response')
-
-    print("\nTest: Send in a list capabilities message and to verify all RackHD Adapter capabilities are present")
-
-    # Send in a "list capabilities message"
-    originalcorrelationID = 'capability-registry-list-rackhd-adapter-corID'
-    the_payload = '{}'
-
-    af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                         rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                         exchange='exchange.dell.cpsd.hdp.capability.registry.request',
-                                         routing_key='dell.cpsd.hdp.capability.registry.request',
-                                         headers={
-                                             '__TypeId__': 'com.dell.cpsd.hdp.capability.registry.list.capability.providers'},
-                                         payload=the_payload,
-                                         payload_type='json',
-                                         correlation_id={originalcorrelationID}, ssl_enabled=cpsd.props.rmq_ssl_enabled)
-
-    # Wait for and consume the Capability Response Message
-    assert waitForMsg('test.capability.registry.response'), 'Error: No List Capability Responce message received'
-    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                                          rmq_username=cpsd.props.rmq_username,
-                                                          rmq_password=cpsd.props.rmq_password,
-                                                          queue='test.capability.registry.response',
-                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled)
-    time.sleep(5)
-
-    # Verify the RackHD Apapter Response
-    identity = 'rackhd-adapter'
-    capabilities1 = 'node-discovered-event'
-
-    error_list = []
-
-    if (identity not in return_message):
-        error_list.append(identity)
-    if (capabilities1 not in return_message):
-        error_list.append(capabilities1)
-
-    # If the capability isnt there then call the function to register the RackHD
-    if error_list:
-        print('Need to register a rackHD, calling function...')
-        registerRackHD()
-
-    cleanup('test.capability.registry.response')
-    print('node-discover available')
-    return True
-
-
-def registerRackHD():
-    # Until consul is  working properly & integrated with the rackhd adapter in the same environment we need to register
-    # it manually by sending this message.  This test is a prerequisite to getting the full list of
-
-    cleanup('test.controlplane.rackhd.response')
-    cleanup('test.endpoint.registration.event')
-    bindQueues('exchange.dell.cpsd.controlplane.rackhd.response', 'test.controlplane.rackhd.response')
-    bindQueues('exchange.dell.cpsd.endpoint.registration.event', 'test.endpoint.registration.event')
-
-    time.sleep(2)
-
-    af_support_tools.rmq_purge_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                     rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                     ssl_enabled=cpsd.props.rmq_ssl_enabled,
-                                     queue='test.controlplane.rackhd.response')
-
-    af_support_tools.rmq_purge_queue(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                     rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                     ssl_enabled=cpsd.props.rmq_ssl_enabled,
-                                     queue='test.endpoint.registration.event')
-
-    the_payload = '{"messageProperties":{"timestamp":"2017-06-14T12:00:00Z","correlationId":"manually-reg-rackhd-3fb0-9696-3f7d28e17f72"},"registrationInfo":{"address":"http://' + rackHD_IP + ':8080/ui","username":"' + rackHD_username + '","password":"' + rackHD_password + '"}}'
-    print(the_payload)
-
-    af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                         rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
-                                         exchange='exchange.dell.cpsd.controlplane.rackhd.request',
-                                         routing_key='controlplane.rackhd.endpoint.register',
-                                         headers={
-                                             '__TypeId__': 'com.dell.cpsd.rackhd.registration.info.request'},
-                                         payload=the_payload, ssl_enabled=cpsd.props.rmq_ssl_enabled)
-
-    # Verify the RackHD account can be validated
-    assert waitForMsg('test.controlplane.rackhd.response'), 'Error: No RackHD validation message received'
-    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                                          rmq_username=cpsd.props.rmq_username,
-                                                          rmq_password=cpsd.props.rmq_password,
-                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
-                                                          queue='test.controlplane.rackhd.response',
-                                                          remove_message=True)
-    return_json = json.loads(return_message, encoding='utf-8')
-    print (return_json)
-    assert return_json['responseInfo']['message'] == 'SUCCESS', 'ERROR: RackHD validation failure'
-
-    # Verify that an event to register the rackHD with endpoint registry is triggered
-    assert waitForMsg('test.endpoint.registration.event'), 'Error: No message to register with Consul sent by system'
-    return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                                          rmq_username=cpsd.props.rmq_username,
-                                                          rmq_password=cpsd.props.rmq_password,
-                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
-                                                          queue='test.endpoint.registration.event',
-                                                          remove_message=True)
-
-    return_json = json.loads(return_message, encoding='utf-8')
-    print (return_json)
-    assert return_json['endpoint']['type'] == 'rackhd', 'rackhd not registered with endpoint'
-
-    cleanup('test.controlplane.rackhd.response')
-    cleanup('test.endpoint.registration.event')
-
-    time.sleep(3)
 
 
 #####################################################################
