@@ -83,7 +83,7 @@ def simulate_validateVcenterClusterRequest_message():
     print(" Publishing a vcenterCluster request message .. ")
     my_routing_key = 'ess.service.request.' + str(uuid.uuid4())
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/engineering_standards_service_parent/fixtures/ess_clusterInfo.json'
+    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_clusterInfo.json'
 
     with open(filePath) as fixture:
 
