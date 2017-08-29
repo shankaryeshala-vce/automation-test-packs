@@ -89,8 +89,8 @@ def load_test_data():
 
 #######################################################################################################################
 
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
+#@pytest.mark.dne_paqx_parent_mvp
+#@pytest.mark.dne_paqx_parent_mvp_extended
 def test_vcenter_discover_cluters():
     print('\nRunning test on Symphony system:', ipaddress, 'and Test vCenter:', vcenter_IP, '\n')
 
@@ -172,8 +172,8 @@ def test_vcenter_discover_cluters():
 
 ################################################
 # Test case to apply ESS rules to all discovered clusters
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
+#@pytest.mark.dne_paqx_parent_mvp
+#@pytest.mark.dne_paqx_parent_mvp_extended
 def test_ess_vcenter_rules():
     actualvCenterClusterList = getRealVcenterInfo()
     numOfClustersInList = len(actualvCenterClusterList)
