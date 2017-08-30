@@ -994,6 +994,7 @@ def test_verifyConsumedAttributes8():
     verifyConsumedAttributesInvalid(path + 'noAllFWRequest.json', path + 'noAllFWCredentials.json',
                                     path + 'noAllFWResponse.json', "SHA-256", "VCEVision")
 
+
 #
 # # def test_verifyConsumedAttributes7():
 # #     verifyConsumedAttributesInvalid(path + 'noSwidFWRequest.json', path + 'noSwidFWCredentials.json',
