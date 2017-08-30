@@ -135,7 +135,7 @@ def test_capability_registry_RMQ_bindings_dne(exchange, queue):
     Parameters      :       1. RMQ Exchange. 2. RQM Queue
     Returns         :       None
     """
-
+    enable_rabbitmq_management_plugin()
     queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
                              exchange=exchange)
     queues = json.dumps(queues)
@@ -260,3 +260,14 @@ def rest_queue_list(user=None, password=None, host=None, port=None, virtual_host
     return queues
 
 #######################################################################################################################
+
+def enable_rabbitmq_management_plugin():
+    """ A function to enable the rabbitmq_management plugin
+    It won't cause any errrors if it is already enabled"""
+    command = "docker exec -d amqp rabbitmq-plugins enable rabbitmq_management"
+    af_support_tools.send_ssh_command(
+        host=ipaddress,
+        username=cli_username,
+        password=cli_password,
+        command=command,
+        return_output=True)

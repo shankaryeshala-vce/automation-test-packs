@@ -51,7 +51,8 @@ def load_test_data():
     ('rackhd-adapter', 'rackhd-consul-register',),
     ('vcenter-adapter', 'vcenter-consul-register'),
     ('coprhd-adapter', 'coprhd-consul-register'),
-    ('endpoint-registry', 'endpoint-registry-lookup')])
+    ('endpoint-registry', 'endpoint-registry-lookup'),
+    ('scaleio-adapter', 'scaleio-consul-register')])
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_ListCapabilities_core_1(param_providerName, param_capabilities1):

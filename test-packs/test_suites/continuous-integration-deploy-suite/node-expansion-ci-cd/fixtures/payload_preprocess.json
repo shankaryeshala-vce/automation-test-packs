@@ -1,0 +1,9 @@
+{
+  "esxiManagementGatewayIpAddress": "string",
+  "esxiManagementHostname": "string",
+  "esxiManagementIpAddress": "string",
+  "esxiManagementSubnetMask": "string",
+  "idracGatewayIpAddress": "string",
+  "idracIpAddress": "string",
+  "idracSubnetMask": "string"
+}
