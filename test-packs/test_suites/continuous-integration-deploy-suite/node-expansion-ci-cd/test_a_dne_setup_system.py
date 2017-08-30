@@ -399,7 +399,7 @@ def registerScaleIO():
     print (return_json)
     #assert return_json['endpoint']['type'] == 'scaleio', 'scaleio not registered with endpoint'
     # Removing this assert as the messages from the different adapters are interfering with one another.
-    cleanup('test.controlplane.vcenter.scaleio')
+    cleanup('test.controlplane.scaleio.response')
     cleanup('test.endpoint.registration.event')
 
     print ('scaleio registerd')
