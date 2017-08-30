@@ -476,7 +476,7 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
                 assert "replyTo" in data[i]["messageProperties"], "Reply To not included in consumed attributes."
                 assert "hashType" in data[i].keys(), "Hash Type not included in consumed attributes."
                 assert "hashVal" in data[i].keys(), "Hash not included in consumed attributes."
-                assert "swid" in data[i].keys(), "Swid not included in consumed attributes."
+                assert "fileName" in data[i].keys(), "Swid not included in consumed attributes."
                 assert "size" in data[i].keys(), "Size not included in consumed attributes."
                 assert "fileUUID" in data[i].keys(), "File UUID not included in consumed attributes."
                 assert filepath in data[i]["url"], "Download complete does not include expected URL."
@@ -491,14 +491,14 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
                 assert data[i]["hashType"] == hashType, "Incorrect hashType detailed."
 
                 hashVal.append(data[i]["hashVal"])
-                print("Looking Good Here")
                 while credCount < maxCreds:
                     if data[i]["size"] == dataCredentials[credCount]["size"]:
                         print(data[i]["size"])
                         print(dataCredentials[credCount]["size"])
                         assert filepath in data[i]["url"], "Unexpected URL returned."
+                        assert data[i]["fileName"] in data[i]["url"], "Unexpected URL returned."
                         assert data[i]["fileUUID"] == dataCredentials[credCount]["fileUUID"], "FileUUIDs don't match in consumed messages."
-                        print("Excellent.................")
+
                     credCount += 1
 
             else:
@@ -517,8 +517,6 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
                     assert dataInput["messageProperties"]["replyTo"] == dataCredentials[cred]["messageProperties"][
                         "replyTo"], "Corr Ids don't match in consumed messages."
                     assert dataCredentials[cred]["hashType"] == hashType, "Incorrect hashType detailed."
-                    #assert dataCredentials[
-                    #           "size"] == sizeNIC or sizeBIOS or sizeRAID, "Size not consistent with expected value."
                     assert dataCredentials[cred]["size"] == size, "Size not consistent with expected value."
                     assert esrsURL in dataCredentials[cred]["url"], "Host and port details incorrect in returned URL"
                     assert dataCredentials[cred]["swid"] in dataCredentials[cred]["header"][
@@ -531,7 +529,6 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
                         "swid"], "Serial number not match Swid in Credential response URL authorization details."
 
                     assert dataCredentials[cred]["hashVal"] in hashVal, "Hash values do not match."
-                    print("You've made it.......")
                     return
 
         count += 1
@@ -560,7 +557,7 @@ def verifyMultiConsumedAttributes(requestFile, credentialsFile, responseFile, ha
 
     sizeBIOS = checkFileSize("BIOS_PFWCY_WN64_2.2.5.EXE",
                              "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
-    sizeDAS = checkFileSize("DAS_Cache_Linux.zip",
+    sizeDAS = checkFileSize("DAS_Cache_Linux_1.zip",
                             "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
     sizeESX = checkFileSize("VMW-ESX-6.0.0-lsi_mr3-6.903.85.00_MR-3818071.zip",
                              "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
@@ -777,7 +774,7 @@ def verifyProgressMessage(requestFile, credentialsFile, responseFile):
     #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
     # sizeMD5 = checkFileSize("VMW-ESX-6.0.0-lsi_mr3-6.903.85.00_MR-3818071.zip.md5",
     #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
-    sizeDAS = checkFileSize("DAS_Cache_Linux.zip",
+    sizeDAS = checkFileSize("DAS_Cache_Linux_1.zip",
                              "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
 
 
@@ -1031,7 +1028,7 @@ def test_checkFileSize():
                   "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
 
 
-time.sleep(2)
+#time.sleep(2)
 
 
 #@pytest.mark.rcm_fitness_mvp_extended
@@ -1042,7 +1039,7 @@ def test_downloadFWFileRequest2():
 
 #@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes2():
-    verifyConsumedAttributes("DAS_Cache_Linux.zip", path + 'repeatDownloadFWRequest.json', path + 'repeatDownloadFWCredentials.json',
+    verifyConsumedAttributes("DAS_Cache_Linux_1.zip", path + 'repeatDownloadFWRequest.json', path + 'repeatDownloadFWCredentials.json',
                              path + 'repeatDownloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
 
 
@@ -1054,10 +1051,10 @@ def test_verifyProgressMessage():
 
 #@pytest.mark.rcm_fitness_mvp_extended
 def test_checkFileSize2():
-    checkFileSize("DAS_Cache_Linux.zip",
+    checkFileSize("DAS_Cache_Linux_1.zip",
                   "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
 
-time.sleep(2)
+#time.sleep(2)
 
 #@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti():
@@ -1075,7 +1072,7 @@ def test_verifyMultiConsumedAttributes():
     verifyMultiConsumedAttributes(path + 'multiDownloadFWRequest.json', path + 'multiDownloadFWCredentials.json',
                                   path + 'multiDownloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
 
-time.sleep(2)
+#time.sleep(2)
 
 #@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti2():
