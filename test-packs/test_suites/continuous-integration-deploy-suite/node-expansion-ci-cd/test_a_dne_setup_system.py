@@ -131,6 +131,9 @@ def test_dne_setup_system():
 
     assert update_IDRAC_json(jsonfilepath, ip_address, the_payload), 'test failed: ' + jsonfilepath + 'doesnt exists'
 
+    enable_rabbitmq_management_plugin()
+    time.sleep(3)
+
     assert run_amqp_tool(amqptooljar, jsonfilepath), 'test failed: unable to execute ' + amqptooljar
 
 
@@ -453,3 +456,14 @@ def waitForMsg(queue):
             return False
 
     return True
+
+def enable_rabbitmq_management_plugin():
+    """ A function to enable the rabbitmq_management plugin
+    It won't cause any errrors if it is already enabled"""
+    command = 'docker exec -d amqp rabbitmq-plugins enable rabbitmq_management'
+    af_support_tools.send_ssh_command(
+        host=ip_address,
+        username=username,
+        password=password,
+        command=command,
+        return_output=False)
