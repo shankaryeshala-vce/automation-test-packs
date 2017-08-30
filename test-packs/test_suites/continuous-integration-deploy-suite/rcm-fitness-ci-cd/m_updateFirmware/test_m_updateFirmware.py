@@ -919,6 +919,7 @@ def test_verifyCredentialRequest():
 def test_verifyCredentialResponse():
     verifyCredentialResponse("out_updateRequest.json", "out_requestCreds.json", "out_responseCreds.json", "RACKHD")
 
+
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifyCorrelationIDs():
