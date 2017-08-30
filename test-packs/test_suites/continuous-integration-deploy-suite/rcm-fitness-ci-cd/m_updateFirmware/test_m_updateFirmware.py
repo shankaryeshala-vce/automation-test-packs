@@ -94,9 +94,9 @@ def load_test_data():
                                                         property=payload_vcenter)
 
     getSystemDefinition()
-    registerRackHD(message_rackHD, "out_registerRackHDResp.json")
-    time.sleep(2)
-    registerVcenter(message_vcenter, "out_registerVcenterResp.json")
+    # registerRackHD(message_rackHD, "out_registerRackHDResp.json")
+    # time.sleep(2)
+    # registerVcenter(message_vcenter, "out_registerVcenterResp.json")
 
 def ensurePathExists(dir):
     if not os.path.exists(dir):
@@ -643,7 +643,7 @@ def verifyCredentialRequest(filename, credRequest, component):
 
     if dataCredRequest is not None:
         while index < len(dataCredRequest["componentCredentials"]):
-            assert len(dataCredRequest["componentCredentials"]) == 4, "Unexpected number of component credentials requested."
+            assert len(dataCredRequest["componentCredentials"]) == 5, "Unexpected number of component credentials requested."
             if dataCredRequest["componentCredentials"][index]["componentUuid"] == dataInput["componentBody"]["componentUuid"]:
                 assert "timestamp" in dataCredRequest["messageProperties"], "No timestamp included in credential request message."
                 listCorrID.append(dataCredRequest["messageProperties"]["correlationId"])
@@ -674,7 +674,7 @@ def verifyCredentialResponse(filename, credRequest, credResponse, component):
 
     if dataCredResponse is not None:
         while index < len(dataCredResponse["componentCredentialElements"]):
-            assert len(dataCredResponse["componentCredentialElements"]) == 4, "Unexpected number of component credentials returned."
+            assert len(dataCredResponse["componentCredentialElements"]) == 5, "Unexpected number of component credentials returned."
             epUuid.append(dataCredResponse["componentCredentialElements"][index]["endpointUuid"])
             credUuid.append(dataCredResponse["componentCredentialElements"][index]["credentialUuid"])
             compUuid.append(dataCredResponse["componentCredentialElements"][index]["componentUuid"])
@@ -924,11 +924,15 @@ def test_verifyCredentialResponse():
 def test_verifyCorrelationIDs():
     verifyCorrelationIDs()
 
-def test_verifyRESTupdateRequest():
-    verifyRESTupdateRequest("out_restRequest.json")
-
-def test_verifyRESTupdateResponse():
-    verifyRESTupdateResponse("out_restResponse.json")
+# @pytest.mark.rcm_fitness_mvp_extended
+# @pytest.mark.rcm_fitness_mvp
+# def test_verifyRESTupdateRequest():
+#     verifyRESTupdateRequest("out_restRequest.json")
+#
+# @pytest.mark.rcm_fitness_mvp_extended
+# @pytest.mark.rcm_fitness_mvp
+# def test_verifyRESTupdateResponse():
+#     verifyRESTupdateResponse("out_restResponse.json")
 
 #@pytest.mark.rcm_fitness_mvp_extended
 #@pytest.mark.rcm_fitness_mvp
