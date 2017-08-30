@@ -929,12 +929,12 @@ def profileESRSResponseTimes(payLoad):
 
 
 
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequestInvalid():
     downloadFWFileRequestInvalid(messageInvalidFile, 'invalidFileFWRequest.json', 'invalidFileFWCredentials.json',
                                  'invalidFileFWResponse.json')
 
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes1():
     verifyConsumedAttributesInvalid(path + 'invalidFileFWRequest.json', path + 'invalidFileFWCredentials.json',
                                     path + 'invalidFileFWResponse.json', "SHA-256", "VCEVision")
@@ -954,22 +954,22 @@ def test_verifyConsumedAttributes1():
 #     verifyConsumedAttributesInvalid(path + 'invalidSwidFWRequest.json', path + 'invalidSwidFWCredentials.json',
 #                                     path + 'invalidSwidFWResponse.json', "SHA-256", "VCEVision")
 
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequestInvalid4():
     downloadFWFileRequestInvalid(messageInvalidAll, 'invalidAllFWRequest.json', 'invalidAllFWCredentials.json',
                                  'invalidAllFWResponse.json')
 
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes4():
     verifyConsumedAttributesInvalid(path + 'invalidAllFWRequest.json', path + 'invalidAllFWCredentials.json',
                                     path + 'invalidAllFWResponse.json', "SHA-256", "VCEVision")
 
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequestInvalid5():
     downloadFWFileRequestInvalid(messageNoFile, 'noFileFWRequest.json', 'noFileFWCredentials.json',
                                  'noFileFWResponse.json')
 
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes5():
     verifyConsumedAttributesInvalid(path + 'noFileFWRequest.json', path + 'noFileFWCredentials.json',
                                     path + 'noFileFWResponse.json', "SHA-256", "VCEVision")
@@ -984,12 +984,12 @@ def test_verifyConsumedAttributes5():
 #     downloadFWFileRequestInvalid(messageNoSwid, 'noSwidFWRequest.json', 'noSwidFWCredentials.json',
 #                                  'noSwidFWResponse.json')
 #
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequestInvalid8():
     downloadFWFileRequestInvalid(messageNoAll, 'noAllFWRequest.json', 'noAllFWCredentials.json',
                                  'noAllFWResponse.json')
 
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes8():
     verifyConsumedAttributesInvalid(path + 'noAllFWRequest.json', path + 'noAllFWCredentials.json',
                                     path + 'noAllFWResponse.json', "SHA-256", "VCEVision")
@@ -999,93 +999,81 @@ def test_verifyConsumedAttributes8():
 # #     verifyConsumedAttributesInvalid(path + 'noSwidFWRequest.json', path + 'noSwidFWCredentials.json',
 # #                                     path + 'noSwidFWResponse.json', "SHA-256", "VCEVision")
 # #
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_profileESRSResponseTimes():
     profileESRSResponseTimes(message)
 
-#@pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_downloadFWFileRequest():
     downloadFWFileRequest(message, 'downloadFWRequest.json', 'downloadFWCredentials.json',
                           'downloadFWResponse.json')
 
 
-#@pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_verifyPublishedAttributes():
     verifyPublishedAttributes(path + 'downloadFWRequest.json')
 
-#@pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_verifyConsumedAttributes():
     verifyConsumedAttributes("BIOS_PFWCY_WN64_2.2.5.EXE", path + 'downloadFWRequest.json', path + 'downloadFWCredentials.json',
                              path + 'downloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
 
-#@pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_checkFileSize():
     checkFileSize("BIOS_PFWCY_WN64_2.2.5.EXE",
                   "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
 
-
-#time.sleep(2)
-
-
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequest2():
     downloadFWFileRequest(messageSec, 'repeatDownloadFWRequest.json', 'repeatDownloadFWCredentials.json',
                           'repeatDownloadFWResponse.json')
 
 
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes2():
     verifyConsumedAttributes("DAS_Cache_Linux_1.zip", path + 'repeatDownloadFWRequest.json', path + 'repeatDownloadFWCredentials.json',
                              path + 'repeatDownloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
 
 
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyProgressMessage():
     verifyProgressMessage(path + 'repeatDownloadFWRequest.json', path + 'repeatDownloadFWCredentials.json',
                           path + 'repeatDownloadFWResponse.json')
 
 
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_checkFileSize2():
     checkFileSize("DAS_Cache_Linux_1.zip",
                   "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
 
-#time.sleep(2)
-
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti():
     downloadFWFileMulti(message, messageSec, messageThird, 'multiDownloadFWRequest.json',
                         'multiDownloadFWCredentials.json', 'multiDownloadFWResponse.json')
 
-
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyMultiPublishedAttributes():
     verifyMultiPublishedAttributes(path + 'multiDownloadFWRequest.json')
 
-
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyMultiConsumedAttributes():
     verifyMultiConsumedAttributes(path + 'multiDownloadFWRequest.json', path + 'multiDownloadFWCredentials.json',
                                   path + 'multiDownloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
 
-#time.sleep(2)
-
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti2():
     downloadFWFileMulti(message, messageSec, messageThird, 'secMultiDownloadFWRequest.json',
                         'secMultiDownloadFWCredentials.json', 'secMultiDownloadFWResponse.json')
 
-
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyMultiPublishedAttributes2():
     verifyMultiPublishedAttributes(path + 'secMultiDownloadFWRequest.json')
 
-
-#@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp_extended
 def test_verifyMultiConsumedAttributes2():
     verifyMultiConsumedAttributes(path + 'secMultiDownloadFWRequest.json', path + 'secMultiDownloadFWCredentials.json',
                                   path + 'secMultiDownloadFWResponse.json', "SHA-256", "VCEVision", "https://10.234.100.5:9443/")
