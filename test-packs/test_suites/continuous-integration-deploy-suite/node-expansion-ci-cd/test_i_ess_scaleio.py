@@ -60,7 +60,7 @@ def load_test_data():
 
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_handle_validateVcenterCluster_message():
+def test_handle_validateScaleIO_ESS_message():
     print("\n======================= Handle validateScaleio Request message =======================\n")
 
     cleanupQ('test.ess.service.response')
