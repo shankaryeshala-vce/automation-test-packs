@@ -1028,6 +1028,7 @@ def test_checkFileSize():
     checkFileSize("BIOS_PFWCY_WN64_2.2.5.EXE",
                   "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
 
+
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequest2():
     downloadFWFileRequest(messageSec, 'repeatDownloadFWRequest.json', 'repeatDownloadFWCredentials.json',
@@ -1064,6 +1065,7 @@ def test_verifyMultiPublishedAttributes():
 def test_verifyMultiConsumedAttributes():
     verifyMultiConsumedAttributes(path + 'multiDownloadFWRequest.json', path + 'multiDownloadFWCredentials.json',
                                   path + 'multiDownloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
+
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti2():

@@ -222,31 +222,6 @@ def test_vcenter_adapter_RMQ_bindings_core(exchange, queue):
     assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
     print(exchange, '\nis bound to\n', queue, '\n')
 
-
-@pytest.mark.skip(reason='need to figure out sequence')
-@pytest.mark.parametrize('exchange, queue', [
-    ('exchange.cpsd.controlplane.vcenter.response', 'queue.dell.cpsd.dne-paqx.response')])
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
-def test_vcenter_adapter_RMQ_bindings_dne(exchange, queue):
-    """
-    Title           :       Verify the RMQ bindings
-    Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
-                            It uses the RMQ API to check.
-                            It will fail if :
-                                The RMQ binding does not exist
-    Parameters      :       1. RMQ Exchange. 2. RQM Queue
-    Returns         :       None
-    """
-
-    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
-                             exchange=exchange)
-    queues = json.dumps(queues)
-
-    assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
-    print(exchange, '\nis bound to\n', queue, '\n')
-
-
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_vcenter_adapter_full_ListCapabilities():
@@ -307,6 +282,7 @@ def test_vcenter_adapter_full_ListCapabilities():
     capabilities14 = 'vcenter-enablePCIpassthroughHost'
     capabilities15 = 'vcenter-addhostdvswitch'
     capabilities16 = 'vcenter-rename-datastore'
+    capabilities17= 'vcenter-list-components'
 
     error_list = []
 
@@ -344,6 +320,8 @@ def test_vcenter_adapter_full_ListCapabilities():
         error_list.append(capabilities15)
     if (capabilities16 not in return_message):
         error_list.append(capabilities16)
+    if (capabilities17 not in return_message):
+        error_list.append(capabilities17)
 
     assert not error_list, ('Missing some vcenter-adapter capabilities')
 
