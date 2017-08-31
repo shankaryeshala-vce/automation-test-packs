@@ -49,7 +49,7 @@ def core_services(setup):
 
 
 
-
+@pytest.mark.common_ui_mvp
 def test_common_ui_install(setup):
     """
     Title: Verify that the common-ui rpm is installed correctly
@@ -76,7 +76,7 @@ def test_common_ui_install(setup):
     assert not err
 
 
-
+@pytest.mark.common_ui_mvp
 def test_allservicesup(core_services, setup):
     """
         Title: Verify that the common-ui service and it's dependent containers are installed correctly
@@ -99,6 +99,7 @@ def test_allservicesup(core_services, setup):
     assert not err
 
 
+@pytest.mark.common_ui_mvp
 def test_common_ui_serviceremove(core_services, setup):
     """
     Title: Verify that the common-ui service and it's dependent containers are installed correctly
