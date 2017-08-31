@@ -363,7 +363,7 @@ def registerScaleIO():
                                      ssl_enabled=cpsd.props.rmq_ssl_enabled,
                                      queue='test.endpoint.registration.event')
 
-    the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"scaleio-full-abcd-abcdabcdabcd"},"registrationInfo":{"address":"https://' + scaleIO_IP + '","username":"' + scaleIO_username + '","password":"' + scaleIO_password + '"}}'
+    the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"scaleio-full-abcd-abcdabcdabcd"},"registrationInfo":{"address":"https://' + scaleIO_IP + ':443","username":"' + scaleIO_username + '","password":"' + scaleIO_password + '"}}'
     print(the_payload)
 
     af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
@@ -399,7 +399,7 @@ def registerScaleIO():
     print (return_json)
     #assert return_json['endpoint']['type'] == 'scaleio', 'scaleio not registered with endpoint'
     # Removing this assert as the messages from the different adapters are interfering with one another.
-    cleanup('test.controlplane.vcenter.scaleio')
+    cleanup('test.controlplane.scaleio.response')
     cleanup('test.endpoint.registration.event')
 
     print ('scaleio registerd')
