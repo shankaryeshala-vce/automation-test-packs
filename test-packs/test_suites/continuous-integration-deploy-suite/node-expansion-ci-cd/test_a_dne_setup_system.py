@@ -363,7 +363,7 @@ def registerScaleIO():
                                      ssl_enabled=cpsd.props.rmq_ssl_enabled,
                                      queue='test.endpoint.registration.event')
 
-    the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"scaleio-full-abcd-abcdabcdabcd"},"registrationInfo":{"address":"https://' + scaleIO_IP + '","username":"' + scaleIO_username + '","password":"' + scaleIO_password + '"}}'
+    the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"scaleio-full-abcd-abcdabcdabcd"},"registrationInfo":{"address":"https://' + scaleIO_IP + ':443","username":"' + scaleIO_username + '","password":"' + scaleIO_password + '"}}'
     print(the_payload)
 
     af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
