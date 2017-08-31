@@ -102,8 +102,8 @@ def test_allservicesup(core_services, setup):
 @pytest.mark.common_ui_mvp
 def test_common_ui_serviceremove(core_services, setup):
     """
-    Title: Verify that the common-ui service and it's dependent containers are installed correctly
-    Description: This test verifies that the common-ui service is installed correctly
+    Title: Verify that the common-ui service and it's dependent containers are uninstalled correctly
+    Description: This test verifies that the common-ui service is uninstalled correctly
     Params: List of service names
     Returns: None
     """
