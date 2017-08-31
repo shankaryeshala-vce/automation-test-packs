@@ -4,11 +4,22 @@ pipeline {
             label 'maven-builder'
         }
     }
-  stages {
-    stage('Run pytest Scanner') {
-      steps {
-        runPyTestScanner()
-      }
-	}
-  }
+    stages {
+        stage('Run pytest Scanner') {
+            steps {
+                runPyTestScanner()
+            }
+	    }
+    }
+    post {
+        always {
+            cleanWorkspace()   
+        }
+        success {
+            successEmail()
+        }
+        failure {
+            failureEmail()
+        }
+    }
 }
