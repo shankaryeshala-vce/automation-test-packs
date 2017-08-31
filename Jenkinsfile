@@ -4,7 +4,6 @@ pipeline {
             label 'maven-builder'
         }
     }
-  }
   stages {
     stage('Run pytest Scanner') {
       steps {
