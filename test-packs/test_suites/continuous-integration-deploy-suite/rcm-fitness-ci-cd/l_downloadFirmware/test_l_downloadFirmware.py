@@ -392,7 +392,7 @@ def verifyPublishedAttributes(filename):
         assert "timestamp" in dataInput["messageProperties"], "Timestamp not included in published attributes."
         assert "correlationId" in dataInput["messageProperties"], "Correlation Id not included in published attributes."
         assert "replyTo" in dataInput["messageProperties"], "Reply To not included in published attributes."
-        assert "swid" in dataInput.keys(), "Swid not included in published attributes."
+        # assert "swid" in dataInput.keys(), "Swid not included in published attributes."
         # assert "url" in dataInput.keys(), "URL not included in published attributes."
         assert "fileName" in dataInput.keys(), "fileName not included in published attributes."
         return
@@ -416,10 +416,10 @@ def verifyMultiPublishedAttributes(filename):
             assert "correlationId" in dataInput[count][
                 "messageProperties"], "Correlation Id not included in published attributes."
             assert "replyTo" in dataInput[count]["messageProperties"], "Reply To not included in published attributes."
-            assert "swid" in dataInput[count].keys(), "Swid not included in published attributes."
+            # assert "swid" in dataInput[count].keys(), "Swid not included in published attributes."
             # assert "url" in dataInput[count].keys(), "URL not included in published attributes."
             assert "fileName" in dataInput[count].keys(), "fileName not included in published attributes."
-            assert dataInput[count]["swid"] == "VCEVISIONDEV01", "Unexpected SWID returned."
+            # assert dataInput[count]["swid"] == "VCEVISIONDEV01", "Unexpected SWID returned."
             assert dataInput[count]["messageProperties"]["replyTo"] == "dell.cpsd.prepositioning.downloader.completed"
             # assert dataInput[count]["url"] is "", "URL is not empty."
             count += 1
@@ -586,7 +586,7 @@ def verifyMultiConsumedAttributes(requestFile, credentialsFile, responseFile, ha
             assert "replyTo" in data[count]["messageProperties"], "Reply To not included in consumed attributes."
             assert "hashType" in data[count].keys(), "Hash Type not included in consumed attributes."
             assert "hashVal" in data[count].keys(), "Hash not included in consumed attributes."
-            assert "swid" in data[count].keys(), "Swid not included in consumed attributes."
+            #assert "swid" in data[count].keys(), "Swid not included in consumed attributes."
             assert "size" in data[count].keys(), "Size not included in consumed attributes."
             assert "fileUUID" in data[count].keys(), "File UUID not included in consumed attributes."
             assert filepath in data[count]["url"], "Download complete does not include expected URL."
@@ -683,8 +683,8 @@ def verifyConsumedAttributesInvalid(requestFile, credentialsFile, responseFile, 
     requestData = open(requestFile, "rU")
     dataInput = json.load(requestData)
 
-    credentialsData = open(credentialsFile, "rU")
-    dataCredentials = json.load(credentialsData)
+    # credentialsData = open(credentialsFile, "rU")
+    # dataCredentials = json.load(credentialsData)
 
     dataFile = open(responseFile, "rU")
     data = json.load(dataFile)
@@ -702,10 +702,42 @@ def verifyConsumedAttributesInvalid(requestFile, credentialsFile, responseFile, 
             print(data[count])
             print(data[count].keys())
             print(data[count]["errorMessage"])
-            assert dataInput["fileName"] in data[count]["errorMessage"], "Expeceted file name included in error message text."
+            if os.path.exists(credentialsFile):
+                credentialsData = open(credentialsFile, "rU")
+                dataCredentials = json.load(credentialsData)
+                print("Credentials response returned.")
+                assert dataInput["fileName"] in dataCredentials[
+                    "errorMessage"], "Expected file name included in error message text."
+                assert data[count]["fileUUID"] == dataCredentials["fileUUID"], "FileUUIDs are not consistent."
+                assert data[count]["size"] == dataCredentials["size"], "File sizes don't match in consumed messages."
+                assert data[count]["hashType"] == dataCredentials["hashType"], "Incorrect hashType detailed."
+                if dataCredentials["fileFound"] == False:
+                    assert "errorMessage" in dataCredentials.keys(), "No error message in credentials response."
+                    assert "replyTo" in dataCredentials[
+                        "messageProperties"], "No message detailed in credentials response."
+                    assert dataInput["fileName"] in dataCredentials[
+                        "errorMessage"], "No file name included in error message text."
+                    # assert dataCredentials["fileName"] == dataInput["fileName"], "File names are not consistent."
+                    assert dataCredentials["size"] == 0, "Size of ZERO not returned in error."
+                    assert dataInput["messageProperties"]["correlationId"] in dataCredentials["messageProperties"][
+                        "correlationId"], "Corr Ids don't match in consumed messages."
+                    assert dataInput["messageProperties"]["replyTo"] == dataCredentials["messageProperties"][
+                        "replyTo"], "ReplyTo values don't match in consumed messages."
+                    assert dataCredentials["hashType"] == hashType, "Incorrect hashType detailed."
+                    print("Header key count: %d" % len(dataCredentials["header"].keys()))
+                    assert len(dataCredentials[
+                                   "header"].keys()) == 0, "Header should not included authorization keys or similar."
+                    assert not dataCredentials["header"].keys(), "Header be an empty list."
+                    assert "authorization" not in dataCredentials[
+                        "header"], "Header should not included authorization keys."
+                    print("Invalid request triggered expected Credentials response.")
+                    print("Credentials response verified on failed request.")
+            # else:
+            #     continue
+
+            assert dataInput["fileName"] in data[count]["errorMessage"], "Expected file name included in error message text."
             assert dataInput["messageProperties"]["correlationId"] in data[count]["messageProperties"][
                 "correlationId"], "Corr Ids don't match in consumed messages."
-
             assert "errorMessage" in data[count].keys(), "Error Message not included in consumed attributes."
             assert "timestamp" in data[count]["messageProperties"], "Timestamp not included in consumed attributes."
             assert "correlationId" in data[count]["messageProperties"], "Correlation Id not included in consumed attributes."
@@ -713,36 +745,32 @@ def verifyConsumedAttributesInvalid(requestFile, credentialsFile, responseFile, 
             assert "hashType" in data[count].keys(), "Hash Type not included in consumed attributes."
             assert "size" in data[count].keys(), "Size not included in consumed attributes."
             assert "fileUUID" in data[count].keys(), "File UUID not included in consumed attributes."
-
             assert data[count]["size"] == 0, "Size of ZERO not returned in error."
-            assert data[count]["errorMessage"] == dataCredentials["errorMessage"], "Error messages are not consistent."
-            assert data[count]["fileUUID"] == dataCredentials["fileUUID"], "FileUUIDs are not consistent."
-            assert data[count]["size"] == dataCredentials["size"], "File sizes don't match in consumed messages."
             assert dataInput["messageProperties"]["replyTo"] == data[count]["messageProperties"][
                 "replyTo"], "Corr Ids don't match in consumed messages."
-            assert data[count]["hashType"] == dataCredentials["hashType"], "Incorrect hashType detailed."
+
             print("Download response verified on failed request.")
 
+            #
+            # if dataCredentials["fileFound"] == False:
+            #     assert "errorMessage" in dataCredentials.keys(), "No error message in credentials response."
+            #     assert "replyTo" in dataCredentials["messageProperties"], "No message detailed in credentials response."
+            #     assert dataInput["fileName"] in dataCredentials["errorMessage"], "No file name included in error message text."
+            #     # assert dataCredentials["fileName"] == dataInput["fileName"], "File names are not consistent."
+            #     assert dataCredentials["size"] == 0, "Size of ZERO not returned in error."
+            #     assert dataInput["messageProperties"]["correlationId"] in dataCredentials["messageProperties"][
+            #         "correlationId"], "Corr Ids don't match in consumed messages."
+            #     assert dataInput["messageProperties"]["replyTo"] == dataCredentials["messageProperties"][
+            #         "replyTo"], "ReplyTo values don't match in consumed messages."
+            #     assert dataCredentials["hashType"] == hashType, "Incorrect hashType detailed."
+            #     print("Header key count: %d" % len(dataCredentials["header"].keys()))
+            #     assert len(dataCredentials["header"].keys()) == 0, "Header should not included authorization keys or similar."
+            #     assert not dataCredentials["header"].keys(), "Header be an empty list."
+            #     assert "authorization" not in dataCredentials["header"], "Header should not included authorization keys."
+            #     print("Invalid request triggered expected Credentials response.")
+            #     print("Credentials response verified on failed request.")
 
-            if dataCredentials["fileFound"] == False:
-                assert "errorMessage" in dataCredentials.keys(), "No error message in credentials response."
-                assert "replyTo" in dataCredentials["messageProperties"], "No message detailed in credentials response."
-                assert dataInput["fileName"] in dataCredentials["errorMessage"], "No file name included in error message text."
-                # assert dataCredentials["fileName"] == dataInput["fileName"], "File names are not consistent."
-                assert dataCredentials["size"] == 0, "Size of ZERO not returned in error."
-                assert dataInput["messageProperties"]["correlationId"] in dataCredentials["messageProperties"][
-                    "correlationId"], "Corr Ids don't match in consumed messages."
-                assert dataInput["messageProperties"]["replyTo"] == dataCredentials["messageProperties"][
-                    "replyTo"], "ReplyTo values don't match in consumed messages."
-                assert dataCredentials["hashType"] == hashType, "Incorrect hashType detailed."
-                print("Header key count: %d" % len(dataCredentials["header"].keys()))
-                assert len(dataCredentials["header"].keys()) == 0, "Header should not included authorization keys or similar."
-                assert not dataCredentials["header"].keys(), "Header be an empty list."
-                assert "authorization" not in dataCredentials["header"], "Header should not included authorization keys."
-                print("Invalid request triggered expected Credentials response.")
-                print("Credentials response verified on failed request.")
-
-                return
+            return
 
     assert False, "Response attributes do not match those defined in request."
 
@@ -984,15 +1012,15 @@ def test_verifyConsumedAttributes5():
 #     downloadFWFileRequestInvalid(messageNoSwid, 'noSwidFWRequest.json', 'noSwidFWCredentials.json',
 #                                  'noSwidFWResponse.json')
 #
-@pytest.mark.rcm_fitness_mvp_extended
-def test_downloadFWFileRequestInvalid8():
-    downloadFWFileRequestInvalid(messageNoAll, 'noAllFWRequest.json', 'noAllFWCredentials.json',
-                                 'noAllFWResponse.json')
-
-@pytest.mark.rcm_fitness_mvp_extended
-def test_verifyConsumedAttributes8():
-    verifyConsumedAttributesInvalid(path + 'noAllFWRequest.json', path + 'noAllFWCredentials.json',
-                                    path + 'noAllFWResponse.json', "SHA-256", "VCEVision")
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_downloadFWFileRequestInvalid8():
+#     downloadFWFileRequestInvalid(messageNoAll, 'noAllFWRequest.json', 'noAllFWCredentials.json',
+#                                  'noAllFWResponse.json')
+#
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_verifyConsumedAttributes8():
+#     verifyConsumedAttributesInvalid(path + 'noAllFWRequest.json', path + 'noAllFWCredentials.json',
+#                                     path + 'noAllFWResponse.json', "SHA-256", "VCEVision")
 
 
 #
