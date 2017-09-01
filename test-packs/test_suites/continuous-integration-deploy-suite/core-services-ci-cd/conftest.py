@@ -31,7 +31,7 @@ class RabbitMqConnection:
 
     def consumeMessageFromQueue(self, queue):
         messageFound = af_support_tools.rmq_wait_for_messages_in_queue(self.ipAddress, self.port, self.username, self.password,
-                                                        queue, wait_time = 40, check_interval = 5)
+                                                        queue, wait_time = 300, check_interval = 5)
         if messageFound :
             message = af_support_tools.rmq_consume_message(self.ipAddress, self.port, self.username,self.password, queue)
             print("INFO message consumed from queue {}: {}".format(queue, message))
