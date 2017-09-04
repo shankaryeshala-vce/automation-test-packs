@@ -187,7 +187,7 @@ def test_registerVcenter():
     ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.register'),
     ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIB'),
     ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIBConfigure'),
-    ('exchange.cdell.psd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.vm.destroy'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.vm.destroy'),
     ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request',
      'queue.dell.cpsd.hdp.hal.data.provider.device.data.discovery.request.vcenter-compute-data-provider'),
     ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request',
