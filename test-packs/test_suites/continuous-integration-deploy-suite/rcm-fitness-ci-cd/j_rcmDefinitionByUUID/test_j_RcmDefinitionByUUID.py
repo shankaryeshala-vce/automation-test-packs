@@ -57,7 +57,7 @@ def getRCMDefinition(family, model):
     optionManu = "MANUFACTURING"
     #model = "340"
     exception = "No rcm definitions for system family"
-    urlInventory = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/inventory/vxrack/FLEX/9.2'
+    urlInventory = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/vxrack/FLEX/9.2'
 
     #print(url)
     respInventory = requests.get(urlInventory)
@@ -65,7 +65,7 @@ def getRCMDefinition(family, model):
     UUID = dataInventory["rcmInventoryItems"][0]["uuid"]
     print("UUID: %s" % UUID)
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/definition/' + UUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/definition/' + UUID
     resp = requests.get(url)
     data = json.loads(resp.text)
     rcm = data["rcmDefinition"]
@@ -127,7 +127,7 @@ def getRCMDefinition_Invalid(UUID, family, model):
     optionManu = "MANUFACTURING"
 
     exception = "No rcm definitions for system family"
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/definition/' + UUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/definition/' + UUID
     print("Requested UUID: %s" % UUID, "\n")
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -144,7 +144,7 @@ def getRCMDefinition_Invalid(UUID, family, model):
 
 
 def getRCMDefinition_Null(rcmUUID):
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/inventory/' + rcmUUID + '/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/' + rcmUUID + '/'
     print(url, "\n")
     resp = requests.get(url)
 
