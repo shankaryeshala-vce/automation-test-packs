@@ -58,7 +58,7 @@ def purgeOldOutput(dir, pattern):
 
 
 def getSystemDefinition():
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/'
     resp = requests.get(url)
     data = json.loads(resp.text)
 
@@ -92,7 +92,7 @@ def getListCompUUIDs(sysUUID):
     compList = []
     # getSystemDefinition()
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
 
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -126,7 +126,7 @@ def getComplianceData(model, type, filename, sysUUID):
     subIndex = 0
     compIndex = 0
     versionIndex = 0
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
 
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -146,7 +146,7 @@ def getComplianceData(model, type, filename, sysUUID):
                 global compUUID
                 compUUID = data["components"][compIndex]["uuid"]
                 print("Component UUID: %s" % compUUID)
-                compURL = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/device/' + compUUID
+                compURL = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/device/' + compUUID
 
                 compResp = requests.get(compURL)
                 compData = json.loads(compResp.text)
@@ -159,8 +159,7 @@ def getComplianceData(model, type, filename, sysUUID):
 
                 while subIndex < len(compData["subComponents"]):
                     if "model" in compData["subComponents"][subIndex]["elementData"]:
-                        if model in (compData["subComponents"][subIndex]["elementData"]["model"]) and (
-                            compData["subComponents"][subIndex]["elementData"]["elementType"] == "RAID"):
+                        if model in (compData["subComponents"][subIndex]["elementData"]["model"]) and (compData["subComponents"][subIndex]["elementData"]["elementType"] == "RAID"):
                             while versionIndex < len(compData["subComponents"][subIndex]["versionDatas"]):
                                 if (compData["subComponents"][subIndex]["versionDatas"][versionIndex][
                                         "type"]) == "FIRMWARE":
@@ -207,7 +206,7 @@ def getComplianceDataSystem(model, filename, sysUUID):
     subIndex = 0
     compIndex = 0
     versionIndex = 0
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
 
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -224,7 +223,7 @@ def getComplianceDataSystem(model, filename, sysUUID):
                     global compUUID
                     compUUID = data["components"][compIndex]["uuid"]
 
-                    systemURL = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system/' + sysUUID
+                    systemURL = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/system/' + sysUUID
 
                     systemResp = requests.get(systemURL)
                     systemData = json.loads(systemResp.text)
@@ -262,7 +261,7 @@ def getAvailableRCMs(family, model, train, version, option, filename):
     rcmIndex = 0
 
     exception = "No RCM definition systems for system family"
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/inventory/' + family + "/" + model + "/" + train + "/" + version
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/' + family + "/" + model + "/" + train + "/" + version
     print(url)
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -304,7 +303,7 @@ def getAvailableRCMs(family, model, train, version, option, filename):
 def getRCMDefinition(component, filename, option):
     contentIndex = 0
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/definition/' + rcmUUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/definition/' + rcmUUID
     print(url)
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -348,7 +347,7 @@ def getRCMDefinition(component, filename, option):
 
 
 def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, product, model, filename, sysUUID):
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/evaluation/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/evaluation/'
     payload = {'systemUuid': sysUUID, 'rcmUuid': rcmUUID}
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     resp = requests.post(url, data=json.dumps(payload), headers=headers)
