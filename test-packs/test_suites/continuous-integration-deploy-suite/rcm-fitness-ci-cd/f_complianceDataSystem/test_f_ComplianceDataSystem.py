@@ -10,7 +10,7 @@ import re
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
     global path
-    path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/restLevelTests/complianceDataSystem/'
+    path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/f_complianceDataSystem/'
     ensurePathExists(path)
     purgeOldOutput(path, "complianceDataSystem")
 
@@ -45,7 +45,7 @@ def purgeOldOutput(dir, pattern):
 
 
 def getSystemDefinition():
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/'
     resp = requests.get(url)
     data = json.loads(resp.text)
 
@@ -83,12 +83,12 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
     deviceIndex = 0
     i = 0
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID
     resp = requests.get(url)
     data = json.loads(resp.text)
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
     resp = requests.get(url)
     deviceData = json.loads(resp.text)
 
@@ -97,7 +97,7 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
 
     totalComponents = len(deviceData["components"])
 
-    compURL = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system/' + sysUUID
+    compURL = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/system/' + sysUUID
 
     compResp = requests.get(compURL)
     compData = json.loads(compResp.text)
@@ -245,7 +245,7 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
 def getComplianceDataSystemSubComps(model, elementType, identifier, sysDefFilename, compDataFilename, sysUUID):
     getSystemDefinition()
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID
 
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -256,7 +256,7 @@ def getComplianceDataSystemSubComps(model, elementType, identifier, sysDefFilena
     with open(sysDefFilename, 'w') as outfile:
         json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
-    compURL = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system/' + sysUUID
+    compURL = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/system/' + sysUUID
 
     compResp = requests.get(compURL)
     compData = json.loads(compResp.text)
@@ -345,7 +345,7 @@ def getComplianceDataSystem_INVALID(sysUUID):
     versionIndex = 0
     getSystemDefinition()
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system/' + sysUUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/system/' + sysUUID
 
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -376,11 +376,11 @@ def getComplianceDataSystem_INVALID(sysUUID):
 def getComplianceDataSystem_NULL():
     print("Verifying 404 returned if no component UUID provided.")
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/system/'
     resp = requests.get(url)
     assert resp.status_code == 404, "Request has not been acknowledged as expected."
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system//'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/system//'
     resp = requests.get(url)
     assert resp.status_code == 404, "Request has not been acknowledged as expected."
 
