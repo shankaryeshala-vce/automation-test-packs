@@ -45,7 +45,7 @@ def purgeOldOutput(dir, pattern):
 
 
 def getSystemDefinition(identifier, system, product, family, model):
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/'
     resp = requests.get(url)
     data = json.loads(resp.text)
 
@@ -135,7 +135,7 @@ def getSystemDefinition(identifier, system, product, family, model):
 
 
 def getSystemDefinitionByUUID(identifier, system, product, family, model, sysUUID):
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID
     resp = requests.get(url)
     data = json.loads(resp.text)
 
@@ -235,7 +235,7 @@ def getSystemDefinitionByUUID(identifier, system, product, family, model, sysUUI
 
 
 def getComponentBySystemUUID(family, series, type, tag, model, endpoints, sysUUID):
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID + '/component'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID + '/component'
     resp = requests.get(url)
     data = json.loads(resp.text)
 
@@ -292,7 +292,7 @@ def getComponentBySystemUUID(family, series, type, tag, model, endpoints, sysUUI
 def getSystemDefinitionInvalidUUID(invalidSystemUUID):
     # invalidSystemUUID = systemUUID[:8]
     print(invalidSystemUUID)
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + invalidSystemUUID + '/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + invalidSystemUUID + '/'
     resp = requests.get(url)
     data = json.loads(resp.text)
 
@@ -310,7 +310,7 @@ def getSystemDefinitionInvalidUUID(invalidSystemUUID):
 def getComponentByInvalidSystemUUID(invalidSystemUUID):
     # invalidSystemUUID = systemUUID[:8]
     print(invalidSystemUUID)
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + invalidSystemUUID + '/component/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + invalidSystemUUID + '/component/'
     resp = requests.get(url)
     data = json.loads(resp.text)
 
@@ -324,14 +324,42 @@ def getComponentByInvalidSystemUUID(invalidSystemUUID):
             assert ('SYSDEF2022W') in (data["message"]), "Returned Error Message does not reflect expected warning."
 
 
-def getSystemDefinitionNullUUID():
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition//'
+def getSystemDefinitionNullUUID(identifier, system, product, family, model):
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition//'
     resp = requests.get(url)
-    # data = json.loads(resp.text)
+    data = json.loads(resp.text)
 
-    print("Requesting a NULL systems specific details ....")
-    print(resp.status_code)
-    assert resp.status_code == 404, "Request has not been acknowledged as expected."
+    groupIndex = linkIndex = totalGroups = 0
+    totalEndpoints = totalSubSystems = totalComponents = totalLinks = 0
+
+    print("GroupIndex: %d" % groupIndex)
+    print("TotalSubSystems: %d" % totalSubSystems)
+
+    print("Requesting UUID from System Definition....")
+    assert resp.status_code == 200, "Request has not been acknowledged as expected."
+
+    if data != "":
+        if data["systems"][0]["uuid"] != "":
+            # with open(path + 'rcmSystemDefinition-VxRack.json', 'w') as outfile:
+            #     json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
+            global systemUUID
+            systemUUID = data["systems"][0]["uuid"]
+            assert data["systems"][0]["definition"][
+                       "productFamily"] == system, "Response details incorrect Product Family."
+            assert data["systems"][0]["definition"]["product"] == product, "Response details incorrect Product."
+            assert data["systems"][0]["definition"]["modelFamily"] == family, "Response details incorrect Model Family."
+            assert data["systems"][0]["definition"]["model"] == model, "Response details incorrect Model."
+            assert data["systems"][0]["identity"]["serialNumber"] != "", "Response details empty Serial Number."
+            assert data["systems"][0]["identity"]["identifier"] == identifier, "Response details empty Identifier."
+            assert model in data["systems"][0]["definition"]["model"], "Response details incorrect Model."
+
+            totalLinks = len(data["systems"][0]["links"])
+            assert totalLinks > 0, "Empty list of Links returned."
+
+        else:
+            print("\nNo System UUID returned in REST response")
+            print(data["message"])
+
 
 
 def getComponentByComponentUUID():
@@ -339,7 +367,7 @@ def getComponentByComponentUUID():
     compIndex = 0
     versionIndex = 0
     compList = []
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/'
     resp = requests.get(url)
     data = json.loads(resp.text)
 
@@ -349,7 +377,7 @@ def getComponentByComponentUUID():
     print("Requesting UUID from System Definition....")
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + systemUUID + '/component/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + systemUUID + '/component/'
 
     resp = requests.get(url)
     dataInput = json.loads(resp.text)
@@ -386,7 +414,7 @@ def getComponentByComponentUUID():
 
     while compListIndex < len(compList):
         compIndexUUID = 0
-        url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + systemUUID + '/component/' + \
+        url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + systemUUID + '/component/' + \
               compList[compListIndex]
         resp = requests.get(url)
         data = json.loads(resp.text)
@@ -509,7 +537,7 @@ def test_getSysDefInvalid8():
 ##    getComponentByInvalidSystemUUID("1111")
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getSysDefNull9():
-    getSystemDefinitionNullUUID()
+    getSystemDefinitionNullUUID("VXRACKFLEX", "VCESYSTEM", "VXRACK", "FLEX", "1000")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
