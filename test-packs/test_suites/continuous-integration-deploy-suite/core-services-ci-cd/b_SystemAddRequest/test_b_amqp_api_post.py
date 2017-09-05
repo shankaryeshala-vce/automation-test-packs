@@ -5,8 +5,6 @@ import json
 import requests
 
 
-
-
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
     # Update config ini files at runtime
