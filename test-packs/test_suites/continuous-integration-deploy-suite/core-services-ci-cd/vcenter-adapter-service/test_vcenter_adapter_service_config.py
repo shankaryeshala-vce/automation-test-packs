@@ -116,7 +116,7 @@ def test_registerVcenter():
 
     cleanup('test.controlplane.vcenter.response')
     cleanup('test.endpoint.registration.event')
-    bindQueues('exchange.cpsd.controlplane.vcenter.response', 'test.controlplane.vcenter.response')
+    bindQueues('exchange.dell.cpsd.controlplane.vcenter.response', 'test.controlplane.vcenter.response')
     bindQueues('exchange.dell.cpsd.endpoint.registration.event', 'test.endpoint.registration.event')
 
     time.sleep(2)
@@ -136,7 +136,7 @@ def test_registerVcenter():
     af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                          rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
-                                         exchange='exchange.cpsd.controlplane.vcenter.request',
+                                         exchange='exchange.dell.cpsd.controlplane.vcenter.request',
                                          routing_key='controlplane.hypervisor.vcenter.endpoint.register',
                                          headers={
                                              '__TypeId__': 'com.dell.cpsd.vcenter.registration.info.request'},
