@@ -10,7 +10,7 @@ import af_support_tools
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
     global path
-    path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/restLevelTests/complianceDataDevice/'
+    path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/e_complianceDataDevice'
     global ssl_options
     ssl_options = {"ca_certs": "/etc/rabbitmq/certs/testca/cacert.pem",
                    "certfile": "/etc/rabbitmq/certs/certs/client/cert.pem",
@@ -45,7 +45,7 @@ def purgeOldOutput(dir, pattern):
 
 
 def getSystemDefinition():
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/'
     resp = requests.get(url)
     data = json.loads(resp.text)
 
@@ -82,14 +82,14 @@ def getComplianceData(product, family, model, deviceProduct, deviceType, filenam
     totalSubComponents = 0
     i = 0
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
 
     resp = requests.get(url)
     data = json.loads(resp.text)
 
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID
 
     resp = requests.get(url)
     sysData = json.loads(resp.text)
@@ -113,7 +113,7 @@ def getComplianceData(product, family, model, deviceProduct, deviceType, filenam
                     print("Component UUID: %s" % compUUID)
                     newComp = compUUID[:8]
                     print(newComp)
-                    compURL = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/device/' + compUUID
+                    compURL = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/device/' + compUUID
 
                     compResp = requests.get(compURL)
                     compData = json.loads(compResp.text)
@@ -248,7 +248,7 @@ def getComplianceDataDeviceSubComps(elementType, identifier, sysDefFilename, com
     totalSubComponents = 0
     getSystemDefinition()
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID
 
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -259,7 +259,7 @@ def getComplianceDataDeviceSubComps(elementType, identifier, sysDefFilename, com
     with open(sysDefFilename, 'w') as outfile:
         json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
-    compURL = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/device/' + compUUID
+    compURL = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/device/' + compUUID
 
     compResp = requests.get(compURL)
     compData = json.loads(compResp.text)
@@ -321,7 +321,7 @@ def getComplianceData_INVALID(compUUID):
     versionIndex = 0
     getSystemDefinition()
     print(compUUID)
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/device/' + compUUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/device/' + compUUID
 
     resp = requests.get(url)
     print(resp)
@@ -360,7 +360,7 @@ def getComplianceData_SPACES(compUUID):
     versionIndex = 0
     getSystemDefinition()
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/device/' + compUUID + '/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/device/' + compUUID + '/'
 
     resp = requests.get(url)
     print(resp.text)
@@ -380,11 +380,11 @@ def getComplianceData_SPACES(compUUID):
 def getComplianceData_NULL():
     print("Verifying 404 returned if no component UUID provided.")
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/device/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/device/'
     resp = requests.get(url)
     assert resp.status_code == 404, "Request has not been acknowledged as expected."
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/device//'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/device//'
     resp = requests.get(url)
     assert resp.status_code == 404, "Request has not been acknowledged as expected."
 
