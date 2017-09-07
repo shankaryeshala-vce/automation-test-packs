@@ -75,8 +75,16 @@ def load_test_data():
     vcenter_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                                  heading=setup_config_header,
                                                                  property='vcenter_password')
+    global rpm_name
+    rpm_name = "dell-cpsd-vcenter-adapter"
+
+    global service_name
+    service_name = 'symphony-vcenter-adapter-service'
+
     global vcenter_port
     vcenter_port = '443'
+
+
 
 
 #####################################################################
@@ -97,7 +105,6 @@ def test_vcenter_adapter_servicerunning():
 
     print('\n* * * Testing the VCenter-Adapter Service on system:', ipaddress, '* * *\n')
 
-    service_name = 'symphony-vcenter-adapter-service'
 
     # 1. Test the service is running
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
@@ -116,7 +123,7 @@ def test_registerVcenter():
 
     cleanup('test.controlplane.vcenter.response')
     cleanup('test.endpoint.registration.event')
-    bindQueues('exchange.cpsd.controlplane.vcenter.response', 'test.controlplane.vcenter.response')
+    bindQueues('exchange.dell.cpsd.controlplane.vcenter.response', 'test.controlplane.vcenter.response')
     bindQueues('exchange.dell.cpsd.endpoint.registration.event', 'test.endpoint.registration.event')
 
     time.sleep(2)
@@ -136,7 +143,7 @@ def test_registerVcenter():
     af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                          rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
-                                         exchange='exchange.cpsd.controlplane.vcenter.request',
+                                         exchange='exchange.dell.cpsd.controlplane.vcenter.request',
                                          routing_key='controlplane.hypervisor.vcenter.endpoint.register',
                                          headers={
                                              '__TypeId__': 'com.dell.cpsd.vcenter.registration.info.request'},
@@ -174,20 +181,20 @@ def test_registerVcenter():
 
 
 @pytest.mark.parametrize('exchange, queue', [
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.add.host.license'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.addhostdvswitch'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.cluster.discover'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.clusteroperation'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.deployVMFromTemplate'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.discover'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.host.enter-maintenance'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.host.powercommand'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.pci.enable.passthrough'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.pci.passthrough'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.register'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIB'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIBConfigure'),
-    ('exchange.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.vm.destroy'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.add.host.license'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.addhostdvswitch'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.cluster.discover'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.clusteroperation'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.deployVMFromTemplate'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.discover'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.host.enter-maintenance'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.host.powercommand'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.pci.enable.passthrough'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.pci.passthrough'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.register'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIB'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.softwareVIBConfigure'),
+    ('exchange.dell.cpsd.controlplane.vcenter.request', 'queue.dell.cpsd.controlplane.vcenter.vm.destroy'),
     ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request',
      'queue.dell.cpsd.hdp.hal.data.provider.device.data.discovery.request.vcenter-compute-data-provider'),
     ('exchange.dell.cpsd.hdp.hal.data.provider.vcenter.compute.data.provider.request',
@@ -508,6 +515,46 @@ def test_vcenter_adapter_log_files_free_of_exceptions():
     assert not error_list, 'Exceptions in log files, Review the ' + errorLogFile + ' file'
 
     print('No ' + excep1, excep2, excep3, excep4 + ' exceptions in log files\n')
+
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_vcenter_removerpm():
+    err = []
+
+    sendCommand = "yum remove -y " + rpm_name
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+                                                         command=sendCommand, return_output=True)
+
+    # 1. Test the service is
+    sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+                                                         command=sendCommand, return_output=True)
+    my_return_status = my_return_status.strip()
+    print('\nDocker Container is:', my_return_status, '\n')
+    assert my_return_status != 'Up', (service_name + " still running")
+
+
+    sendCommand = 'ls /opt/dell/cpsd/ | grep "hal-mediation" '
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+                                                         command=sendCommand, return_output=True)
+
+    if "hal-mediation" in my_return_status:
+        err.append('hal-mediation-service not removed')
+    assert not err
+    
+    
+     #installing rpm
+    sendCommand = "yum install -y " + rpm_name
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+                                                         command=sendCommand, return_output=True)
+
+    # 1. Test the service is running
+    sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+                                                         command=sendCommand, return_output=True)
+    my_return_status = my_return_status.strip()
+    print('\nDocker Container is:', my_return_status, '\n')
+    assert my_return_status == 'Up', (service_name + " not running")
 
 
 ##############################################################################################
