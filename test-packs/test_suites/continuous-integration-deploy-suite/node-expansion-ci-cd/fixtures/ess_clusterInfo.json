@@ -12,15 +12,15 @@
       },
       {
         "name": "test2",
-        "numberOfHosts": "2"
+        "numberOfHosts": "63"
       },
       {
         "name": "test3",
-        "numberOfHosts": "1000"
+        "numberOfHosts": "64"
       },
       {
         "name": "test4",
-        "numberOfHosts": "20000"
+        "numberOfHosts": "65"
       }
     ]
   }
