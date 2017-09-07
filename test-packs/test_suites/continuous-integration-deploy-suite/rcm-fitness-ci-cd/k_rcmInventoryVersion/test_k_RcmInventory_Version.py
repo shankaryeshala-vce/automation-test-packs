@@ -52,7 +52,7 @@ def getAvailableRCMs(family, model, train, version):
     optionManu = "MANUFACTURING"
 
     exception = "No rcm definitions for system family"
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/inventory/' + family + "/" + model + "/" + train + "/" + version + "/"
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/' + family + "/" + model + "/" + train + "/" + version + "/"
     print(url)
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -103,7 +103,7 @@ def getAvailableRCMs_Invalid(family, model, train, version):
     optionManu = "MANUFACTURING"
 
     exception = "No rcm definitions for system family"
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/inventory/' + family + "/" + model + "/" + train + "/" + version + "/"
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/' + family + "/" + model + "/" + train + "/" + version + "/"
     print(url, "\n")
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -123,13 +123,29 @@ def getAvailableRCMs_Invalid(family, model, train, version):
     print("\nReturned data has completed all defined checks successfully......")
 
 def getAvailableRCMs_Null(family, model, train, version):
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/inventory/' + family + "/" + model + "/" + train + '/' + version + '/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/' + family + "/" + model + "/" + train + '/' + version + '/'
     print(url, "\n")
     resp = requests.get(url)
+    data = json.loads(resp.text)
 
     #print("Requesting a NULL train ....")
     print(resp.status_code)
-    assert resp.status_code == 404, "Request has not been acknowledged as expected."
+    print(data)
+    if family == "" and model == "" and train == "" and version == "":
+        assert resp.status_code == 404, "Request has not been acknowledged as expected."
+    elif family == "" and version != "":
+        assert resp.status_code == 200, "Request has not been acknowledged as expected."
+        assert "RFCA1019I No RCM definitions for system family" in data["message"], "Unexpected error response returned."
+    elif family != "" and version == "":
+        assert resp.status_code == 200, "Request has not been acknowledged as expected."
+        assert len(data["rcmInventoryItems"]) >= 1, "Returned RCM items should be one or more."
+        assert data["message"] is None, "Unexpected error response returned."
+    else:
+        assert resp.status_code == 200, "Request has not been acknowledged as expected."
+        assert data["rcmInventoryItems"] is None, "Returned RCM items should be null."
+        assert "RFCA1019I No RCM definitions for system family" in data["message"], "Unexpected error response returned."
+
+
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM1():

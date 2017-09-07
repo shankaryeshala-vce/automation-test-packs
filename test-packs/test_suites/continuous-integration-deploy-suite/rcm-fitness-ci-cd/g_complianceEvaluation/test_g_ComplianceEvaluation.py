@@ -22,7 +22,7 @@ def load_test_data():
 
 @pytest.fixture()
 def sys():
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/'
     response = requests.get(url)
     assert response.status_code == 200, "Request has not been acknowledged as expected."
     data = response.json()
@@ -42,7 +42,7 @@ def sys():
 @pytest.fixture()
 def rcmid():
     # Returns the first rcm uuid listed
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/inventory/vxrack/FLEX'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/vxrack/FLEX'
     response = requests.get(url)
     assert response.status_code == 200, "Request has not been acknowledged as expected."
     data = response.json()
@@ -59,7 +59,7 @@ def rcmid():
 @pytest.fixture()
 def train():
     # returns the train of first rcm listed
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/inventory/vxrack/FLEX'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/vxrack/FLEX'
     response = requests.get(url)
     assert response.status_code == 200, "Request has not been acknowledged as expected."
     data = response.json()
@@ -71,7 +71,7 @@ def train():
 @pytest.fixture()
 def version():
     # returns the version of first rcm listed
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/inventory/vxrack/FLEX'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/vxrack/FLEX'
     response = requests.get(url)
     assert response.status_code == 200, "Request has not been acknowledged as expected."
     data = response.json()
@@ -96,7 +96,7 @@ def version():
     ("VCENTER", "VCENTER-APPLIANCE", "VCENTER-APPLIANCE", "VMware-VCSA"),
     ("VCENTER", "VCENTER-WINDOWS", "VCENTER-WINDOWS", "VMware-VIMSetup")])
 def test_post_eval(sys, rcmid, train, version, type, model, identifier, fileName):
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/evaluation/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/evaluation/'
     body = {'systemUuid': sys[0], 'rcmUuid': rcmid}
     data_json = json.dumps(body)
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
