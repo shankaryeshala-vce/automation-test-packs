@@ -516,7 +516,8 @@ def test_vcenter_adapter_log_files_free_of_exceptions():
 
     print('No ' + excep1, excep2, excep3, excep4 + ' exceptions in log files\n')
 
-
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
 def test_vcenter_removerpm():
     err = []
 
@@ -540,6 +541,20 @@ def test_vcenter_removerpm():
     if "hal-mediation" in my_return_status:
         err.append('hal-mediation-service not removed')
     assert not err
+    
+    
+     #installing rpm
+    sendCommand = "yum install -y " + rpm_name
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+                                                         command=sendCommand, return_output=True)
+
+    # 1. Test the service is running
+    sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+                                                         command=sendCommand, return_output=True)
+    my_return_status = my_return_status.strip()
+    print('\nDocker Container is:', my_return_status, '\n')
+    assert my_return_status == 'Up', (service_name + " not running")
 
 
 ##############################################################################################
@@ -572,7 +587,7 @@ def waitForMsg(queue):
     timeout = 0
 
     # Max number of seconds to wait
-    max_timeout = 100
+    max_timeout = 500
 
     # Amount of time in seconds that the loop is going to wait on each iteration
     sleeptime = 1
