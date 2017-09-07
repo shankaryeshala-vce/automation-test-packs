@@ -1027,7 +1027,8 @@ def profileESRSResponseTimes(payLoad):
         else:
             continue
 
-
+    time.sleep(5)
+    resetTestQueues()
     assert count == 200, "Failed to complete 200 requests to profile."
 
 
@@ -1100,7 +1101,7 @@ def test_downloadFWFileRequestInvalid8():
 def test_verifyConsumedInvalidAttributes8():
     verifyConsumedAttributesInvalid(path + 'noAllFWRequest.json', path + 'noAllFWCredentials.json',
                                     path + 'noAllFWResponse.json', "SHA-256", "VCEVision")
-
+#
 @pytest.mark.rcm_fitness_mvp_extended
 def test_profileESRSResponseTimes():
     profileESRSResponseTimes(message)
@@ -1137,9 +1138,9 @@ def test_verifyConsumedAttributes2():
 def test_verifyProgressMessage():
     verifyProgressMessage(path + 'repeatDownloadFWRequest.json', path + 'repeatDownloadFWCredentials.json',
                           path + 'repeatDownloadFWResponse.json')
-#
-#
-#
+# #
+# #
+# #
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti():
     downloadFWFileMulti(message, messageSec, messageThird, 'multiDownloadFWRequest.json',
