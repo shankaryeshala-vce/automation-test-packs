@@ -94,7 +94,7 @@ def load_test_data():
                                                         property=payload_vcenter)
 
     getSystemDefinition()
-    # registerRackHD(message_rackHD, "out_registerRackHDResp.json")
+    registerRackHD(message_rackHD, "out_registerRackHDResp.json")
     # time.sleep(2)
     # registerVcenter(message_vcenter, "out_registerVcenterResp.json")
 
@@ -241,10 +241,10 @@ def registerVcenter(payLoad, responseRegVcenter):
     time.sleep(2)
 
     af_support_tools.rmq_bind_queue(host=host, port=port, rmq_username=rmq_username, rmq_password=rmq_username,
-                                    queue='testRegisterVcenterRequest', exchange='exchange.cpsd.controlplane.vcenter.request',
+                                    queue='testRegisterVcenterRequest', exchange='exchange.dell.cpsd.controlplane.vcenter.request',
                                     routing_key='#', ssl_enabled=False)
     af_support_tools.rmq_bind_queue(host=host, port=port, rmq_username=rmq_username, rmq_password=rmq_username,
-                                    queue='testRegisterVcenterResponse', exchange='exchange.cpsd.controlplane.vcenter.response',
+                                    queue='testRegisterVcenterResponse', exchange='exchange.dell.cpsd.controlplane.vcenter.response',
                                     routing_key='#', ssl_enabled=False)
 
     af_support_tools.rmq_publish_message(host=host, port=port, rmq_username=rmq_username, rmq_password=rmq_username,
@@ -355,7 +355,7 @@ def updateFWRequest(payLoad, requestFile, requestCredentials, responseCredential
 
 
 def restResponse(input):
-    assert "19080/rcm-fitness-api/api/install/firmware" in input["link"][
+    assert "10000/rcm-fitness-paqx/rcm-fitness-api/api/install/firmware" in input["link"][
         "href"], "No URL included in response to query subsequent progress."
     assert input["link"]["method"] == "GET", "Unexpected method returned in response."
     assert len(input["uuid"]) > 16, "Unexpected correlation ID returned"
@@ -369,7 +369,7 @@ def restResponse(input):
     print("Total CorrIDs: %d" % len(restCorrID))
 
 def getSystemDefinition():
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/'
     resp = requests.get(url)
     data = json.loads(resp.text)
 
@@ -436,40 +436,40 @@ def duplicateUpdateFWRequest(payLoad, dupPayLoad, anotherDupPayLoad, requestFile
                                          ssl_enabled=False)
 
     print("Update request publish.")
-    # time.sleep(20)
-    #
-    # my_request_body = af_support_tools.rmq_consume_message(host=host, port=port,
-    #                                                        rmq_username=rmq_username, rmq_password=rmq_username,
-    #                                                        queue='testUpdateFWRequest',
-    #                                                        ssl_enabled=False)
-    # af_support_tools.rmq_payload_to_file(my_request_body, path + requestFile)
-    #
-    # my_request_credentials_body = af_support_tools.rmq_consume_message(host=host, port=port,
-    #                                                                    rmq_username=rmq_username,
-    #                                                                    rmq_password=rmq_username,
-    #                                                                     queue='testUpdateFWCredsRequest',
-    #                                                                     ssl_enabled=False)
-    # af_support_tools.rmq_payload_to_file(my_request_credentials_body, path + requestCredentials)
-    #
-    # my_response_credentials_body = af_support_tools.rmq_consume_message(host=host, port=port,
-    #                                                                     rmq_username=rmq_username,
-    #                                                                     rmq_password=rmq_username,
-    #                                                                     queue='testUpdateFWCredsResp',
-    #                                                                     ssl_enabled=False)
-    # af_support_tools.rmq_payload_to_file(my_response_credentials_body, path + responseCredentials)
-    #
-    # print("Update request and credential request/response consumed.")
-    #
-    # time.sleep(180)
-    #
-    # my_response_download_body = af_support_tools.rmq_consume_all_messages(host=host, port=port,
-    #                                                                       rmq_username=rmq_username,
-    #                                                                       rmq_password=rmq_username,
-    #                                                                       queue='testUpdateFWResponse',
-    #                                                                       ssl_enabled=False)
-    # af_support_tools.rmq_payload_to_file(my_response_download_body, path + responseFile)
-    #
-    # print("Update progress messages consumed.")
+    time.sleep(20)
+
+    my_request_body = af_support_tools.rmq_consume_message(host=host, port=port,
+                                                           rmq_username=rmq_username, rmq_password=rmq_username,
+                                                           queue='testUpdateFWRequest',
+                                                           ssl_enabled=False)
+    af_support_tools.rmq_payload_to_file(my_request_body, path + requestFile)
+
+    my_request_credentials_body = af_support_tools.rmq_consume_message(host=host, port=port,
+                                                                       rmq_username=rmq_username,
+                                                                       rmq_password=rmq_username,
+                                                                        queue='testUpdateFWCredsRequest',
+                                                                        ssl_enabled=False)
+    af_support_tools.rmq_payload_to_file(my_request_credentials_body, path + requestCredentials)
+
+    my_response_credentials_body = af_support_tools.rmq_consume_message(host=host, port=port,
+                                                                        rmq_username=rmq_username,
+                                                                        rmq_password=rmq_username,
+                                                                        queue='testUpdateFWCredsResp',
+                                                                        ssl_enabled=False)
+    af_support_tools.rmq_payload_to_file(my_response_credentials_body, path + responseCredentials)
+
+    print("Update request and credential request/response consumed.")
+
+    time.sleep(180)
+
+    my_response_download_body = af_support_tools.rmq_consume_all_messages(host=host, port=port,
+                                                                          rmq_username=rmq_username,
+                                                                          rmq_password=rmq_username,
+                                                                          queue='testUpdateFWResponse',
+                                                                          ssl_enabled=False)
+    af_support_tools.rmq_payload_to_file(my_response_download_body, path + responseFile)
+
+    print("Update progress messages consumed.")
 
 def verifyPublishedAttributes(filename):
     paramIndex = 0
@@ -804,7 +804,7 @@ def verifyRESTupdateRequest(filename):
     print("SubComp: %s" % subComp)
     print("subCompUUID: %s" % subCompUUID)
     mode = 'on'
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/install/firmware/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/install/firmware/'
     payload = {'filePath': updatePath, 'subComponentType': subComp, 'deviceId': subCompUUID, 'emulationMode': mode}
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     resp = requests.post(url, data=json.dumps(payload), headers=headers)
