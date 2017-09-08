@@ -191,8 +191,9 @@ def test_post_eval(sys, rcmid, train, version, type, model, identifier, fileName
                 if "versionFileName" in data['rcmEvaluationResults'][results]['evaluatedRcmDatum']:
                     assert fileName in data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileName"], "Unexpected fileName returned."
                     assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"] != "", "Unexpected fileHash returned."
-                if data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"] != "unknown":
-                    assert len(data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"]) >  24, "Unexpected fileHash rturned."
+                if "versionFileHash" in data['rcmEvaluationResults'][results]['evaluatedRcmDatum']:
+                    if data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"] != "unknown":
+                        assert len(data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"]) >  24, "Unexpected fileHash rturned."
 
                 return
             instances += 1

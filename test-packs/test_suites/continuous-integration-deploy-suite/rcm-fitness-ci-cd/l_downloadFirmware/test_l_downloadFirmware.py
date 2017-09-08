@@ -1101,10 +1101,6 @@ def test_downloadFWFileRequestInvalid8():
 def test_verifyConsumedInvalidAttributes8():
     verifyConsumedAttributesInvalid(path + 'noAllFWRequest.json', path + 'noAllFWCredentials.json',
                                     path + 'noAllFWResponse.json', "SHA-256", "VCEVision")
-#
-@pytest.mark.rcm_fitness_mvp_extended
-def test_profileESRSResponseTimes():
-    profileESRSResponseTimes(message)
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
@@ -1215,3 +1211,8 @@ def test_verifyConsumedAttributes5():
 def test_verifyConsumedAttributes5a():
     verifyConsumedAttributes("ESXi600-201703001-Build-5224934.zip", path + 'downloadAllEsxiFWRequest.json', path + 'downloadAllEsxiFWCredentials.json',
                              path + 'downloadAllEsxiFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
+
+#
+@pytest.mark.rcm_fitness_mvp_extended
+def test_profileESRSResponseTimes():
+    profileESRSResponseTimes(message)
