@@ -4,6 +4,8 @@ import json
 import os
 import time
 import paramiko
+import requests
+
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -136,7 +138,7 @@ def test_SystemAdditionRequested():
 
     # Call the function to verify the system exists. This is not a necessary step but it will return the system UUID.
     verify_SystemExists()
-
+    verifyConsulUpdate("rcm-fitness-paqx", "rcm-fitness-api")
     cleanup()
 
 
@@ -374,6 +376,26 @@ def verify_SystemExists():
     config = json.loads(return_message[0], encoding='utf-8')
     my_systemUuid = config['convergedSystems'][0]['uuid']
     print('\nTEST: System Exists - System UUID: ', my_systemUuid)
+
+def verifyConsulUpdate(paqx, context):
+    url = 'http://' + host + ':8500/v1/catalog/services'
+    resp = requests.get(url)
+    data = json.loads(resp.text)
+
+    print("Requesting Consul info....")
+    print(data)
+    assert resp.status_code == 200, "Request has not been acknowledged as expected."
+
+    if data != "":
+        if paqx in data:
+            assert len(data[paqx]) == 1, "Unexpected number of RCM Fitness Paqx returned."
+            assert "contextPath=/" in data[paqx][0], "Unexpected string value returned."
+            assert data[paqx][0].endswith(context), "Unexpected end to path string returned."
+            print("Consul info verified.")
+        return
+
+    assert False, "No Consul info returned."
+
 
 #######################################################################################################################
 
