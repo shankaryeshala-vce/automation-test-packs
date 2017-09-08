@@ -10,7 +10,7 @@ import re
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
     global path
-    path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/restLevelTests/complianceDataSystem/'
+    path = '/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/rcm-fitness-ci-cd/f_complianceDataSystem/'
     ensurePathExists(path)
     purgeOldOutput(path, "complianceDataSystem")
 
@@ -45,7 +45,7 @@ def purgeOldOutput(dir, pattern):
 
 
 def getSystemDefinition():
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/'
     resp = requests.get(url)
     data = json.loads(resp.text)
 
@@ -83,12 +83,12 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
     deviceIndex = 0
     i = 0
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID
     resp = requests.get(url)
     data = json.loads(resp.text)
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
     resp = requests.get(url)
     deviceData = json.loads(resp.text)
 
@@ -97,7 +97,7 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
 
     totalComponents = len(deviceData["components"])
 
-    compURL = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system/' + sysUUID
+    compURL = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/system/' + sysUUID
 
     compResp = requests.get(compURL)
     compData = json.loads(compResp.text)
@@ -142,84 +142,99 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
         while groupIndex < totalGroups:
             print(compData["groups"][groupIndex]["uuid"])
             print(data["system"]["groups"][i]["uuid"])
+            if compData["groups"][groupIndex]["uuid"] != data["system"]["groups"][i]["uuid"]:
+                i += 1
+                continue
             if compData["groups"][groupIndex]["uuid"] == data["system"]["groups"][i]["uuid"]:
                 print("You are here...")
                 assert compData["groups"][groupIndex]["parentSystemUuids"][0] == systemUUID, "Response not detail parent System UUID."
                 assert compData["groups"][groupIndex]["type"] == "STORAGE" or "NETWORK" or "COMPUTE"
                 print("Done System type: %s" % compData["groups"][groupIndex]["type"])
                 i += 1
-                return
+                # continue
+
+                #return
+            else:
+                assert compData["groups"][groupIndex]["uuid"] == data["system"]["groups"][i]["uuid"], "Group UUIDs not matching....."
 
             groupIndex += 1
-        assert False, "Group UUIDs not matching....."
+        # assert False, "Group UUIDs not matching....."
         print("Verifying groups....")
         index = 0
         while deviceIndex < totalDevices:
-            if compData["devices"][deviceIndex]["uuid"] == deviceData["components"][compIndex]["uuid"]:
-                # assert compData["devices"][deviceIndex]["uuid"] == deviceData["components"][deviceIndex]["uuid"], "Response detailed an empty group UUID."
-                assert compData["devices"][deviceIndex]["parentGroupUuids"][0] == \
-                       deviceData["components"][compIndex]["parentGroupUuids"][
-                           0], "Response not detail parent Group UUID."
-                assert "productFamily" in compData["devices"][deviceIndex][
-                    "elementData"], "Response not detail Product Family."
-                assert "modelFamily" in compData["devices"][deviceIndex][
-                    "elementData"], "Response not detail Model Family."
-                assert "model" in compData["devices"][deviceIndex]["elementData"], "Response not detail Model."
-                assert "identifier" in compData["devices"][deviceIndex][
-                    "elementData"], "Response not detail Identifier."
-                assert "elementType" in compData["devices"][deviceIndex][
-                    "elementData"], "Response not detail ElementType."
-                # assert "ipAddress" in compData["devices"][deviceIndex]["elementData"], "Response not detail IP Address."
-                # assert "serialNumber" in compData["devices"][deviceIndex]["elementData"], "Response not detail Serial Number."
-                assert compData["devices"][deviceIndex]["auditData"][
-                           "collectedTime"] != "", "Response not detail Collection Time."
-                assert compData["devices"][deviceIndex]["auditData"][
-                           "collectionSentTime"] != "", "Response not detail Collection Sent Time."
-                assert compData["devices"][deviceIndex]["auditData"][
-                           "messageReceivedTime"] != "", "Response not detail Received Time."
-
-                if compData["devices"][deviceIndex]["elementData"]["model"] == deviceModel:
-                    assert compData["devices"][deviceIndex]["uuid"] == deviceData["components"][compIndex][
-                        "uuid"], "Response detailed an empty group UUID."
+            while compIndex < len(deviceData["components"]):
+                if compData["devices"][deviceIndex]["uuid"] != deviceData["components"][compIndex]["uuid"]:
+                    compIndex += 1
+                    continue
+                if compData["devices"][deviceIndex]["uuid"] == deviceData["components"][compIndex]["uuid"]:
+                    # assert compData["devices"][deviceIndex]["uuid"] == deviceData["components"][deviceIndex]["uuid"], "Response detailed an empty group UUID."
                     assert compData["devices"][deviceIndex]["parentGroupUuids"][0] == \
-                           deviceData["components"][compIndex]["parentGroupUuids"][0], "Response not detail parent Group UUID."
-                    assert compData["devices"][deviceIndex]["elementData"][
-                               "elementType"] == deviceType, "Response not detail Element Type."
-                    assert compData["devices"][deviceIndex]["elementData"][
-                               "modelFamily"] == deviceFamily, "Response not detail Model."
-                    assert compData["devices"][deviceIndex]["elementData"]["elementType"] == \
-                           deviceData["components"][compIndex]["identity"][
-                               "elementType"], "Response not detail Element Type."
-                    assert compData["devices"][deviceIndex]["elementData"]["model"] == \
-                           deviceData["components"][compIndex]["definition"]["model"], "Response not detail Model."
-                    assert compData["devices"][deviceIndex]["elementData"]["modelFamily"] == \
-                           deviceData["components"][compIndex]["definition"][
-                               "modelFamily"], "Response not detail Identifier."
-                    assert compData["devices"][deviceIndex]["elementData"]["productFamily"] == \
-                           deviceData["components"][compIndex]["definition"][
-                               "productFamily"], "Response not detail Product Family."
-                    assert compData["devices"][deviceIndex]["elementData"]["identifier"] == \
-                           deviceData["components"][compIndex]["identity"][
-                               "identifier"], "Response not detail Identifier."
-                    macAddress = compData["devices"][deviceIndex]["elementData"]["identifier"]
-                    if ":" in macAddress:
-                        countColon = macAddress.count(":")
-                        assert countColon == 5, "Unexpected MAC address format returned."
-                    # assert compData["devices"][deviceIndex]["elementData"]["serialNumber"] != "", "Response not detail Serial Number."
+                           deviceData["components"][compIndex]["parentGroupUuids"][
+                               0], "Response not detail parent Group UUID."
+                    assert "productFamily" in compData["devices"][deviceIndex][
+                        "elementData"], "Response not detail Product Family."
+                    assert "modelFamily" in compData["devices"][deviceIndex][
+                        "elementData"], "Response not detail Model Family."
+                    assert "model" in compData["devices"][deviceIndex]["elementData"], "Response not detail Model."
+                    assert "identifier" in compData["devices"][deviceIndex][
+                        "elementData"], "Response not detail Identifier."
+                    assert "elementType" in compData["devices"][deviceIndex][
+                        "elementData"], "Response not detail ElementType."
+                    # assert "ipAddress" in compData["devices"][deviceIndex]["elementData"], "Response not detail IP Address."
+                    # assert "serialNumber" in compData["devices"][deviceIndex]["elementData"], "Response not detail Serial Number."
                     assert compData["devices"][deviceIndex]["auditData"][
                                "collectedTime"] != "", "Response not detail Collection Time."
                     assert compData["devices"][deviceIndex]["auditData"][
                                "collectionSentTime"] != "", "Response not detail Collection Sent Time."
                     assert compData["devices"][deviceIndex]["auditData"][
                                "messageReceivedTime"] != "", "Response not detail Received Time."
-                    print("Done Device: %s\n" % compData["devices"][deviceIndex]["elementData"]["identifier"])
-                    return
-                else:
-                    compData["devices"][deviceIndex]["elementData"]["model"] == deviceModel, "Device UUIDs not matching....."
 
-                compIndex += 1
+                    if compData["devices"][deviceIndex]["elementData"]["model"] != deviceData["components"][compIndex]["definition"]["model"]:
+                        compIndex += 1
+                        continue
+                    if compData["devices"][deviceIndex]["elementData"]["model"] == deviceData["components"][compIndex]["definition"]["model"]:
+                        assert compData["devices"][deviceIndex]["uuid"] == deviceData["components"][compIndex][
+                            "uuid"], "Response detailed an empty group UUID."
+                        assert compData["devices"][deviceIndex]["parentGroupUuids"][0] == \
+                               deviceData["components"][compIndex]["parentGroupUuids"][0], "Response not detail parent Group UUID."
+                        assert compData["devices"][deviceIndex]["elementData"][
+                                   "elementType"] == deviceType, "Response not detail Element Type."
+                        assert compData["devices"][deviceIndex]["elementData"][
+                                   "modelFamily"] == deviceFamily, "Response not detail Model."
+                        assert compData["devices"][deviceIndex]["elementData"]["elementType"] == \
+                               deviceData["components"][compIndex]["identity"][
+                                   "elementType"], "Response not detail Element Type."
+                        # assert compData["devices"][deviceIndex]["elementData"]["model"] == deviceModel, "Response not detail Model."
+                        assert compData["devices"][deviceIndex]["elementData"]["modelFamily"] == \
+                               deviceData["components"][compIndex]["definition"][
+                                   "modelFamily"], "Response not detail Identifier."
+                        assert compData["devices"][deviceIndex]["elementData"]["productFamily"] == \
+                               deviceData["components"][compIndex]["definition"][
+                                   "productFamily"], "Response not detail Product Family."
+                        assert compData["devices"][deviceIndex]["elementData"]["identifier"] == \
+                               deviceData["components"][compIndex]["identity"][
+                                   "identifier"], "Response not detail Identifier."
+                        macAddress = compData["devices"][deviceIndex]["elementData"]["identifier"]
+                        if ":" in macAddress:
+                            countColon = macAddress.count(":")
+                            assert countColon == 5, "Unexpected MAC address format returned."
+                        # assert compData["devices"][deviceIndex]["elementData"]["serialNumber"] != "", "Response not detail Serial Number."
+                        assert compData["devices"][deviceIndex]["auditData"][
+                                   "collectedTime"] != "", "Response not detail Collection Time."
+                        assert compData["devices"][deviceIndex]["auditData"][
+                                   "collectionSentTime"] != "", "Response not detail Collection Sent Time."
+                        assert compData["devices"][deviceIndex]["auditData"][
+                                   "messageReceivedTime"] != "", "Response not detail Received Time."
+                        print("Done Device: %s\n" % compData["devices"][deviceIndex]["elementData"]["identifier"])
+                        return
+                    else:
+                        assert compData["devices"][deviceIndex]["elementData"]["model"] == deviceModel, "Device Models not matching....."
+
+                    compIndex += 1
+                else:
+                    assert compData["devices"][deviceIndex]["uuid"] == deviceData["components"][compIndex]["uuid"], "Device UUIDs not matching....."
             deviceIndex += 1
-        assert False, "Device UUIDs not matching....."
+
         deviceIndex = 0
         print("Verifying Devices completed....\n")
     assert False, "No devices returned."
@@ -230,7 +245,7 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
 def getComplianceDataSystemSubComps(model, elementType, identifier, sysDefFilename, compDataFilename, sysUUID):
     getSystemDefinition()
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/system/definition/' + sysUUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID
 
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -241,7 +256,7 @@ def getComplianceDataSystemSubComps(model, elementType, identifier, sysDefFilena
     with open(sysDefFilename, 'w') as outfile:
         json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
-    compURL = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system/' + sysUUID
+    compURL = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/system/' + sysUUID
 
     compResp = requests.get(compURL)
     compData = json.loads(compResp.text)
@@ -330,7 +345,7 @@ def getComplianceDataSystem_INVALID(sysUUID):
     versionIndex = 0
     getSystemDefinition()
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system/' + sysUUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/system/' + sysUUID
 
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -361,11 +376,11 @@ def getComplianceDataSystem_INVALID(sysUUID):
 def getComplianceDataSystem_NULL():
     print("Verifying 404 returned if no component UUID provided.")
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system/'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/system/'
     resp = requests.get(url)
     assert resp.status_code == 404, "Request has not been acknowledged as expected."
 
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/compliance/data/system//'
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/system//'
     resp = requests.get(url)
     assert resp.status_code == 404, "Request has not been acknowledged as expected."
 

@@ -52,6 +52,12 @@ def load_test_data():
     payload_messageSec = 'second_download'
     global payload_messageThird
     payload_messageThird = 'third_download'
+    global payload_all_bios
+    payload_all_bios = 'all_bios_download'
+    global payload_all_sas
+    payload_all_sas = 'all_sas_download'
+    global payload_all_esxi
+    payload_all_esxi = 'all_esxi_download'
     global payload_messageInvalidFile
     payload_messageInvalidFile = 'invalid_file'
     global payload_messageInvalidReplyTo
@@ -80,6 +86,7 @@ def load_test_data():
 
     ensurePathExists(path)
     purgeOldOutput(path, "loadFW")
+    purgeOldOutput(path, "downloadAll")
     purgeOldOutput(path, "invalid")
     purgeOldOutput(path, "no")
 
@@ -91,6 +98,15 @@ def load_test_data():
     global messageThird
     messageThird = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
                                                              property=payload_messageThird)
+    global messageBios
+    messageBios = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+                                                             property=payload_all_bios)
+    global messageSas
+    messageSas = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+                                                             property=payload_all_sas)
+    global messageEsxi
+    messageEsxi = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+                                                             property=payload_all_esxi)
     global messageInvalidFile
     messageInvalidFile = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
                                                                property=payload_messageInvalidFile)
@@ -127,6 +143,8 @@ def purgeOldOutput(dir, pattern):
         if re.search(pattern, f) and f.endswith(".json"):
             os.remove(os.path.join(dir, f))
             print("Old output files successfully deleted.")
+        elif f.endswith(".txt"):
+            os.remove(os.path.join(dir, f))
         else:
             print('Unable to locate output files to remove.')
 
@@ -168,8 +186,8 @@ def resetTestQueues():
                                     routing_key='#', ssl_enabled=False)
     print("New test queues successfully initialized.")
 
-
-def downloadFWFileRequest(payLoad, requestFile, requestCredentials, responseFileComplete):
+# filename, expectedDiskSize
+def downloadFWFileRequest(payLoad, requestFile, requestCredentials, responseFileComplete, filename, expectedDiskSize):
     messageReqHeader = {'__TypeId__': 'com.dell.cpsd.prepositioning.downloader.file.download.request'}
     messageResHeaderComplete = {'__TypeId__': 'com.dell.cpsd.prepositioning.downloader.file.download.completed'}
     messageResHeaderProgress = {'__TypeId__': 'com.dell.cpsd.prepositioning.downloader.file.download.progress'}
@@ -184,7 +202,7 @@ def downloadFWFileRequest(payLoad, requestFile, requestCredentials, responseFile
 
     time.sleep(2)
     deletePreviousDownloadFiles("BIOS_PFWCY_WN64_2.2.5.EXE",
-                              "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+                              "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     print("Previous downloads deleted.")
     time.sleep(2)
 
@@ -226,7 +244,13 @@ def downloadFWFileRequest(payLoad, requestFile, requestCredentials, responseFile
     af_support_tools.rmq_payload_to_file(my_response_credentials_body, path + requestCredentials)
 
     print("Download request and credential response(s) consumed.")
-    time.sleep(120)
+    # time.sleep(delay)
+    checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
+    while checkDisk < expectedDiskSize:
+        time.sleep(1)
+        checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
+        time.sleep(2)
+
 
     my_response_download_body = af_support_tools.rmq_consume_all_messages(host=host, port=port,
                                                                           rmq_username=rmq_username,
@@ -239,15 +263,14 @@ def downloadFWFileRequest(payLoad, requestFile, requestCredentials, responseFile
 
     time.sleep(1)
 
-
-def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestCredentials, responseFileComplete):
+def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestCredentials, responseFileComplete, filename, expectedDiskSize):
     resetTestQueues()
     messageReqHeader = {'__TypeId__': 'com.dell.cpsd.prepositioning.downloader.file.download.request'}
     time.sleep(2)
     print("Queues reset.")
 
     deletePreviousDownloadFiles("BIOS_PFWCY_WN64_2.2.5.EXE",
-                                "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+                                "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
 
     print("Previous downloads deleted.")
     time.sleep(2)
@@ -304,7 +327,13 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
     af_support_tools.rmq_payload_to_file(my_response_credentials_body, path + requestCredentials)
 
     print("Download request and credential response(s) consumed.")
-    time.sleep(60)
+#    time.sleep(60)
+    checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
+    while checkDisk < expectedDiskSize:
+        time.sleep(1)
+        checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
+        time.sleep(2)
+
 
     my_response_download_body = af_support_tools.rmq_consume_all_messages(host=host, port=port,
                                                                           rmq_username=rmq_username,
@@ -317,14 +346,13 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
 
     time.sleep(1)
 
-
 def downloadFWFileRequestInvalid(payLoad, requestFile, requestCredentials, responseFileComplete):
     messageReqHeader = {'__TypeId__': 'com.dell.cpsd.prepositioning.downloader.file.download.request'}
     resetTestQueues()
     print("Queues reset.")
     time.sleep(2)
     deletePreviousDownloadFiles("BIOS_PFWCY_WN64_2.2.5.EXE",
-                                "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+                                "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
 
     print("Previous downloads deleted.")
 
@@ -379,7 +407,6 @@ def downloadFWFileRequestInvalid(payLoad, requestFile, requestCredentials, respo
     print("All download responses consumed.")
     time.sleep(1)
 
-
 def verifyPublishedAttributes(filename):
     countInstances = 0
     with open(filename, "rU") as dataFile:
@@ -398,7 +425,6 @@ def verifyPublishedAttributes(filename):
         return
 
     assert False, ("Unable to verify published attributes.")
-
 
 def verifyMultiPublishedAttributes(filename):
     count = 0
@@ -432,7 +458,7 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
     count = 0
     credCount = 0
     hashVal = []
-    filepath = "file:///opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads"
+    filepath = "file:///opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads"
     requestData = open(requestFile, "rU")
     dataInput = json.load(requestData)
 
@@ -444,11 +470,12 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
     print(data)
     print("\nName of file: %s" % dataFile.name)
 
-    size = checkFileSize(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+    size = checkFileSize(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
+    hash = checkFileHash(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     # sizeMD5 = checkFileSize("VMW-ESX-6.0.0-lsi_mr3-6.903.85.00_MR-3818071.zip.md5",
-    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     # sizeRAID = checkFileSize("VMW-ESX-6.0.0-lsi_mr3-6.903.85.00_MR-3818071.zip",
-    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
 
     maxCount = len(data)
     maxCreds = len(dataCredentials)
@@ -467,7 +494,7 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
 
 
         for i in range(maxCount):
-            if ("url") in data[i].keys():
+            if ("url") in data[i].keys() and data[i]["fileName"].endswith(filename):
                 print("Count: %d" % i)
                 print("HERE NOW")
                 assert "timestamp" in data[i]["messageProperties"], "Timestamp not included in consumed attributes."
@@ -479,7 +506,7 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
                 assert "fileName" in data[i].keys(), "Swid not included in consumed attributes."
                 assert "size" in data[i].keys(), "Size not included in consumed attributes."
                 assert "fileUUID" in data[i].keys(), "File UUID not included in consumed attributes."
-                assert filepath in data[i]["url"], "Download complete does not include expected URL."
+                #assert filepath in data[i]["url"], "Download complete does not include expected URL."
 
                 # assert data["swid"] == dataCredentials["swid"], "Swids don't match in consumed messages."
                 # assert data[maxCount-1]["size"] == sizeNIC or sizeBIOS or sizeRAID, "Size not consistent with expected value."
@@ -495,10 +522,11 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
                     if data[i]["size"] == dataCredentials[credCount]["size"]:
                         print(data[i]["size"])
                         print(dataCredentials[credCount]["size"])
-                        assert filepath in data[i]["url"], "Unexpected URL returned."
+                        # assert filepath in data[i]["url"], "Unexpected URL returned."
                         assert data[i]["fileName"] in data[i]["url"], "Unexpected URL returned."
+                        assert data[i]["hashVal"] == hash, "Unexpected HASH found."
                         assert data[i]["fileUUID"] == dataCredentials[credCount]["fileUUID"], "FileUUIDs don't match in consumed messages."
-
+                        print("Looking good...")
                     credCount += 1
 
             else:
@@ -508,7 +536,9 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
             print("Cred count: %d" % cred)
             print("Total creds: %d" % maxCreds)
             if dataCredentials[cred]["fileFound"] == True:
-                if ("url") in dataCredentials[cred].keys():
+                print("You are in....")
+                if ("url") in dataCredentials[cred].keys() and dataCredentials[cred]["fileName"].endswith(filename):
+                    print("Even deeper now.....")
                     assert dataInput["fileName"] in dataCredentials[cred]["fileName"], "File names are not consistent."
                     assert dataCredentials[cred]["swid"] in dataCredentials[cred]["url"], "Swid not included in Credential response URL."
                     assert dataCredentials[cred]["size"] == size, "Size not consistent with expected value."
@@ -528,7 +558,8 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
                     assert dataCredentials[cred]["header"]["serialNumber"] == dataCredentials[cred][
                         "swid"], "Serial number not match Swid in Credential response URL authorization details."
 
-                    assert dataCredentials[cred]["hashVal"] in hashVal, "Hash values do not match."
+                    assert dataCredentials[cred]["hashVal"] == hash, "Hash values do not match."
+                    print("Excellent")
                     return
 
         count += 1
@@ -536,11 +567,10 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
 
     assert False, "Consumed response messages not complete."
 
-
 def verifyMultiConsumedAttributes(requestFile, credentialsFile, responseFile, hashType, family, esrsURL):
     count = 0
 
-    filepath = "file:///opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads"
+    filepath = "file:///opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads"
     requestData = open(requestFile, "rU")
     dataInput = json.load(requestData)
 
@@ -556,13 +586,14 @@ def verifyMultiConsumedAttributes(requestFile, credentialsFile, responseFile, ha
     print("Response count: %d" % len(data))
 
     sizeBIOS = checkFileSize("BIOS_PFWCY_WN64_2.2.5.EXE",
-                             "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+                             "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     sizeDAS = checkFileSize("DAS_Cache_Linux_1.zip",
-                            "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+                            "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     sizeESX = checkFileSize("VMW-ESX-6.0.0-lsi_mr3-6.903.85.00_MR-3818071.zip",
-                             "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+                             "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     sizeMD5 = checkFileSize("VMW-ESX-6.0.0-lsi_mr3-6.903.85.00_MR-3818071.zip.md5",
-                             "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+                             "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
+
 
     print("Total messages consumed: %d" % len(data))
 
@@ -676,10 +707,9 @@ def verifyMultiConsumedAttributes(requestFile, credentialsFile, responseFile, ha
 
     assert False, "Consumed response messages not complete."
 
-
 def verifyConsumedAttributesInvalid(requestFile, credentialsFile, responseFile, hashType, family):
     numRCMs = 0
-    path = "file:///opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads"
+    path = "file:///opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads"
     requestData = open(requestFile, "rU")
     dataInput = json.load(requestData)
 
@@ -691,7 +721,7 @@ def verifyConsumedAttributesInvalid(requestFile, credentialsFile, responseFile, 
     # print(data.keys())
     print("\nName of file: %s" % dataFile.name)
 
-    # checkFileSize("BIOS_PFWCY_WN64_2.2.5.EXE", "/rootfs/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+    # checkFileSize("BIOS_PFWCY_WN64_2.2.5.EXE", "/rootfs/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     maxCount = len(data)
 
     for count in range(maxCount):
@@ -774,12 +804,11 @@ def verifyConsumedAttributesInvalid(requestFile, credentialsFile, responseFile, 
 
     assert False, "Response attributes do not match those defined in request."
 
-
 def verifyProgressMessage(requestFile, credentialsFile, responseFile):
     numRCMs = 0
     count = 0
 
-    filepath = "file:///opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads"
+    filepath = "file:///opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads"
     requestData = open(requestFile, "rU")
     dataInput = json.load(requestData)
 
@@ -795,15 +824,16 @@ def verifyProgressMessage(requestFile, credentialsFile, responseFile):
     print("Response count: %d" % len(data))
 
     # sizeBIOS = checkFileSize("BIOS_PFWCY_WN64_2.2.5.EXE",
-    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     # sizePNG = checkFileSize("shai.png",
-    #                         "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+    #                         "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     # sizeESX = checkFileSize("VMW-ESX-6.0.0-lsi_mr3-6.903.85.00_MR-3818071.zip",
-    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     # sizeMD5 = checkFileSize("VMW-ESX-6.0.0-lsi_mr3-6.903.85.00_MR-3818071.zip.md5",
-    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     sizeDAS = checkFileSize("DAS_Cache_Linux_1.zip",
-                             "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+                             "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
+
 
 
     credCount = len(dataCredentials)
@@ -828,6 +858,7 @@ def verifyProgressMessage(requestFile, credentialsFile, responseFile):
                 assert data[count]["totalSize"] == dataCredentials[cred]["size"], "Size not consistent in consumed messages."
                 assert data[count]["totalSize"] == sizeDAS, "Size not consistent with expected value."
                 #assert data[count]["totalSize"] == sizeNIC or sizePNG or sizeESX or sizeMD5 or sizeDAS, "Size not consistent with expected value."
+                #assert data[count]["hashVal"] == hashDAS, "Hash not consistent with expected value."
                 assert data[count]["downloadedSize"] >= 0, "No bytes downloaded as per progress message."
                 assert data[count]["downloadSpeed"] >= 0, "No download speed returned as per progress message."
                 assert dataInput["messageProperties"]["correlationId"] in data[count]["messageProperties"][
@@ -841,7 +872,6 @@ def verifyProgressMessage(requestFile, credentialsFile, responseFile):
         count += 1
 
     assert False, ("Progress message is not complete.")
-
 
 def deletePreviousDownloadFiles(filename, filepath):
     sendCommand = "find /opt/dell/cpsd -name downloads"
@@ -869,7 +899,6 @@ def deletePreviousDownloadFiles(filename, filepath):
     else:
         print(filename + "not found in the repo directory.")
 
-
 def checkFileSize(filename, filepath):
     sendCommand = "find /opt/dell/cpsd -name " + filename
     fileStatus = af_support_tools.send_ssh_command(host=host, username=cli_username, password=cli_password,
@@ -889,6 +918,46 @@ def checkFileSize(filename, filepath):
 
     assert False, ("Attempt to check File Size is unsuccessful.")
 
+def checkWritesComplete(filename, filepath):
+    sendCommand = "find /opt/dell/cpsd -name " + filename
+    fileStatus = af_support_tools.send_ssh_command(host=host, username=cli_username, password=cli_password,
+                                                   command=sendCommand, return_output=True)
+    if fileStatus is not "":
+        fileStatus = fileStatus.rstrip()
+        if filepath in fileStatus:
+            sendCommand = "ls -ltr " + filepath + " | awk \'FNR == 1 {print$2}\'"
+            global totalRepoSize
+            totalRepoSize = af_support_tools.send_ssh_command(host=host, username=cli_username, password=cli_password,
+                                                         command=sendCommand, return_output=True)
+            print("Size: %s" % totalRepoSize)
+            totalRepoSize = int(totalRepoSize.rstrip())
+            print("Size: %d" % totalRepoSize)
+            print("File status: %s" % fileStatus)
+            return totalRepoSize
+
+    assert False, ("Attempt to check Repo Disk Usage is unsuccessful.")
+
+
+def checkFileHash(filename, filepath):
+    sendCommand = "find /opt/dell/cpsd -name " + filename
+    fileStatus = af_support_tools.send_ssh_command(host=host, username=cli_username, password=cli_password,
+                                                   command=sendCommand, return_output=True)
+
+    if fileStatus is not "":
+        fileStatus = fileStatus.rstrip()
+        if filepath in fileStatus:
+            # sendCommand = "ls -ltr " + fileStatus + " | awk \'FNR == 1 {print$5}\'"
+            sendCommand = "sha256sum " + fileStatus + " | awk \'FNR == 1 {print$1}\'"
+            global fileHash
+            fileHash = af_support_tools.send_ssh_command(host=host, username=cli_username, password=cli_password,
+                                                         command=sendCommand, return_output=True)
+            print("Hash: %s" % fileHash)
+            fileHash = fileHash.rstrip()
+            print("Hash: %s" % fileHash)
+            print("File status: %s" % fileStatus)
+            return fileHash
+
+    assert False, "Attempt to check File Size is unsuccessful."
 
 def profileESRSResponseTimes(payLoad):
     messageReqHeader = {'__TypeId__': 'com.dell.cpsd.prepositioning.downloader.file.download.request'}
@@ -896,7 +965,7 @@ def profileESRSResponseTimes(payLoad):
     print("Queues reset.")
     time.sleep(0.5)
     deletePreviousDownloadFiles("BIOS_PFWCY_WN64_2.2.5.EXE",
-                                "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
+                                "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
 
     print("Previous downloads deleted.")
     count = 0
@@ -913,10 +982,11 @@ def profileESRSResponseTimes(payLoad):
                                              routing_key="dell.cpsd.prepositioning.downloader.request",
                                              headers=messageReqHeader, payload=payLoad, payload_type='json',
                                              ssl_enabled=False)
+        print("\nCount: %d" % count)
         print("Download request published.")
         print(datetime.datetime.utcnow())
         t1 = datetime.datetime.utcnow()
-        time.sleep(0.1)
+        # time.sleep(0.1)
         q_len = 0
         timeout = 0
 
@@ -926,8 +996,8 @@ def profileESRSResponseTimes(payLoad):
                                                        rmq_username=rmq_username, rmq_password=rmq_username,
                                                        queue='testCredentialsResponse', ssl_enabled=False)
             timeout += 1
-            time.sleep(1)
-            if timeout > 60:
+            time.sleep(0.1)
+            if timeout > 500:
                 print("ERROR: ESRS Credential response took too long to return.")
                 break
 
@@ -936,12 +1006,17 @@ def profileESRSResponseTimes(payLoad):
 
         timeDelta = (t2 - t1).total_seconds()
         print(timeDelta)
+        write_to_file = []
+        write_to_file = [count, timeDelta]
+        file = open('esrsProfile.txt', 'a')
+        file.write("Loop: {} \tDelta: {}\n".format(*write_to_file))
+        file.close
         assert timeDelta < 5, "Significant delay in response from ESRS."
         listDelta.append(timeDelta)
         averageDelta = sum(listDelta[0:(len(listDelta)-1)])/(len(listDelta))
         count += 1
-        print("\nCount: %d" % count)
-        if len(listDelta) > 5:
+
+        if len(listDelta) > 5 and timeDelta > 5:
             print(listDelta)
             sortedDelta = sorted(listDelta)
             sortedDelta = sortedDelta[-5:]
@@ -952,8 +1027,9 @@ def profileESRSResponseTimes(payLoad):
         else:
             continue
 
-        return
-    assert False, "No messages published to profile."
+    time.sleep(5)
+    resetTestQueues()
+    assert count == 200, "Failed to complete 200 requests to profile."
 
 
 
@@ -963,7 +1039,7 @@ def test_downloadFWFileRequestInvalid():
                                  'invalidFileFWResponse.json')
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_verifyConsumedAttributes1():
+def test_verifyConsumedInvalidAttributes1():
     verifyConsumedAttributesInvalid(path + 'invalidFileFWRequest.json', path + 'invalidFileFWCredentials.json',
                                     path + 'invalidFileFWResponse.json', "SHA-256", "VCEVision")
 
@@ -978,7 +1054,7 @@ def test_verifyConsumedAttributes1():
 #     downloadFWFileRequestInvalid(messageInvalidSwid, 'invalidSwidFWRequest.json', 'invalidSwidFWCredentials.json',
 #                                  'invalidSwidFWResponse.json')
 #
-# def test_verifyConsumedAttributes3():
+# def test_verifyConsumedInvalidAttributes3():
 #     verifyConsumedAttributesInvalid(path + 'invalidSwidFWRequest.json', path + 'invalidSwidFWCredentials.json',
 #                                     path + 'invalidSwidFWResponse.json', "SHA-256", "VCEVision")
 
@@ -988,7 +1064,7 @@ def test_downloadFWFileRequestInvalid4():
                                  'invalidAllFWResponse.json')
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_verifyConsumedAttributes4():
+def test_verifyConsumedInvalidAttributes4():
     verifyConsumedAttributesInvalid(path + 'invalidAllFWRequest.json', path + 'invalidAllFWCredentials.json',
                                     path + 'invalidAllFWResponse.json', "SHA-256", "VCEVision")
 
@@ -998,7 +1074,7 @@ def test_downloadFWFileRequestInvalid5():
                                  'noFileFWResponse.json')
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_verifyConsumedAttributes5():
+def test_verifyConsumedInvalidAttributes5():
     verifyConsumedAttributesInvalid(path + 'noFileFWRequest.json', path + 'noFileFWCredentials.json',
                                     path + 'noFileFWResponse.json', "SHA-256", "VCEVision")
 
@@ -1012,32 +1088,25 @@ def test_verifyConsumedAttributes5():
 #     downloadFWFileRequestInvalid(messageNoSwid, 'noSwidFWRequest.json', 'noSwidFWCredentials.json',
 #                                  'noSwidFWResponse.json')
 #
-# @pytest.mark.rcm_fitness_mvp_extended
-# def test_downloadFWFileRequestInvalid8():
-#     downloadFWFileRequestInvalid(messageNoAll, 'noAllFWRequest.json', 'noAllFWCredentials.json',
-#                                  'noAllFWResponse.json')
-#
-# @pytest.mark.rcm_fitness_mvp_extended
-# def test_verifyConsumedAttributes8():
-#     verifyConsumedAttributesInvalid(path + 'noAllFWRequest.json', path + 'noAllFWCredentials.json',
-#                                     path + 'noAllFWResponse.json', "SHA-256", "VCEVision")
-
-
-#
 # # def test_verifyConsumedAttributes7():
 # #     verifyConsumedAttributesInvalid(path + 'noSwidFWRequest.json', path + 'noSwidFWCredentials.json',
 # #                                     path + 'noSwidFWResponse.json', "SHA-256", "VCEVision")
-# #
+
 @pytest.mark.rcm_fitness_mvp_extended
-def test_profileESRSResponseTimes():
-    profileESRSResponseTimes(message)
+def test_downloadFWFileRequestInvalid8():
+    downloadFWFileRequestInvalid(messageNoAll, 'noAllFWRequest.json', 'noAllFWCredentials.json',
+                                 'noAllFWResponse.json')
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyConsumedInvalidAttributes8():
+    verifyConsumedAttributesInvalid(path + 'noAllFWRequest.json', path + 'noAllFWCredentials.json',
+                                    path + 'noAllFWResponse.json', "SHA-256", "VCEVision")
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_downloadFWFileRequest():
     downloadFWFileRequest(message, 'downloadFWRequest.json', 'downloadFWCredentials.json',
-                          'downloadFWResponse.json')
-
+                          'downloadFWResponse.json', "BIOS_PFWCY_WN64_2.2.5.EXE", 24412)
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
@@ -1051,16 +1120,9 @@ def test_verifyConsumedAttributes():
                              path + 'downloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
-def test_checkFileSize():
-    checkFileSize("BIOS_PFWCY_WN64_2.2.5.EXE",
-                  "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
-
-
-@pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequest2():
     downloadFWFileRequest(messageSec, 'repeatDownloadFWRequest.json', 'repeatDownloadFWCredentials.json',
-                          'repeatDownloadFWResponse.json')
+                          'repeatDownloadFWResponse.json', "DAS_Cache_Linux_1.zip", 109192)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
@@ -1068,22 +1130,17 @@ def test_verifyConsumedAttributes2():
     verifyConsumedAttributes("DAS_Cache_Linux_1.zip", path + 'repeatDownloadFWRequest.json', path + 'repeatDownloadFWCredentials.json',
                              path + 'repeatDownloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
 
-
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyProgressMessage():
     verifyProgressMessage(path + 'repeatDownloadFWRequest.json', path + 'repeatDownloadFWCredentials.json',
                           path + 'repeatDownloadFWResponse.json')
-
-
-@pytest.mark.rcm_fitness_mvp_extended
-def test_checkFileSize2():
-    checkFileSize("DAS_Cache_Linux_1.zip",
-                  "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader/repository/downloads/")
-
+# #
+# #
+# #
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti():
     downloadFWFileMulti(message, messageSec, messageThird, 'multiDownloadFWRequest.json',
-                        'multiDownloadFWCredentials.json', 'multiDownloadFWResponse.json')
+                        'multiDownloadFWCredentials.json', 'multiDownloadFWResponse.json', "DAS_Cache_Linux_1.zip", 133764)
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyMultiPublishedAttributes():
@@ -1094,11 +1151,10 @@ def test_verifyMultiConsumedAttributes():
     verifyMultiConsumedAttributes(path + 'multiDownloadFWRequest.json', path + 'multiDownloadFWCredentials.json',
                                   path + 'multiDownloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
 
-
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti2():
     downloadFWFileMulti(message, messageSec, messageThird, 'secMultiDownloadFWRequest.json',
-                        'secMultiDownloadFWCredentials.json', 'secMultiDownloadFWResponse.json')
+                        'secMultiDownloadFWCredentials.json', 'secMultiDownloadFWResponse.json', "DAS_Cache_Linux_1.zip", 133764)
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyMultiPublishedAttributes2():
@@ -1108,3 +1164,55 @@ def test_verifyMultiPublishedAttributes2():
 def test_verifyMultiConsumedAttributes2():
     verifyMultiConsumedAttributes(path + 'secMultiDownloadFWRequest.json', path + 'secMultiDownloadFWCredentials.json',
                                   path + 'secMultiDownloadFWResponse.json', "SHA-256", "VCEVision", "https://10.234.100.5:9443/")
+#
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_downloadFWFileRequest3():
+    downloadFWFileRequest(messageBios, 'downloadAllBiosFWRequest.json', 'downloadAllBiosFWCredentials.json',
+                          'downloadAllBiosFWResponse.json', "BIOS_PFWCY_WN64_2.2.5.EXE", 46692)
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyConsumedAttributes3():
+    verifyConsumedAttributes("BIOS_PFWCY_WN64_2.2.5.EXE", path + 'downloadAllBiosFWRequest.json', path + 'downloadAllBiosFWCredentials.json',
+                             path + 'downloadAllBiosFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyConsumedAttributes3a():
+    verifyConsumedAttributes("BIOS_6YDCM_WN64_2.4.3.EXE", path + 'downloadAllBiosFWRequest.json', path + 'downloadAllBiosFWCredentials.json',
+                             path + 'downloadAllBiosFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
+#
+@pytest.mark.rcm_fitness_mvp_extended
+def test_downloadFWFileRequest4():
+    downloadFWFileRequest(messageSas, 'downloadAllSasFWRequest.json', 'downloadAllSasFWCredentials.json',
+                          'downloadAllSasFWResponse.json', "SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE", 32468)
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyConsumedAttributes4():
+    verifyConsumedAttributes("SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE", path + 'downloadAllSasFWRequest.json', path + 'downloadAllSasFWCredentials.json',
+                             path + 'downloadAllSasFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyConsumedAttributes4a():
+    verifyConsumedAttributes("SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE", path + 'downloadAllSasFWRequest.json', path + 'downloadAllSasFWCredentials.json',
+                             path + 'downloadAllSasFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_downloadFWFileRequest5():
+    downloadFWFileRequest(messageEsxi, 'downloadAllEsxiFWRequest.json', 'downloadAllEsxiFWCredentials.json',
+                          'downloadAllEsxiFWResponse.json', "ESXi600-201610001-Build-4510822.zip", 717000)
+
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyConsumedAttributes5():
+    verifyConsumedAttributes("ESXi600-201610001-Build-4510822.zip", path + 'downloadAllEsxiFWRequest.json', path + 'downloadAllEsxiFWCredentials.json',
+                             path + 'downloadAllEsxiFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyConsumedAttributes5a():
+    verifyConsumedAttributes("ESXi600-201703001-Build-5224934.zip", path + 'downloadAllEsxiFWRequest.json', path + 'downloadAllEsxiFWCredentials.json',
+                             path + 'downloadAllEsxiFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
+
+#
+@pytest.mark.rcm_fitness_mvp_extended
+def test_profileESRSResponseTimes():
+    profileESRSResponseTimes(message)
