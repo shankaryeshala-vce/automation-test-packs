@@ -9,7 +9,7 @@ import pytest
 
 @pytest.fixture(scope="session",
                 params=["system-definition-service", "credentials", "hal-orchestrator-service", "identity-service",
-                        "capability-registry-service", "endpoint-registration-service", "hal-mediation-services",
+                        "capability-registry-service", "endpoint-registration-service", "vcenter-adapter",
                         "hdp-poweredge-compute", "coprhd-adapter", "rackhd-adapter", "scaleio-adapter",
                         "hal-data-provider-vcenter"])
 def core_container(setup, request):
