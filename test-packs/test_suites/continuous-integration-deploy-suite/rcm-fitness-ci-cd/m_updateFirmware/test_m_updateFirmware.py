@@ -206,7 +206,7 @@ def registerRackHD(payLoad, responseRegRackHD):
                                                                         ssl_enabled=False)
     af_support_tools.rmq_payload_to_file(my_response_credentials_body, path + responseRegRackHD)
     print("\nRegister response consumed.")
-    data_RackHD = open(responseRegRackHD, 'rU')
+    data_RackHD = open(path + responseRegRackHD, 'rU')
     dataRackHD = json.load(data_RackHD)
 
     af_support_tools.rmq_purge_queue(host=host, port=port, rmq_username=rmq_username, rmq_password=rmq_username,
@@ -263,7 +263,7 @@ def registerVcenter(payLoad, responseRegVcenter):
                                                                         ssl_enabled=False)
     af_support_tools.rmq_payload_to_file(my_response_credentials_body, path + responseRegVcenter)
     print("\nRegister response consumed.")
-    data_Vcenter = open(responseRegVcenter, 'rU')
+    data_Vcenter = open(path + responseRegVcenter, 'rU')
     dataVcenter = json.load(data_Vcenter)
 
     af_support_tools.rmq_purge_queue(host=host, port=port, rmq_username=rmq_username, rmq_password=rmq_username,
