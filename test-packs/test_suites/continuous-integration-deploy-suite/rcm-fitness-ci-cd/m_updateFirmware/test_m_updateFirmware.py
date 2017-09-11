@@ -94,7 +94,7 @@ def load_test_data():
                                                         property=payload_vcenter)
 
     getSystemDefinition()
-    registerRackHD(message_rackHD, "out_registerRackHDResp.json")
+    # registerRackHD(message_rackHD, "out_registerRackHDResp.json")
     # time.sleep(2)
     # registerVcenter(message_vcenter, "out_registerVcenterResp.json")
 
