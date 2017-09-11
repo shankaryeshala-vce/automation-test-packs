@@ -228,7 +228,7 @@ def getComplianceDataSystem(product, family, identifier, deviceFamily, deviceMod
                             assert compData["devices"][deviceIndex]["auditData"][
                                        "messageReceivedTime"] != "", "Response not detail Received Time."
                             print("Done Device: %s\n" % compData["devices"][deviceIndex]["elementData"]["model"])
-                            # return
+                            return
                         else:
                             compIndex += 1
                             continue
