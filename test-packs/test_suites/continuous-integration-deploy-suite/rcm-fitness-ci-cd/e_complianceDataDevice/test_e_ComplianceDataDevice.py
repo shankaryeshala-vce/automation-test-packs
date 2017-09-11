@@ -5,6 +5,8 @@ import pytest
 import os
 import re
 import af_support_tools
+import datetime
+import time
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -27,6 +29,8 @@ def load_test_data():
     ensurePathExists(path)
     purgeOldOutput(path, "complianceDataDevice")
 
+    initUrl = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/about'
+    time.sleep(2)
     getSystemDefinition()
 
 
