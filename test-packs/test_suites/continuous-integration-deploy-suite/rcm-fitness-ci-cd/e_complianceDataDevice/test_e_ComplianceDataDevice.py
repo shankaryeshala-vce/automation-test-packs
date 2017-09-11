@@ -30,7 +30,8 @@ def load_test_data():
     purgeOldOutput(path, "complianceDataDevice")
 
     initUrl = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/about'
-    time.sleep(2)
+    resp = requests.get(initUrl)
+    time.sleep(15)
     getSystemDefinition()
 
 
