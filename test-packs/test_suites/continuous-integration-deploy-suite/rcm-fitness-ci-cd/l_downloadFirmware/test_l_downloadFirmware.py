@@ -247,9 +247,13 @@ def downloadFWFileRequest(payLoad, requestFile, requestCredentials, responseFile
     # time.sleep(delay)
     checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     while checkDisk < expectedDiskSize:
+        timeout += 1
         time.sleep(1)
         checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
         time.sleep(2)
+        if timeout > 1000:
+            print("ERROR: Download attempt doesn't appear to have completed in a timely manner.")
+            break
 
 
     my_response_download_body = af_support_tools.rmq_consume_all_messages(host=host, port=port,
@@ -330,9 +334,13 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
 #    time.sleep(60)
     checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     while checkDisk < expectedDiskSize:
+        timeout += 1
         time.sleep(1)
         checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
         time.sleep(2)
+        if timeout > 1000:
+            print("ERROR: Download attempt doesn't appear to have completed in a timely manner.")
+            break
 
 
     my_response_download_body = af_support_tools.rmq_consume_all_messages(host=host, port=port,
