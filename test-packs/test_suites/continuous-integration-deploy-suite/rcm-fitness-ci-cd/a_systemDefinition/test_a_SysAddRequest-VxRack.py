@@ -5,6 +5,9 @@ import os
 import time
 import paramiko
 import requests
+import os
+import datetime
+import time
 
 
 
@@ -378,6 +381,11 @@ def verify_SystemExists():
     print('\nTEST: System Exists - System UUID: ', my_systemUuid)
 
 def verifyConsulUpdate(paqx, context):
+
+    initUrl = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/about'
+    resp = requests.get(initUrl)
+    data = json.loads(resp.text)
+
     url = 'http://' + host + ':8500/v1/catalog/services'
     resp = requests.get(url)
     data = json.loads(resp.text)
