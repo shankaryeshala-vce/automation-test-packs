@@ -19,7 +19,7 @@ class Connection:
 
 class RmqConnection(Connection):
     def __init__(self, ip_address, username, password, port):
-        super(ip_address, username, password)
+        super().__init__(ip_address, username, password)
         self.port = port
         self.url = "http://{}:15672".format(self.ipAddress)
 
@@ -91,7 +91,7 @@ def hostConnection(hostIpAddress):
 def rabbitMq(hostIpAddress):
     import cpsd
     global cpsd
-    port = cpsd.props.rmq_port
+    port = 5672
     username = cpsd.props.rmq_username
     password = cpsd.props.rmq_password
 
