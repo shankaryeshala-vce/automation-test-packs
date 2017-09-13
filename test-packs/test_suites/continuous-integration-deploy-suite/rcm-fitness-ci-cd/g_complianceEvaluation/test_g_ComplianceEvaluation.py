@@ -101,10 +101,11 @@ def test_post_eval(sys, rcmid, train, version, type, model, identifier, fileName
     data_json = json.dumps(body)
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     response = requests.post(url, data_json, headers=headers)
-    assert response.status_code == 200, "Request has not been acknowledged as expected."
     data = response.json()
     datas = json.dumps(data)
-    # print(datas)
+    print(datas)
+    assert response.status_code == 200, "Request has not been acknowledged as expected."
+
     evals = len(data['rcmEvaluationResults'])
     assert evals != 0, "Unexpected number of evaluation results found, has Collectcomponentversion been executed??"
     results = 0
