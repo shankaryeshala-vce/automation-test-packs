@@ -19,7 +19,7 @@ class Connection:
 
 class RmqConnection(Connection):
     def __init__(self, ip_address, username, password, port):
-        super(ip_address, username, password)
+        super().__init__(ip_address, username, password)
         self.port = port
         self.url = "http://{}:15672".format(self.ipAddress)
 
@@ -52,23 +52,23 @@ class RabbitMq:
                                           self.connection.password, queue)
 
     def consume_message_from_queue(self, queue):
-        message_found = af_support_tools.rmq_wait_for_messages_in_queue(self.connection.ipAddress, self.connection.port,
-                                                                       self.connection.username, self.connection.password,
-                                                                       queue, wait_time=300, check_interval=5)
+        message_found = af_support_tools.rmq_wait_for_messages_in_queue(host=self.connection.ipAddress, port=self.connection.port,
+                                                                       rmq_username=self.connection.username, rmq_password=self.connection.password,
+                                                                       queue=queue, wait_time=300, check_interval=5)
         if message_found:
-            message = af_support_tools.rmq_consume_message(self.connection.ipAddress, self.connection.port,
-                                                           self.connection.username, self.connection.password,
-                                                           queue)
+            message = af_support_tools.rmq_consume_message(host=self.connection.ipAddress, port=self.connection.port,
+                                                           rmq_username=self.connection.username, rmq_password=self.connection.password,
+                                                           queue=queue)
             print("INFO message consumed from queue {}: {}".format(queue, message))
             return json.loads(message, encoding='utf-8')
         else:
             raise NoMessageConsumedException("failed to consume message from queue: \'{}\'".format(queue))
 
     def publish_message(self, exchange, routing_key, message):
-        af_support_tools.rmq_publish_message(self.connection.ipAddress, self.connection.port,
-                                             self.connection.username, self.connection.password,
-                                             exchange, routing_key,
-                                             message.headers, message.payload, message.payloadType)
+        af_support_tools.rmq_publish_message(host=self.connection.ipAddress, port=self.connection.port,
+                                             rmq_username=self.connection.username, rmq_password=self.connection.password,
+                                             exchange=exchange, routing_key=routing_key,
+                                             headers=message.headers, payload=message.payload, payload_type=message.payloadType)
 
 
 @pytest.fixture(scope="session")
@@ -91,7 +91,7 @@ def hostConnection(hostIpAddress):
 def rabbitMq(hostIpAddress):
     import cpsd
     global cpsd
-    port = cpsd.props.rmq_port
+    port = 5672
     username = cpsd.props.rmq_username
     password = cpsd.props.rmq_password
 
@@ -113,4 +113,3 @@ def setup():
                                                              property='password')
     parameters['password'] = cli_password
     return parameters
-
