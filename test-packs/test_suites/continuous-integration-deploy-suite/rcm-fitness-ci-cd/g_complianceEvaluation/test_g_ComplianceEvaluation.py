@@ -102,6 +102,7 @@ def test_post_eval(sys, rcmid, train, version, type, model, identifier, fileName
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     response = requests.post(url, data_json, headers=headers)
     data = response.json()
+    print(data)
     datas = json.dumps(data)
     print(datas)
     assert response.status_code == 200, "Request has not been acknowledged as expected."
