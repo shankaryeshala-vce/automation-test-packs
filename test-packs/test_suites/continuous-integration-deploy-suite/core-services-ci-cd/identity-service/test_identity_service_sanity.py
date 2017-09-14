@@ -265,10 +265,6 @@ def test_negative_messages(my_test_type, rabbitMq):
         if return_json['errorMessage'] != 'EIDS1004E Invalid request message':
             negative_errors.append("Error message incorrect")
             print("Incorrect error message responce" + return_json)
-    # if my_test_type == 'describe_no_element':
-    #     if return_json['errorMessage'] != 'EIDS1006E Failed to describe element':
-    #         negative_errors.append("Error message incorrect")
-    #         print("Incorrect error message responce" + return_json)
 
     assert not negative_errors
     print("Negative Message Test Passed")
