@@ -3,6 +3,9 @@ import pytest
 import os
 import json
 import requests
+import time
+
+
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -61,11 +64,12 @@ def test_api_addsystem():
 
     the_payload = af_support_tools.get_config_file_property(config_file=payload_file, heading= payload_header,
                                                             property= payload_property_amqp )
+    #print (the_payload)
     sysadd = json.loads(the_payload)
 
     header = {'Content-Type': 'application/json', 'Accept': 'application/json'}
-
     r = requests.post(api_url, headers = header,  data=the_payload)
+    time.sleep(2)
     resp = json.loads(r.text)
 
 
@@ -81,7 +85,7 @@ def test_api_addsystem():
 
     if (sysadd["body"]["convergedSystem"]["components"][0] != resp["body"]["convergedSystem"]["components"][0]and
             sysadd["body"]["convergedSystem"]["components"][1] != resp["body"]["convergedSystem"]["components"][1]and
-                sysadd["body"]["convergedSystem"]["components"][2] != resp["body"]["convergedSystem"]["components"][2]and
+                sysadd["body"]["convergedSystem"]["components"][1] != resp["body"]["convergedSystem"]["components"][2]and
                     sysadd["body"]["convergedSystem"]["components"][3] != resp["body"]["convergedSystem"]["components"][3]):
 
         err.append("Error---All Components are not added successfully")
