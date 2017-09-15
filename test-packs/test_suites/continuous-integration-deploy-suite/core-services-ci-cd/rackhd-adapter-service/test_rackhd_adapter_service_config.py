@@ -298,7 +298,7 @@ def test_rackHD_adapter_full_ListCapabilities():
     capabilities11 = 'rackhd-set-node-obm-setting'
     capabilities12 = 'rackhd-configure-bmc-settings'
     capabilities13 = 'rackhd-set-idrac-credentials'
-    capabilities14 = 'rackhd-node-inventory'
+    #capabilities14 = 'rackhd-node-inventory'
 
     error_list = []
 
@@ -330,8 +330,8 @@ def test_rackHD_adapter_full_ListCapabilities():
         error_list.append(capabilities12)
     if (capabilities13 not in return_message):
         error_list.append(capabilities13)
-    if (capabilities14 not in return_message):
-        error_list.append(capabilities14)
+    #if (capabilities14 not in return_message):
+    #    error_list.append(capabilities14)
 
     assert not error_list, ('Missing some rackHD capabilities')
 
