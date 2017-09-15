@@ -174,13 +174,13 @@ def test_registerRackHD():
 
 
 @pytest.mark.parametrize('exchange, queue', [
-    ('exchange.dell.cpsd.controlplane.rackhd.response', 'queue.controlplane.hardware.list.node.catalogs.response'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'controlplane.hardware.list.nodes'),
+    ('exchange.dell.cpsd.controlplane.rackhd.response', 'queue.dell.cpsd.controlplane.hardware.list.node.catalogs.response'),
+    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.hardware.list.nodes'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'dell.cpsd.service.rcm.capability.update.firmware.requested'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.esxi.install'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.list.node.catalogs'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.set.node.BMC.config'),
-    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.controlplane.hardware.set.node.obm.setting'),
+    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.hardware.esxi.install'),
+    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.hardware.list.node.catalogs'),
+    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.hardware.set.node.BMC.config'),
+    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.hardware.set.node.obm.setting'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.cpsd.service.configure.idrac.network.settings.requested'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.change.idrac.credentials.request'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.hardware.idrac.configure.request'),
