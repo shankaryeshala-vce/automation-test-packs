@@ -64,12 +64,12 @@ def test_api_addsystem():
 
     the_payload = af_support_tools.get_config_file_property(config_file=payload_file, heading= payload_header,
                                                             property= payload_property_amqp )
-    #print (the_payload)
+    
     sysadd = json.loads(the_payload)
-
+    
+    time.sleep(10)
     header = {'Content-Type': 'application/json', 'Accept': 'application/json'}
-    r = requests.post(api_url, headers = header,  data=the_payload)
-    time.sleep(2)
+    r = requests.post(api_url, headers = header,  data=the_payload)    
     resp = json.loads(r.text)
 
 
@@ -90,23 +90,5 @@ def test_api_addsystem():
 
         err.append("Error---All Components are not added successfully")
     assert not err
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
