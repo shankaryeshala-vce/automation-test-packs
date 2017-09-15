@@ -241,30 +241,7 @@ def test_rackHD_RMQ_bindings_dne(exchange, queue):
     print(exchange, '\nis bound to\n', queue, '\n')
 
 
-@pytest.mark.parametrize('exchange, queue', [
-    ('exchange.dell.cpsd.adapter.rackhd.node.discovered.event', 'queue.dell.cpsd.frupaqx.node.discovered-event')])
-@pytest.mark.fru_paqx_parent
-@pytest.mark.fru_mvp
-def test_rackHD_RMQ_bindings_fru(exchange, queue):
-    """
-    Title           :       Verify the RMQ bindings
-    Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
-                            It uses the RMQ API to check.
-                            It will fail if :
-                                The RMQ binding does not exist
-    Parameters      :       1. RMQ Exchange. 2. RQM Queue
-    Returns         :       None
-    """
-
-    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
-                             exchange=exchange)
-    queues = json.dumps(queues)
-
-    assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
-    print(exchange, '\nis bound to\n', queue, '\n')
-
-
-@pytest.mark.core_services_mvp
+    @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_rackHD_adapter_full_ListCapabilities():
     """
