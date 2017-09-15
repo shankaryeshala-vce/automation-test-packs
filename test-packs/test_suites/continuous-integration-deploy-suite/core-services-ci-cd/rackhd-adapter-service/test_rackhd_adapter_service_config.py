@@ -241,7 +241,7 @@ def test_rackHD_RMQ_bindings_dne(exchange, queue):
     print(exchange, '\nis bound to\n', queue, '\n')
 
 
-    @pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_rackHD_adapter_full_ListCapabilities():
     """
