@@ -91,7 +91,7 @@ def test_registerServiceWithNoHealthCheck(rabbitMq):
         rabbitMq.consume_message_from_queue('testQueue')
 #
 # # # **************************************************************************************
-
+@pytest.mark.skip(reason="Waiting for new API to be developed")
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_registerServiceSuccess(rabbitMq):
@@ -126,7 +126,7 @@ def test_registerServiceSuccess(rabbitMq):
     assert not errors_list
 # #
 # # # **************************************************************************************
-
+@pytest.mark.skip(reason="Waiting for new API to be developed")
 @pytest.mark.core_services_mvp_extended
 def test_registerTwoServicesSameName(rabbitMq):
     # this test verifies that the same service can be registered twice, but with differing endpoints
@@ -191,7 +191,7 @@ def test_registerTwoServicesSameName(rabbitMq):
     assert not errors_list
 
 # # **************************************************************************************
-
+@pytest.mark.skip(reason="Waiting for new API to be developed")
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_deregisterServiceSuccess(rabbitMq):
@@ -226,7 +226,7 @@ def test_deregisterServiceSuccess(rabbitMq):
     assert test_service["Name"] in message['type'], "Service Name on the AMQP Bus is incorrect"
 
 #  **************************************************************************************
-
+@pytest.mark.skip(reason="Waiting for new API to be developed")
 @pytest.mark.core_services_mvp_extended
 def test_deregisterOneOfTwoSameServices(rabbitMq):
     # This test verifies what happens if there is a service with 2 instances registered and
@@ -280,7 +280,7 @@ def test_deregisterOneOfTwoSameServices(rabbitMq):
     cleanup("duplicateService1")
     cleanup("duplicateService2")
 # # *****************************************************************************************************
-
+@pytest.mark.skip(reason="Waiting for new API to be developed")
 @pytest.mark.core_services_mvp_extended
 def test_deregisterTwoOfTwoSameServices(rabbitMq):
 # This test verifies what happens when all instances of a service (in this case 2) are deregistered
