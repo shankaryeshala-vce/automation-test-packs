@@ -46,7 +46,10 @@ def purgeOldOutput(dir, pattern):
 
 def getAvailableRCMs(family, model, train, version):
         # print(data)
-
+    combo = str(family + "/" + model + "/" + train + "/" + version)
+    href = []
+    method = []
+    rel = []
     option = "ORIGINAL"
     optionAdd = "ADDENDUM"
     optionManu = "MANUFACTURING"
@@ -69,7 +72,7 @@ def getAvailableRCMs(family, model, train, version):
 
             print("\nStarting to verify a sample of the returned data....")
             assert len(rcm) > 0
-            print("\nRequesting all RCMs for family: %s" % train)
+            print("\nRequesting all RCMs for: %s" % combo)
             print("Number of RCMs found: %d" % len(rcm))
 
             lastRCM = len(rcm)
@@ -86,14 +89,28 @@ def getAvailableRCMs(family, model, train, version):
             assert rcm[(lastRCM-1)]["systemProductFamily"] == family
             assert (rcm[0]["viewOption"] == option) or (rcm[0]["viewOption"] == optionAdd) or (rcm[0]["viewOption"] == optionManu)
             assert (rcm[(lastRCM-1)]["viewOption"] == option) or (rcm[(lastRCM-1)]["viewOption"] == optionAdd) or (rcm[(lastRCM-1)]["viewOption"] == optionManu)
-        else:
-            combo = str(family + "/" + model + "/" + train)
-            print("\nNo RCMs found for product/model/train combination: %s" % combo)
-            print(data["message"])
-            assert exception in data["message"], ("No RCMs returned for model:" + train)
+
+            assert len(rcm[0]["links"]) > 0, "Empty list of Links returned."
+            lenLinks = len(rcm[0]["links"])
+            linkIndex = 0
+            while linkIndex < lenLinks:
+                href.append(rcm[0]["links"][linkIndex]["href"])
+                method.append(rcm[0]["links"][linkIndex]["method"])
+                rel.append(rcm[0]["links"][linkIndex]["rel"])
+                assert rcm[0]["links"][linkIndex]["rel"] == "self" or "content", "Unexpected Rel value returned in link."
+                assert rcm[0]["links"][linkIndex]["method"] == "GET", "Unexpected Method value returned in link."
+                assert "/rcm/" in rcm[0]["links"][linkIndex]["href"], "Unexpected Href value returned in link."
+                linkIndex += 1
+
+            assert len(href) == len(set(href)), "Href links failed uniqueness check."
+            assert len(method) != len(set(method)), "Method links failed uniqueness check."
+            assert len(rel) == len(set(rel)), "Rel links failed uniqueness check."
+            print("\nReturned data has completed all defined checks successfully......")
+            return
 
 
-        print("\nReturned data has completed all defined checks successfully......")
+
+    assert False, "No rcm details returned: %s" % combo
 
 def getAvailableRCMs_Invalid(family, model, train, version):
         # print(data)
@@ -153,28 +170,34 @@ def getAvailableRCMs_Null(family, model, train, version):
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM1():
-    getAvailableRCMs("VxRack", "FLEX", "9.2", "9.2.33.1")
+    getAvailableRCMs("VxRack", "1000 FLEX", "9.2", "9.2.1")
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM2():
-    getAvailableRCMs_Invalid("VxRack", "FLEX", "9.2", "9.2.99")
+    getAvailableRCMs("VxRack", "1000 FLEX", "9.2", "9.2.2")
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM3():
-    getAvailableRCMs_Invalid("VxRack", "FLEX", "9.9", "9.2.33")
+    getAvailableRCMs("VxRack", "1000 FLEX", "9.2", "9.2.1.1")
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM4():
-    getAvailableRCMs_Invalid("VxRack", "999", "9.2", "9.2.33")
+    getAvailableRCMs_Invalid("VxRack", "1000 FLEX", "9.2", "9.2.99")
+@pytest.mark.rcm_fitness_mvp_extended
+def test_getRCM5():
+    getAvailableRCMs_Invalid("VxRack", "1000 FLEX", "9.9", "9.2.1")
+@pytest.mark.rcm_fitness_mvp_extended
+def test_getRCM6():
+    getAvailableRCMs_Invalid("VxRack", "999", "9.2", "9.2.1")
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM7():
-    getAvailableRCMs_Null("VxRack", "FLEX", "9.2", "")
+    getAvailableRCMs_Null("VxRack", "1000 FLEX", "9.2", "")
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM8():
-    getAvailableRCMs_Null("VxRack", "FLEX", "", "9.2.33")
+    getAvailableRCMs_Null("VxRack", "1000 FLEX", "", "9.2.1")
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM9():
-    getAvailableRCMs_Null("VxRack", "", "9.2", "9.2.33")
+    getAvailableRCMs_Null("VxRack", "", "9.2", "9.2.1")
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM10():
-    getAvailableRCMs_Null("", "1000 FLEX", "9.2", "9.2.33")
+    getAvailableRCMs_Null("", "1000 FLEX", "9.2", "9.2.1")
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCM11():
     getAvailableRCMs_Null("", "", "", "")
