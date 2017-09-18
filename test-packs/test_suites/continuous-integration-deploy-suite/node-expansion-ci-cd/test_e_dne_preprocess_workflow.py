@@ -148,6 +148,30 @@ def load_test_data():
                                                                  heading=setup_config_header,
                                                                  property='vcenter_password_rtp')
 
+    global serviceName
+    serviceName = 'dell-wsman-obm-service'
+
+
+    global esxiManagementGatewayIpAddress
+    esxiManagementGatewayIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                       heading=setup_config_header,
+                                                                       property='esxi_management_gateway_ipaddress')
+
+    global esxiManagementHostname
+    esxiManagementHostname = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                       heading=setup_config_header,
+                                                                       property='esxi_management_hostname')
+
+    global esxiManagementIpAddress
+    esxiManagementIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                       heading=setup_config_header,
+                                                                       property='esxi_management_ipaddress')
+
+    global esxiManagementSubnetMask
+    esxiManagementSubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                       heading=setup_config_header,
+                                                                       property='esxi_management_subnet_mask')
+
     ####################
 
     global Alpha_Node
@@ -292,17 +316,20 @@ def test_preprocess_GET_workflow_status():
     json_number = 0
 
     workflow_step1 = 'Finding discovered Nodes'
-    workflow_step2 = 'List ScaleIO Components'
+    # workflow_step2 = 'List ScaleIO Components'
     workflow_step3 = 'List VCenter Components'
     #workflow_step4 = 'Discover ScaleIO'
     workflow_step5 = 'Discover VCenter'
-    workflow_step6 = 'Configuring Out of Band Management'
-    workflow_step7 = 'Ping iDRAC IP Address'
-    # workflow_step8 = 'Find ScaleIO'
-    # workflow_step9 = 'Configure Boot Device Idrac'
-    workflow_step10 = 'Find VCluster'
-    # workflow_step11 = ''
-    # workflow_step12 = ''
+    workflow_step6 = 'Discover Rackhd Node Inventory'
+    workflow_step7 = 'Configuring Out of Band Management'
+    workflow_step8 = 'Ping iDRAC IP Address'
+    # workflow_step9 = 'Find ScaleIO'
+    workflow_step10 = 'Configuring Obm Settings'
+    workflow_step11 = 'Configure Boot Device Idrac'
+    workflow_step12 = 'Configure Pxe boot'
+    workflow_step13 = 'Find vcluster'
+
+
 
     endpoint = '/dne/preprocess/'
     url_body = protocol + ipaddress + dne_port + endpoint + preprocess_workflow_id
@@ -323,10 +350,10 @@ def test_preprocess_GET_workflow_status():
                 assert check_step1_findNode(data, json_number), 'Check on ' + workflow_step1 + ' failed'
                 json_number += 1
 
-            # List ScaleIO Components
-            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step2:
-                check_the_workflow_task(url_body, data, json_number, workflow_step2)
-                json_number += 1
+            # # List ScaleIO Components
+            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step2:
+            #     check_the_workflow_task(url_body, data, json_number, workflow_step2)
+            #     json_number += 1
 
             # List VCenter Components
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step3:
@@ -343,37 +370,58 @@ def test_preprocess_GET_workflow_status():
                 check_the_workflow_task(url_body, data, json_number, workflow_step5)
                 json_number += 1
 
-            # Configuring Out of Band Management
+            data = get_latest_api_response(url_body)
+
+            # Discover Rackhd Node Inventory
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step6:
                 check_the_workflow_task(url_body, data, json_number, workflow_step6)
-                assert check_step6_IPchange(data)
                 json_number += 1
 
-            # Ping iDRAC IP Address
+            # Configuring Out of Band Management
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step7:
                 check_the_workflow_task(url_body, data, json_number, workflow_step7)
-                assert check_step7_PingIP(New_Node), 'Check on ' + workflow_step7 + ' failed'
+                # assert check_step7_IPchange(data, json_number), 'Check on ' + workflow_step7 + ' failed'
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # Ping iDRAC IP Address
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step8:
+                check_the_workflow_task(url_body, data, json_number, workflow_step8)
+                assert check_step8_PingIP(New_Node), 'Check on ' + workflow_step8 + ' failed'
                 json_number += 1
 
             # # Find ScaleIO
-            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step8:
-            #     check_the_workflow_task(url_body, data, json_number, workflow_step8)
-            #     assert check_step8_FindScaleIO(data), 'Check on ' + workflow_step8 + ' failed'
-            #     json_number += 1
-            #
-            # # Configure Boot Device Idrac
-            # if data['workflowTasksResponseList'][json_number_step9]['workFlowTaskName'] == workflow_step9:
-            #     check_the_workflow_task(url_body, data, json_number_step9, workflow_step9)
-            #     assert check_step9_biosChange(New_Node), 'Check on ' + workflow_step9 + ' failed'
+            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step9:
+            #     check_the_workflow_task(url_body, data, json_number, workflow_step9)
+            #     assert check_step9_FindScaleIO(data), 'Check on ' + workflow_step9 + ' failed'
             #     json_number += 1
 
-            # Find vcluster
+            data = get_latest_api_response(url_body)
+
+            # Configuring Obm Settings
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
                 check_the_workflow_task(url_body, data, json_number, workflow_step10)
-                assert check_step10_findVcluster(data), 'Check on ' + workflow_step10 + ' failed'
                 json_number += 1
 
+            # Configure Boot Device Idrac
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step11:
+                check_the_workflow_task(url_body, data, json_number, workflow_step11)
+                assert check_step11_biosChange(New_Node), 'Check on ' + workflow_step11 + ' failed'
+                json_number += 1
 
+            data = get_latest_api_response(url_body)
+
+            # Configure PXE Boot
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step12:
+                check_the_workflow_task(url_body, data, json_number, workflow_step12)
+                json_number += 1
+
+            # Find vcluster
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step13:
+                check_the_workflow_task(url_body, data, json_number, workflow_step13)
+                assert check_step13_findVcluster(data), 'Check on ' + workflow_step13 + ' failed'
+                json_number += 1
 
 
             ######################### Done
@@ -411,6 +459,9 @@ def update_preprocess_params_json():
     Returns:        0 or 1 (Boolean)
     """
 
+    global symphonyUuid
+    symphonyUuid = get_SymphonyUuid_of_discovered_node()
+
     filePath = os.environ[
                    'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_preprocess.json'
 
@@ -422,6 +473,11 @@ def update_preprocess_params_json():
     data['idracIpAddress'] = New_Node['Node_IP']
     data['idracSubnetMask'] = New_Node['Node_Mask']
     data['idracGatewayIpAddress'] = New_Node['Node_GW']
+    data['esxiManagementHostname'] = esxiManagementHostname
+    data['esxiManagementIpAddress'] = esxiManagementIpAddress
+    data['esxiManagementSubnetMask'] = esxiManagementSubnetMask
+    data['symphonyUuid'] = symphonyUuid
+    data['serviceName'] = serviceName
 
     with open(filePath, 'w') as outfile:
         json.dump(data, outfile)
@@ -479,29 +535,29 @@ def check_step1_findNode(data, json_num):
 
 
 # Check the new IP address is returned in the results
-def check_step6_IPchange(data):
+def check_step7_IPchange(data, json_num):
     ip = New_Node['Node_IP']
 
     error_list = []
-    for step in data['workflowTasksResponseList']:
-        if step['workFlowTaskName'] == 'Configuring Out of Band Management':
-            if step['results']['idracIpAddress'] != New_Node['Node_IP']:
-                error_list.append('Error : The new IP has not been set correctly')
+    if data['workflowTasksResponseList'][json_num]['workFlowTaskName'] == 'Configuring Out of Band Management':
+        if data['workflowTasksResponseList'][json_num]['results']['idracIpAddress'] != New_Node['Node_IP']:
+            error_list.append('Error : The new IP has not been set correctly')
 
-            if step['results']['idracSubnetMask'] != New_Node['Node_Mask']:
-                error_list.append('Error : The new IP Mask has not been set correctly')
+        if data['workflowTasksResponseList'][json_num]['results']['idracSubnetMask'] != New_Node['Node_Mask']:
+            error_list.append('Error : The new IP Mask has not been set correctly')
 
-            if step['results']['idracGatewayIpAddress'] != New_Node['Node_GW']:
-                error_list.append('Error : The new IP Gateway has not been set correctly')
+        if data['workflowTasksResponseList'][json_num]['results']['idracGatewayIpAddress'] != New_Node['Node_GW']:
+            error_list.append('Error : The new IP Gateway has not been set correctly')
+
     if error_list == []:
-        print('IP crednetials have been correctly configured')
+        print('IP credentials have been correctly configured')
         return 1
     else:
         return 0
 
 
 # Check we can ping the new IP address
-def check_step7_PingIP(New_Node):
+def check_step8_PingIP(New_Node):
     # Contact the new IP address and check the network settings
     error_list = []
     ipaddres = New_Node['Node_IP']
@@ -521,7 +577,7 @@ def check_step7_PingIP(New_Node):
 
 
 # Check that ScaleIO data (volumes ...) is returned
-def check_step8_FindScaleIO(data):
+def check_step9_FindScaleIO(data):
     #TODO this needs to be expanded to valiadte at source.
     error_list = []
     for step in data['workflowTasksResponseList']:
@@ -536,7 +592,7 @@ def check_step8_FindScaleIO(data):
 
 
 # Check the bios setting has changed.
-def check_step9_biosChange(New_Node):
+def check_step11_biosChange(New_Node):
     # export the bios configuration again and check the DNE relevant attributes have been updated
     response = get_BIOS_settings(New_Node)
     assert response.status_code == 200, 'Error, '
@@ -558,7 +614,7 @@ def check_step9_biosChange(New_Node):
 
 
 # Check the cluster retunred is retunred from source also
-def check_step10_findVcluster(data):
+def check_step13_findVcluster(data):
     actualvCenterClusterList = getRealVcenterInfo()
 
     error_list = []
@@ -576,6 +632,23 @@ def check_step10_findVcluster(data):
         return 1
     else:
         return 0
+
+######## Supporting Function to get the symphonyUuid of the discovered node ############
+
+def get_SymphonyUuid_of_discovered_node():
+
+    endpoint = '/dne/nodes'
+    url_body = protocol + ipaddress + dne_port + endpoint
+    response = requests.get(url_body)
+    # verify the status_code
+    assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
+    data = response.json()
+
+    global symphonyUuid
+    symphonyUuid = data[0]['symphonyUuid']
+
+    return symphonyUuid
+
 
 ######## Supporting Functions to get Node Bios Details ##########
 
