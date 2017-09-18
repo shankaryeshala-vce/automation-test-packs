@@ -13,7 +13,6 @@ import json
 import requests
 import os
 import time
-import cpsd
 
 ##############################################################################################
 
