@@ -61,9 +61,6 @@ def test_ConvergedSystem_RestAPI():
     the_payload = af_support_tools.get_config_file_property(config_file=payload_file, heading= payload_header,
                                                             property= payload_property_sysadd )
     sysadd = json.loads(the_payload)
-    #print (sysadd)
-
-
 
 # =================================================================
 # Converged System Rest API
@@ -71,6 +68,8 @@ def test_ConvergedSystem_RestAPI():
     RestAPIurl = 'http://'+ ipaddress +':8088/convergedsystems'
     resp = requests.get(RestAPIurl)
     Rest_data = json.loads(resp.text)
+    time.sleep(5)
+    print (Rest_data)
 
 # Find the Converged Systems UUID to build the Converged Systems Components Rest API
     Rest_Component_element =  Rest_data[0]["uuid"]
