@@ -83,8 +83,6 @@ def load_test_data():
 # These are the main tests.
 #####################################################################
 
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
 @pytest.mark.network_services_mvp
 def test_rackHD_adapter_servicerunning():
     """
@@ -108,9 +106,6 @@ def test_rackHD_adapter_servicerunning():
     print('\nDocker Container is:', my_return_status, '\n')
     assert my_return_status == 'Up', (service_name + " not running")
 
-
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
 @pytest.mark.network_services_mvp
 def test_registerRackHD():
     # Until consul is  working properly & integrated with the rackhd adapter in the same environment we need to register
@@ -199,8 +194,7 @@ def test_registerRackHD():
     ('exchange.dell.cpsd.cms.credentials.response', 'queue.dell.cpsd.controlplane.rackhd.credentials.response'),
     ('exchange.dell.cpsd.endpoint.registration.event', 'queue.dell.cpsd.controlplane.rackhd.endpoint-events'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.rackhd.register')])
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
+
 @pytest.mark.network_services_mvp
 def test_rackHD_RMQ_bindings_core(exchange, queue):
     """
@@ -223,8 +217,7 @@ def test_rackHD_RMQ_bindings_core(exchange, queue):
 
 @pytest.mark.parametrize('exchange, queue', [
     ('exchange.dell.cpsd.controlplane.rackhd.response', 'controlplane.hardware.list.nodes.response')])
-@pytest.mark.dne_paqx_parent
-@pytest.mark.dne_paqx_parent_mvp_extended
+
 @pytest.mark.network_services_mvp
 def test_rackHD_RMQ_bindings_dne(exchange, queue):
     """
@@ -247,8 +240,7 @@ def test_rackHD_RMQ_bindings_dne(exchange, queue):
 
 @pytest.mark.parametrize('exchange, queue', [
     ('exchange.dell.cpsd.adapter.rackhd.node.discovered.event', 'queue.dell.cpsd.frupaqx.node.discovered-event')])
-@pytest.mark.fru_paqx_parent
-@pytest.mark.fru_mvp
+
 @pytest.mark.network_services_mvp
 def test_rackHD_RMQ_bindings_fru(exchange, queue):
     """
@@ -268,9 +260,6 @@ def test_rackHD_RMQ_bindings_fru(exchange, queue):
     assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
     print(exchange, '\nis bound to\n', queue, '\n')
 
-
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
 @pytest.mark.network_services_mvp
 def test_rackHD_adapter_full_ListCapabilities():
     """
@@ -365,9 +354,6 @@ def test_rackHD_adapter_full_ListCapabilities():
 
     cleanup('test.capability.registry.response')
 
-
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
 @pytest.mark.network_services_mvp
 def test_consul_verify_rackHD_registered():
     """
@@ -409,9 +395,6 @@ def test_consul_verify_rackHD_registered():
         print('\n')
         raise Exception(err)
 
-
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
 @pytest.mark.network_services_mvp
 def test_consul_verify_rackHD_passing_status():
     """
@@ -448,9 +431,6 @@ def test_consul_verify_rackHD_passing_status():
         print('\n')
         raise Exception(err)
 
-
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
 @pytest.mark.network_services_mvp
 def test_rackHD_adapter_log_files_exist():
     """
@@ -483,9 +463,6 @@ def test_rackHD_adapter_log_files_exist():
 
     print('Valid log files exist')
 
-
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
 @pytest.mark.network_services_mvp
 def test_rackhd_adapter_log_files_free_of_exceptions():
     """
