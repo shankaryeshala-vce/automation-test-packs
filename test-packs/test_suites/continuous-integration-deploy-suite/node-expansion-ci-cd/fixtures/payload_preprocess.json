@@ -5,5 +5,7 @@
   "esxiManagementSubnetMask": "string",
   "idracGatewayIpAddress": "string",
   "idracIpAddress": "string",
-  "idracSubnetMask": "string"
+  "idracSubnetMask": "string",
+  "symphonyUuid": "string",
+  "serviceName": "string"
 }
