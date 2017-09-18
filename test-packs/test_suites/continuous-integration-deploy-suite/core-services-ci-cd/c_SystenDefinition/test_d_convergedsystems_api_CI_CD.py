@@ -64,11 +64,10 @@ def test_ConvergedSystem_RestAPI():
 
     # =================================================================
     # Converged System Rest API
-
+    time.sleep(5)
     RestAPIurl = 'http://' + ipaddress + ':8088/convergedsystems'
     resp = requests.get(RestAPIurl)
-    Rest_data = json.loads(resp.text)
-    time.sleep(5)
+    Rest_data = json.loads(resp.text)    
     print(Rest_data)
 
     # Find the Converged Systems UUID to build the Converged Systems Components Rest API
