@@ -232,10 +232,10 @@ def test_rackHD_RMQ_bindings_dne(exchange, queue):
     print(exchange, '\nis bound to\n', queue, '\n')
 
 
-@pytest.mark.parametrize('exchange, queue', [
-    ('exchange.dell.cpsd.adapter.rackhd.node.discovered.event', 'queue.dell.cpsd.frupaqx.node.discovered-event')])
+#@pytest.mark.parametrize('exchange, queue', [
+#    ('exchange.dell.cpsd.adapter.rackhd.node.discovered.event', 'queue.dell.cpsd.frupaqx.node.discovered-event')])
 
-@pytest.mark.network_services_mvp
+#@pytest.mark.network_services_mvp
 def test_rackHD_RMQ_bindings_fru(exchange, queue):
     """
     Title           :       Verify the RMQ bindings
