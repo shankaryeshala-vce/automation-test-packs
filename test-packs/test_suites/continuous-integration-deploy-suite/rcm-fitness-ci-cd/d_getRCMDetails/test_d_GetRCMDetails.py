@@ -100,7 +100,7 @@ def load_test_data():
 
     deleteTestQueues('testGetRCMDetailsRequest', 'testGetRCMDetailsResponse')
 
-    getAvailableRCMs("VxRack", "FLEX", "9.2", "9.2.33")
+    getAvailableRCMs("VxRack", "1000 FLEX", "9.2", "9.2.1")
     # with open(path + "getRcmDetailsInputs.json", 'rt') as dataFileIN:
     #     data = json.load(dataFileIN)
 
@@ -214,7 +214,7 @@ def getAvailableRCMs(family, model, train, version):
     optionManu = "MANUFACTURING"
 
     exception = "No RCM definition systems for system family"
-    url = 'http://' + host + ':19080/rcm-fitness-api/api/rcm/inventory/' + family + "/" + model + "/" + train + "/" + version
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/' + family + "/" + model + "/" + train + "/" + version
     print(url)
     resp = requests.get(url)
     data = json.loads(resp.text)
@@ -450,67 +450,67 @@ def test_verifyConsumedAttributes1():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes2():
-    verifyConsumedAttributes(path + 'getRCMsRequest2.json', path + 'getRCMsResponse2.json', "9.2", "9.2.33", "FLEX",
+    verifyConsumedAttributes(path + 'getRCMsRequest2.json', path + 'getRCMsResponse2.json', "9.2", "9.2.1", "1000 FLEX",
                              "VxRack")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes3():
-    verifyConsumedAttributes(path + 'getRCMsRequest3.json', path + 'getRCMsResponse3.json', "9.2", "9.2.33", "FLEX",
+    verifyConsumedAttributes(path + 'getRCMsRequest3.json', path + 'getRCMsResponse3.json', "9.2", "9.2.1", "1000 FLEX",
                              "VxRack")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes4():
-    verifyConsumedAttributes(path + 'getRCMsRequest4.json', path + 'getRCMsResponse4.json', "9.2", "9.2.33", "FLEX",
+    verifyConsumedAttributes(path + 'getRCMsRequest4.json', path + 'getRCMsResponse4.json', "9.2", "9.2.1", "1000 FLEX",
                              "VxRack")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes5():
-    verifyConsumedAttributes(path + 'getRCMsRequest5.json', path + 'getRCMsResponse5.json', "9.2", "9.2.33", "FLEX",
+    verifyConsumedAttributes(path + 'getRCMsRequest5.json', path + 'getRCMsResponse5.json', "9.2", "9.2.1", "1000 FLEX",
                              "VxRack")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes6():
-    verifyConsumedAttributes(path + 'getRCMsRequest6.json', path + 'getRCMsResponse6.json', "9.2", "9.2.33", "FLEX",
+    verifyConsumedAttributes(path + 'getRCMsRequest6.json', path + 'getRCMsResponse6.json', "9.2", "9.2.1", "1000 FLEX",
                              "VxRack")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes7():
-    verifyConsumedAttributes(path + 'getRCMsRequest7.json', path + 'getRCMsResponse7.json', "9.2", "9.2.33", "FLEX",
+    verifyConsumedAttributes(path + 'getRCMsRequest7.json', path + 'getRCMsResponse7.json', "9.2", "9.2.1", "1000 FLEX",
                              "VxRack")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes8():
-    verifyConsumedAttributes(path + 'getRCMsRequest8.json', path + 'getRCMsResponse8.json', "9.2", "9.2.33", "FLEX",
+    verifyConsumedAttributes(path + 'getRCMsRequest8.json', path + 'getRCMsResponse8.json', "9.2", "9.2.1", "1000 FLEX",
                              "VxRack")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes9():
-    verifyConsumedAttributes(path + 'getRCMsRequest9.json', path + 'getRCMsResponse9.json', "9.2", "9.2.33", "FLEX",
+    verifyConsumedAttributes(path + 'getRCMsRequest9.json', path + 'getRCMsResponse9.json', "9.2", "9.2.1", "1000 FLEX",
                              "VxRack")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes10():
-    verifyConsumedAttributes(path + 'getRCMsRequest10.json', path + 'getRCMsResponse10.json', "9.2", "9.2.33", "FLEX",
+    verifyConsumedAttributes(path + 'getRCMsRequest10.json', path + 'getRCMsResponse10.json', "9.2", "9.2.1", "1000 FLEX",
                              "VxRack")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes11():
-    verifyConsumedAttributes(path + 'getRCMsRequest11.json', path + 'getRCMsResponse11.json', "9.2", "9.2.33", "FLEX",
+    verifyConsumedAttributes(path + 'getRCMsRequest11.json', path + 'getRCMsResponse11.json', "9.2", "9.2.1", "1000 FLEX",
                              "VxRack")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes12():
-    verifyConsumedAttributes(path + 'getRCMsRequest12.json', path + 'getRCMsResponse12.json', "9.2", "9.2.33", "FLEX",
+    verifyConsumedAttributes(path + 'getRCMsRequest12.json', path + 'getRCMsResponse12.json', "9.2", "9.2.1", "1000 FLEX",
                              "VxRack")
 
 

@@ -47,9 +47,10 @@ def purgeOldOutput(dir, pattern):
         else:
             print('Unable to locate output files to remove.')
 
-def getRCMDefinition(family, model):
+def getRCMDefinition(family, model, train, version):
         # print(data)
     contentIndex = 0
+    fileIndex = 0
     fileList = []
     fileHash = []
     option = "ORIGINAL"
@@ -57,7 +58,7 @@ def getRCMDefinition(family, model):
     optionManu = "MANUFACTURING"
     #model = "340"
     exception = "No rcm definitions for system family"
-    urlInventory = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/vxrack/FLEX/9.2'
+    urlInventory = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/vxrack/1000 FLEX/' + train + '/' + version + '/'
 
     #print(url)
     respInventory = requests.get(urlInventory)
@@ -69,6 +70,7 @@ def getRCMDefinition(family, model):
     resp = requests.get(url)
     data = json.loads(resp.text)
     rcm = data["rcmDefinition"]
+    rcmContent = data["rcmDefinition"]["rcmContents"]
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
 
     if data != "":
@@ -88,36 +90,83 @@ def getRCMDefinition(family, model):
             print("Option: %s" % rcm["viewOption"])
             assert rcm["systemModelFamily"] == model
             assert rcm["systemProductFamily"] == family
+            assert rcm["rcmTrain"] == train
+            assert rcm["rcmVersion"] == version
+            assert rcm["initialReleaseDate"] != ""
+            assert rcm["lastModificationDate"] != ""
+            assert rcm["endOfLifeDate"] != ""
             assert (rcm["viewOption"] == option) or (rcm["viewOption"] == optionAdd) or (rcm["viewOption"] == optionManu)
             prod = rcm["systemProductFamily"]
             mod = rcm["systemModelFamily"]
             train = rcm["rcmTrain"]
             version = rcm["rcmVersion"]
-            combo = prod + '/' + mod + '/' + train + '/'  + version
+            combo = prod + '/' + mod + '/' + train + '/' + version
             print("RCM returned for: %s" % combo)
 
             while contentIndex < len(data["rcmDefinition"]["rcmContents"]):
-                if "versionFileName" in data["rcmDefinition"]["rcmContents"][contentIndex]:
-                    assert "versionFileHash" in data["rcmDefinition"]["rcmContents"][contentIndex]
-                    assert data["rcmDefinition"]["rcmContents"][contentIndex]["versionFileName"] != "", "No filename specified in definition."
-                    assert data["rcmDefinition"]["rcmContents"][contentIndex]["versionFileHash"] != "", "No filename specified in definition."
-                    versFileName = data["rcmDefinition"]["rcmContents"][contentIndex]["versionFileName"]
-                    versFileHash = data["rcmDefinition"]["rcmContents"][contentIndex]["versionFileHash"]
-                    fileList.append(versFileName)
-                    fileHash.append(versFileHash)
+                print("Loop: %d" % contentIndex)
+                assert "uuid" in rcmContent[contentIndex] and rcmContent[contentIndex]["uuid"] != "", "No UUID returned in rcmContents."
+                assert "category" in rcmContent[contentIndex] and rcmContent[contentIndex]["category"] != "", "No category returned in rcmContents."
+                assert "component" in rcmContent[contentIndex] and rcmContent[contentIndex]["component"] != "", "No component returned in rcmContents."
+                #assert "option" in rcmContent[contentIndex] and rcmContent[contentIndex]["option"] != "", "No option returned in rcmContents."
+                assert "option" in rcmContent[contentIndex], "No option returned in rcmContents."
+                assert "priorVersion" in rcmContent[contentIndex], "No priorVersion returned in rcmContents."
+                assert "priorComponent" in rcmContent[contentIndex], "No priorComponent returned in rcmContents."
+                assert "subType" in rcmContent[contentIndex], "No subType returned in rcmContents."
+                assert "type" in rcmContent[contentIndex] and rcmContent[contentIndex]["type"] != "", "No type returned in rcmContents."
+                assert "version" in rcmContent[contentIndex] and rcmContent[contentIndex]["version"] != "", "No version returned in rcmContents."
+                assert "remediationFiles" in rcmContent[contentIndex] and rcmContent[contentIndex]["remediationFiles"] != "", "No remediationFiles returned in rcmContents."
+
+                if "Compute" in rcmContent[contentIndex]["type"]:
+                    assert rcmContent[contentIndex]["type"] == "Compute" or "Compute - Dell (R630/R730)"
+
+                if "Management" in rcmContent[contentIndex]["type"]:
+                    assert rcmContent[contentIndex]["type"] == "Management" or "Management - Dell (R630)"
+
+
+                print(len(rcmContent[contentIndex]["remediationFiles"]))
+                print("Component level checks complete.")
+
+                if len(rcmContent[contentIndex]["remediationFiles"]) > 0:
+                    print("Deep")
+                    while fileIndex < len(rcmContent[contentIndex]["remediationFiles"]):
+                        print("Deeper still")
+                        print("File Loop: %d" % fileIndex)
+                        assert "uuid" in rcmContent[contentIndex]["remediationFiles"][fileIndex], "No file UUID returned in remediationFiles."
+                        assert rcmContent[contentIndex]["remediationFiles"][fileIndex]["uuid"] != "", "Unexpected file UUID returned in remediationFiles."
+                        assert "filename" in rcmContent[contentIndex]["remediationFiles"][fileIndex], "No file name returned in remediationFiles."
+                        assert rcmContent[contentIndex]["remediationFiles"][fileIndex]["filename"] != "", "Unexpected file name returned in remediationFiles."
+                        assert "platform" in rcmContent[contentIndex]["remediationFiles"][fileIndex], "No platform returned in remediationFiles."
+                        assert rcmContent[contentIndex]["remediationFiles"][fileIndex]["platform"] != "", "Unexpected platform returned in remediationFiles."
+                        assert rcmContent[contentIndex]["remediationFiles"][fileIndex]["operatingSystem"] != "", "Unexpected operatingSystem returned in remediationFiles."
+                        assert rcmContent[contentIndex]["remediationFiles"][fileIndex]["osArchitecture"] != "", "Unexpected osArchitecture returned in remediationFiles."
+                        assert rcmContent[contentIndex]["remediationFiles"][fileIndex]["fileVersion"] != "", "Unexpected fileVersion returned in remediationFiles."
+                        assert rcmContent[contentIndex]["remediationFiles"][fileIndex]["fileType"] != "", "Unexpected fileType returned in remediationFiles."
+                        assert len(rcmContent[contentIndex]["remediationFiles"][fileIndex]["fileHash"]) > 16, "Unexpected fileHash returned in remediationFiles."
+                        assert rcmContent[contentIndex]["remediationFiles"][fileIndex]["hashType"] == "SHA256" or "MD5", "Unexpected hash type returned in remediationFiles."
+                        assert "/VxRack_1000_FLEX/Component/" in rcmContent[contentIndex]["remediationFiles"][fileIndex]["cdnPath"], "Unexpected path returned in remediationFiles."
+                        versFileName = rcmContent[contentIndex]["remediationFiles"][fileIndex]["filename"]
+                        versFileHash = rcmContent[contentIndex]["remediationFiles"][fileIndex]["fileHash"]
+                        fileList.append(versFileName)
+                        fileHash.append(versFileHash)
+                        print("File level checks complete.")
+                        fileIndex += 1
+                    #contentIndex += 1
+                fileIndex = 0
                 contentIndex += 1
+
+
             print("List of filenames:", fileList)
             print("List of filehashes:", fileHash)
-            #contentndex = 0
-
-        else:
-            combo = str(family + "/" + model + "/")
-            print("\nNo RCMs found for product/model combination: %s" % combo)
-            print(data["message"])
-            assert exception in data["message"], ("No RCMs not returned for model:" + model)
 
 
-        print("\nReturned data has completed all defined checks successfully......")
+
+            print("\nReturned data has completed all defined checks successfully......")
+            return
+
+
+    assert False, "No RCMs not returned for model:" + model
+
 
 def getRCMDefinition_Invalid(UUID, family, model):
         # print(data)
@@ -154,33 +203,24 @@ def getRCMDefinition_Null(rcmUUID):
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef1():
-    getRCMDefinition("VxRack", "FLEX")
+    getRCMDefinition("VxRack", "1000 FLEX", "9.2", "9.2.2")
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef2():
-    getRCMDefinition_Invalid("12345678-1234-1234-1234-12347b7370a2", "VxRack", "FLEX")
+    getRCMDefinition("VxRack", "1000 FLEX", "9.2", "9.2.1")
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef3():
-    getRCMDefinition_Invalid("----", "VxRack", "FLEX")
+    getRCMDefinition_Invalid("12345678-1234-1234-1234-12347b7370a2", "VxRack", "FLEX")
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef4():
-    getRCMDefinition_Invalid("1-1-1-1-1", "VxRack", "FLEX")
+    getRCMDefinition_Invalid("----", "VxRack", "1000 FLEX")
+
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef5():
+    getRCMDefinition_Invalid("1-1-1-1-1", "VxRack", "1000 FLEX")
+@pytest.mark.rcm_fitness_mvp_extended
+def test_getRCMDef6():
     getRCMDefinition_Null("")
 
-
-#@pytest.mark.TC546562_Vxblock
-#def test_getRCMDef5():
-#    getRCMDefinition_Invalid("", "Vblock", "340")
-
-# getRCMDefinition("0ef9b082-0d9f-479b-9934-ff0f7b7370a2", "Vblock", "340")
-# getRCMDefinition("12345678-1234-1234-1234-12347b7370a2", "Vblock", "340")
-# getRCMDefinition("----", "Vblock", "340")
-# getRCMDefinition("1-1-1-1-1", "Vblock", "340")
-# getRCMDefinition("", "Vblock", "340")
-#getRCMDefinition()
-#getAvailableRCMs("Block")
-#getRCMDefinition()
