@@ -55,6 +55,7 @@ def load_test_data():
 # These are the main tests.
 #####################################################################
 
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_Control_and_Binding_Ping_Message_core():
@@ -131,7 +132,7 @@ def test_capabilityRegistry_Control_and_Binding_Ping_Message_core():
     print('The Capability Registry Control Ping message is sent and has the correct containerID:', containerID)
     print('\n*******************************************************\n')
 
-
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_Control_and_Binding_Pong_Message_core():
@@ -289,7 +290,7 @@ def test_capabilityRegistry_Control_and_Binding_Pong_Message_core():
 
     cleanup()
 
-
+@pytest.mark.daily_status
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_capabilityRegistry_Control_and_Binding_Ping_Message_dne():
@@ -366,7 +367,7 @@ def test_capabilityRegistry_Control_and_Binding_Ping_Message_dne():
     print('The Capability Registry Control Ping message is sent and has the correct containerID:', containerID)
     print('\n*******************************************************\n')
 
-
+@pytest.mark.daily_status
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_capabilityRegistry_Control_and_Binding_Pong_Message_dne():

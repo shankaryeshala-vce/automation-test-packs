@@ -55,6 +55,7 @@ def load_test_data():
 # These are the main tests.
 #####################################################################
 
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_servicerunning():
@@ -80,6 +81,7 @@ def test_capabilityRegistry_servicerunning():
     assert my_return_status == 'Up', (service_name + " not running")
 
 
+@pytest.mark.daily_status
 @pytest.mark.parametrize('exchange, queue', [
     ('exchange.dell.cpsd.hdp.capability.registry.binding', 'queue.dell.cpsd.hdp.capability.registry.binding'),
     ('exchange.dell.cpsd.hdp.capability.registry.control', 'queue.dell.cpsd.hdp.capability.registry.control.coprhd-adapter'),
@@ -169,6 +171,7 @@ def test_capability_registry_RMQ_bindings_fru(exchange, queue):
 
 
 @pytest.mark.skip(reason="Test will be enabled when CI pipeline will install the rpms from master. Tha fix is already pushed into the master")
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_log_files_exist():
@@ -204,6 +207,7 @@ def test_capabilityRegistry_log_files_exist():
     print('Valid log files exist')
 
 @pytest.mark.skip(reason="Test will be enabled when CI pipeline will install the rpms from master. Tha fix is already pushed into the master")
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_log_files_free_of_exceptions():
