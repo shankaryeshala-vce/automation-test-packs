@@ -54,7 +54,7 @@ def test_ConvergedSystem_RestAPI():
     """ Verify the Converged System Components Rest API V's JSON input file.
 
     Pre-requisite : The system has already been defined and discovered.
-                    You can open a browser to the Converged System Rest API (e.g. http://10.20.30.40:8088/convergedsystems)
+                    You can open a browser to the Converged System Rest API (e.g. http://10.20.30.40:10000/sds/convergedsystems)
     """
 
     # Check the JSON system definition input file
@@ -65,7 +65,7 @@ def test_ConvergedSystem_RestAPI():
     # =================================================================
     # Converged System Rest API
     time.sleep(5)
-    RestAPIurl = 'http://' + ipaddress + ':8088/convergedsystems'
+    RestAPIurl = 'http://' + ipaddress + ':10000/sds/convergedsystems'
     resp = requests.get(RestAPIurl)
     Rest_data = json.loads(resp.text)    
     print(Rest_data)
@@ -73,7 +73,7 @@ def test_ConvergedSystem_RestAPI():
     # Find the Converged Systems UUID to build the Converged Systems Components Rest API
     #Rest_Component_element = Rest_data[0]["uuid"]
 
-    RestAPI_Component_url = u'http://' + ipaddress + u':8088/convergedsystems/' + Rest_data[0]["uuid"] + u'/components'
+    RestAPI_Component_url = u'http://' + ipaddress + u':10000/sds/convergedsystems/' + Rest_data[0]["uuid"] + u'/components'
     comp_resp = requests.get(RestAPI_Component_url)
     Rest_Component_data = json.loads(comp_resp.text)
 
