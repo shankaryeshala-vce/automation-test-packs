@@ -71,11 +71,11 @@ def test_handle_validateScaleIO_ESS_message():
     simulate_validateScaleIORequest_message();
 
     print("Consume validate scaleIO response message ...\n")
-    listingsMsg = consumeResponse('queue.dell.cpsd.ess.service.response')
+    listingsMsg = consumeResponse('test.ess.service.response')
     cleanupQ('test.ess.service.response')
 
-    assert len(listingsMsg['validStorage']) == 2, "Error - should have 2 valid storagePools"
-    assert len(listingsMsg['invalidStorage']) == 2, "Error - should have 2 failed storagePools"
+    assert len(listingsMsg['validStorage']) == 3, "Error - should have 2 valid storagePools"
+    assert len(listingsMsg['invalidStorage']) == 2, "Error - should have 3 failed storagePools"
 
 #######################################################################################################################
 
@@ -89,6 +89,7 @@ def simulate_validateScaleIORequest_message():
     with open(filePath) as fixture:
 
         my_payload = fixture.read()
+        print(my_payload)
         af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                              rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
                                              exchange='exchange.dell.cpsd.service.ess.request',
