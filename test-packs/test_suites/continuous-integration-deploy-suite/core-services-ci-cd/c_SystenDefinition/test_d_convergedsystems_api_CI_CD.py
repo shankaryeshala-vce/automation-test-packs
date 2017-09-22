@@ -45,6 +45,33 @@ def load_test_data():
     cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS',
                                                              property='password')
 
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_common_ui_install(setup):
+    """
+    Title: Verify that the common-ui rpm is installed correctly
+    Description: This test verifies that the common-ui service is installed correctly
+    Params: List of service names
+    Returns: None
+    """
+    print(test_common_ui_install.__doc__)
+
+    err = []
+
+    common_ui = "dell-cpsd-common-ui"
+
+    sendcommand = "yum install -y " + common_ui
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username,
+                                                             password=cli_password,
+                                                            command=sendcommand, return_output=True)
+
+    rpmcheck_ui = af_support_tools.check_for_installed_rpm(host=ipaddress, username=cli_username,
+                                                             password=cli_password, rpm_name=common_ui)
+
+    if rpmcheck_ui != True:
+        err.append(common_ui+ " did not install properly")
+    assert not err
+
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
@@ -67,8 +94,9 @@ def test_ConvergedSystem_RestAPI():
     time.sleep(5)
     RestAPIurl = 'http://' + ipaddress + ':10000/sds/convergedsystems'
     resp = requests.get(RestAPIurl)
-    Rest_data = json.loads(resp.text)    
-    print(Rest_data)
+    Rest_data = json.loads(resp.text)
+    time.sleep(5)
+
 
     # Find the Converged Systems UUID to build the Converged Systems Components Rest API
     #Rest_Component_element = Rest_data[0]["uuid"]
