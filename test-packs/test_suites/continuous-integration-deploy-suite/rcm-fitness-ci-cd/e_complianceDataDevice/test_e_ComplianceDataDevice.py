@@ -85,6 +85,7 @@ def getComplianceData(product, family, model, deviceProduct, deviceType, filenam
     versionIndex = 0
     totalComponents = 0
     totalSubComponents = 0
+    groupIndex = 0
     i = 0
 
     url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID + '/component/'
@@ -105,151 +106,161 @@ def getComplianceData(product, family, model, deviceProduct, deviceType, filenam
     # data = sysData["system"]
     totalComponents = len(data["components"])
     print("Total Comps: %d" % totalComponents)
-    try:
-        if data != "":
-            while compIndex < totalComponents:
-                print("You are here now...")
-                if "modelFamily" in data["components"][compIndex]["definition"] and \
-                                data["components"][compIndex]["definition"]["model"] == model:
-                    print("You are right here now......")
-                    i = 0
-                    global compUUID
-                    compUUID = data["components"][compIndex]["uuid"]
-                    print("Component UUID: %s" % compUUID)
-                    newComp = compUUID[:8]
-                    print(newComp)
-                    compURL = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/device/' + compUUID
+    # try:
+    if data != "":
+        while compIndex < totalComponents:
+            print("You are here now...")
+            if "modelFamily" in data["components"][compIndex]["definition"] and \
+                            data["components"][compIndex]["definition"]["model"] == model:
+                print("You are right here now......")
+                # i = 0
+                global compUUID
+                compUUID = data["components"][compIndex]["uuid"]
+                print("Component UUID: %s" % compUUID)
+                newComp = compUUID[:8]
+                print(newComp)
+                compURL = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/device/' + compUUID
 
-                    compResp = requests.get(compURL)
-                    compData = json.loads(compResp.text)
+                compResp = requests.get(compURL)
+                compData = json.loads(compResp.text)
 
-                    assert compResp.status_code == 200, "Request has not been acknowledged as expected."
+                assert compResp.status_code == 200, "Request has not been acknowledged as expected."
 
-                    totalSubComponents = len(compData["subComponents"])
-                    assert totalSubComponents == minSubCount or maxSubCount, "Unexpected number of subcomponents returned."
+                totalSubComponents = len(compData["subComponents"])
+                print("Number of subcomps: %d" % totalSubComponents)
+                assert totalSubComponents == minSubCount or maxSubCount, "Unexpected number of subcomponents returned."
 
-                    with open(filename, 'a') as outfile:
-                        json.dump(compData, outfile, sort_keys=True, indent=4, ensure_ascii=False)
+                with open(filename, 'a') as outfile:
+                    json.dump(compData, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
-                    if compData["device"]["uuid"] != "":
-                        print("You are right here now again......")
-                        if compData["device"]["uuid"] == data["components"][i]["uuid"]:
-                            print(i)
-                            assert compData["device"]["uuid"] == data["components"][i][
-                                "uuid"], "response does not detail Component UUID."
+                if compData["device"]["uuid"] != "":
+                    print("You are right here now again......")
+                    if compData["device"]["uuid"] != data["components"][i]["uuid"]:
+                        i += 1
+                        continue
+                    if compData["device"]["uuid"] == data["components"][i]["uuid"]:
+                        print("Verifications starting.")
+                        print(i)
+                        assert compData["device"]["uuid"] == data["components"][i][
+                            "uuid"], "response does not detail Component UUID."
 
-                            assert "parentGroupUuids" in compData["device"], "Response not detail Parent Group UUID."
-                            assert compData["device"]["parentGroupUuids"] == data["components"][i][
-                                "parentGroupUuids"], "Response not detail Parent Group UUID."
+                        assert "parentGroupUuids" in compData["device"], "Response not detail Parent Group UUID."
+                        assert compData["device"]["parentGroupUuids"] == data["components"][i][
+                            "parentGroupUuids"], "Response not detail Parent Group UUID."
 
-                            assert "elementData" in compData["device"], "Response not detail Element Data."
-                            assert "auditData" in compData["device"], "Response not detail Audit Data."
-                            assert "versionDatas" in compData["device"], "Response not detail Version Datas."
-                            # assert "productFamily" in compData["device"]["elementData"], "Response not detail Product Family."
+                        assert "elementData" in compData["device"], "Response not detail Element Data."
+                        assert "auditData" in compData["device"], "Response not detail Audit Data."
+                        assert "versionDatas" in compData["device"], "Response not detail Version Datas."
+                        # assert "productFamily" in compData["device"]["elementData"], "Response not detail Product Family."
 
-                            assert "modelFamily" in compData["device"]["elementData"], "Response not detail Family."
-                            assert compData["device"]["elementData"]["modelFamily"] == \
-                                   data["components"][i]["definition"]["modelFamily"], "Response not detail Family."
+                        assert "modelFamily" in compData["device"]["elementData"], "Response not detail Family."
+                        assert compData["device"]["elementData"]["modelFamily"] == \
+                               data["components"][i]["definition"]["modelFamily"], "Response not detail Family."
 
-                            assert "model" in compData["device"]["elementData"], "Response not detail Model."
-                            assert compData["device"]["elementData"]["model"] == model, "Response not detail Model."
-                            assert compData["device"]["elementData"]["model"] == data["components"][i]["definition"][
-                                "model"], "Response not detail Model."
+                        assert "model" in compData["device"]["elementData"], "Response not detail Model."
+                        assert compData["device"]["elementData"]["model"] == model, "Response not detail Model."
+                        assert compData["device"]["elementData"]["model"] == data["components"][i]["definition"][
+                            "model"], "Response not detail Model."
 
-                            assert "productFamily" in compData["device"]["elementData"], "Response not detail Model."
-                            assert compData["device"]["elementData"][
-                                       "productFamily"] == deviceProduct, "Response not detail Model."
-                            assert compData["device"]["elementData"]["productFamily"] == \
-                                   data["components"][i]["definition"]["productFamily"], "Response not detail Model."
+                        assert "productFamily" in compData["device"]["elementData"], "Response not detail Model."
+                        assert compData["device"]["elementData"][
+                                   "productFamily"] == deviceProduct, "Response not detail Model."
+                        assert compData["device"]["elementData"]["productFamily"] == \
+                               data["components"][i]["definition"]["productFamily"], "Response not detail Model."
 
-                            assert "elementType" in compData["device"][
-                                "elementData"], "Response not detail Element Type."
-                            assert compData["device"]["elementData"][
-                                       "elementType"] == deviceType, "Response not detail Type."
-                            assert compData["device"]["elementData"]["elementType"] == \
-                                   data["components"][i]["identity"]["elementType"], "Response not detail Type."
+                        assert "elementType" in compData["device"][
+                            "elementData"], "Response not detail Element Type."
+                        assert compData["device"]["elementData"][
+                                   "elementType"] == deviceType, "Response not detail Type."
+                        assert compData["device"]["elementData"]["elementType"] == \
+                               data["components"][i]["identity"]["elementType"], "Response not detail Type."
 
-                            assert "identifier" in compData["device"]["elementData"], "response not detail Identifier."
-                            assert compData["device"]["elementData"]["identifier"] == data["components"][i]["identity"][
-                                "identifier"], "Response not detail Identifier."
+                        assert "identifier" in compData["device"]["elementData"], "response not detail Identifier."
+                        assert compData["device"]["elementData"]["identifier"] == data["components"][i]["identity"][
+                            "identifier"], "Response not detail Identifier."
 
-                            # assert "ipAddress" in compData["device"]["elementData"], "Response not detail IP Address."
-                            # assert compData["device"]["elementData"]["identifier"] == data["components"][0]["identity"]["identifier"], "Response not detail IP Address."
+                        # assert "ipAddress" in compData["device"]["elementData"], "Response not detail IP Address."
+                        # assert compData["device"]["elementData"]["identifier"] == data["components"][0]["identity"]["identifier"], "Response not detail IP Address."
 
-                            # assert "serialNumber" in compData["device"]["elementData"], "Response not detail Serial No."
-                            # assert compData["device"]["elementData"]["serialNumber"] == data["components"][0]["identity"]["serialNumber"], "Response not detail Serial Number."
+                        # assert "serialNumber" in compData["device"]["elementData"], "Response not detail Serial No."
+                        # assert compData["device"]["elementData"]["serialNumber"] == data["components"][0]["identity"]["serialNumber"], "Response not detail Serial Number."
 
-                            assert "collectedTime" in compData["device"][
-                                "auditData"], "Response not detail Collected Time."
-                            assert "collectionSentTime" in compData["device"][
-                                "auditData"], "Response not detail Collection Sent Time."
-                            assert "messageReceivedTime" in compData["device"][
-                                "auditData"], "Response not detail Received Time."
+                        assert "collectedTime" in compData["device"][
+                            "auditData"], "Response not detail Collected Time."
+                        assert "collectionSentTime" in compData["device"][
+                            "auditData"], "Response not detail Collection Sent Time."
+                        assert "messageReceivedTime" in compData["device"][
+                            "auditData"], "Response not detail Received Time."
 
-                            assert "uuid" in compData["groups"][0], "Response not detail component Groups."
-                            assert compData["groups"][0]["uuid"] == sysData["system"]["groups"][0][
-                                "uuid"], "Response not detail component Groups."
+                        while groupIndex < len(sysData["system"]["groups"]):
+                            if compData["groups"][0]["uuid"] != sysData["system"]["groups"][groupIndex]["uuid"]:
+                                groupIndex += 1
+                                continue
+                            if compData["groups"][0]["uuid"] == sysData["system"]["groups"][groupIndex]["uuid"]:
+                                assert "uuid" in compData["groups"][0], "Response not detail component Groups."
+                                assert compData["groups"][0]["uuid"] == sysData["system"]["groups"][groupIndex][
+                                    "uuid"], "Response not detail component Groups."
 
-                            assert "parentGroupUuids" in compData["groups"][0], "Response not detail Parent Groups."
-                            assert compData["groups"][0]["parentGroupUuids"] == sysData["system"]["groups"][0][
-                                "parentGroupUuids"], "Response not detail Parent Group."
+                                assert "parentGroupUuids" in compData["groups"][0], "Response not detail Parent Groups."
+                                assert compData["groups"][0]["parentGroupUuids"] == sysData["system"]["groups"][groupIndex][
+                                    "parentGroupUuids"], "Response not detail Parent Group."
 
-                            assert "parentSystemUuids" in compData["groups"][0], "Response not detail Parent System."
-                            assert compData["groups"][0]["parentSystemUuids"][0] == \
-                                   sysData["system"]["groups"][0]["parentSystemUuids"][
-                                       0], "Response not detail Parent System."
+                                assert "parentSystemUuids" in compData["groups"][0], "Response not detail Parent System."
+                                assert compData["groups"][0]["parentSystemUuids"][0] == \
+                                       sysData["system"]["groups"][groupIndex]["parentSystemUuids"][
+                                           0], "Response not detail Parent System."
 
-                            assert "type" in compData["groups"][0], "Response not detail component Groups."
-                            assert compData["groups"][0]["type"] == sysData["system"]["groups"][0][
-                                "type"], "Response not detail Type."
+                                assert "type" in compData["groups"][0], "Response not detail component Groups."
+                                assert compData["groups"][0]["type"] == sysData["system"]["groups"][groupIndex][
+                                    "type"], "Response not detail Type."
+                                groupIndex += 1
 
-                            assert "systemUuid" in compData["systems"][0], "Response not detail System UUID."
-                            assert compData["systems"][0]["systemUuid"] == sysData["system"][
-                                "uuid"], "Response not detail Type."
+                        assert "systemUuid" in compData["systems"][0], "Response not detail System UUID."
+                        assert compData["systems"][0]["systemUuid"] == sysData["system"][
+                            "uuid"], "Response not detail Type."
 
-                            assert "product" in compData["systems"][0], "Response not detail System UUID."
-                            assert compData["systems"][0]["product"] == product, "1 Response not detail Product."
-                            assert compData["systems"][0]["product"] == sysData["system"]["definition"][
-                                "product"], "2 Response not detail Product."
+                        assert "product" in compData["systems"][0], "Response not detail System UUID."
+                        assert compData["systems"][0]["product"] == product, "1 Response not detail Product."
+                        assert compData["systems"][0]["product"] == sysData["system"]["definition"][
+                            "product"], "2 Response not detail Product."
 
-                            assert "modelFamily" in compData["systems"][0], "Response not detail System UUID."
-                            assert compData["systems"][0]["modelFamily"] == family, "Response not detail Family."
-                            assert compData["systems"][0]["modelFamily"] == sysData["system"]["definition"][
-                                "modelFamily"], "Response not detail Family."
+                        assert "modelFamily" in compData["systems"][0], "Response not detail System UUID."
+                        assert compData["systems"][0]["modelFamily"] == family, "Response not detail Family."
+                        assert compData["systems"][0]["modelFamily"] == sysData["system"]["definition"][
+                            "modelFamily"], "Response not detail Family."
 
-                            assert "model" in compData["systems"][0], "Response not detail System UUID."
-                            assert compData["systems"][0]["model"] == sysData["system"]["definition"][
-                                "model"], "Response not detail Model."
+                        assert "model" in compData["systems"][0], "Response not detail System UUID."
+                        assert compData["systems"][0]["model"] == sysData["system"]["definition"][
+                            "model"], "Response not detail Model."
 
-                            assert "identifier" in compData["systems"][0], "Response not detail System UUID."
-                            assert compData["systems"][0]["identifier"] == sysData["system"]["identity"][
-                                "identifier"], "Response not detail Identifier."
+                        assert "identifier" in compData["systems"][0], "Response not detail System UUID."
+                        assert compData["systems"][0]["identifier"] == sysData["system"]["identity"][
+                            "identifier"], "Response not detail Identifier."
 
-                            assert "serialNumber" in compData["systems"][0], "Response not detail System UUID."
-                            assert compData["systems"][0]["serialNumber"] == sysData["system"]["identity"][
-                                "serialNumber"], "Response not detail Serial Number."
+                        assert "serialNumber" in compData["systems"][0], "Response not detail System UUID."
+                        assert compData["systems"][0]["serialNumber"] == sysData["system"]["identity"][
+                            "serialNumber"], "Response not detail Serial Number."
 
-                            # assert "productFamily" in compData["systems"][0], "Response not detail Product Family."
-                            # assert compData["systems"][0]["productFamily"] == sysData["system"]["definition"]["productFamily"], "Response not detail Serial Number."
+                        # assert "productFamily" in compData["systems"][0], "Response not detail Product Family."
+                        # assert compData["systems"][0]["productFamily"] == sysData["system"]["definition"]["productFamily"], "Response not detail Serial Number."
 
-                            #assert compData["device"]["elementData"]["model"] == deviceModel
-                            assert compData["device"]["elementData"]["elementType"] == deviceType
-                            #assert compData["device"]["elementData"]["identifier"] == deviceID
-                            i += 1
-                    print("Key and Value assertions concluded.")
+                        #assert compData["device"]["elementData"]["model"] == deviceModel
+                        assert compData["device"]["elementData"]["elementType"] == deviceType
+                        #assert compData["device"]["elementData"]["identifier"] == deviceID
+                        i += 1
+                    print("Verifications complete.")
+                print("Key and Value assertions concluded.")
+                return
+            compIndex += 1
+        compIndex = 0
 
-                compIndex += 1
-            compIndex = 0
-
-    except Exception as e:
-        print("Unexpected error: " + str(e))
-        # print(response)
-        traceback.print_exc()
-        raise Exception(e)
+    assert False, "No component details returned for System Def request."
 
 
-def getComplianceDataDeviceSubComps(elementType, identifier, sysDefFilename, compDataFilename, sysUUID):
+
+def getComplianceDataDeviceSubComps(elementType, identifier, model, sysDefFilename, compDataFilename, sysUUID):
     subIndex = 0
+    index = 0
     totalSubComponents = 0
     getSystemDefinition()
 
@@ -259,12 +270,31 @@ def getComplianceDataDeviceSubComps(elementType, identifier, sysDefFilename, com
     data = json.loads(resp.text)
 
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
-    print("Requesting system details from Compliance Data Service.\n")
+    print("Requesting component details System Definition.\n")
 
     with open(sysDefFilename, 'w') as outfile:
         json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
-    compURL = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/device/' + compUUID
+    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/' + sysUUID + '/component'
+
+    sysCompResp = requests.get(url)
+    sysCompData = json.loads(sysCompResp.text)
+
+    assert sysCompResp.status_code == 200, "Request has not been acknowledged as expected."
+    print("Requesting system details from Compliance Data Service.\n")
+
+    while index < len(sysCompData["components"]):
+        print("Model: %s" % sysCompData["components"][index]["definition"]["model"])
+        print(len(sysCompData["components"]))
+        if sysCompData["components"][index]["definition"]["model"] != model:
+            index += 1
+            continue
+        if sysCompData["components"][index]["definition"]["model"] == model:
+            componentID = sysCompData["components"][index]["uuid"]
+            index += 1
+    print(componentID)
+
+    compURL = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/compliance/data/device/' + componentID
 
     compResp = requests.get(compURL)
     compData = json.loads(compResp.text)
@@ -274,13 +304,18 @@ def getComplianceDataDeviceSubComps(elementType, identifier, sysDefFilename, com
     with open(compDataFilename, 'w') as outfile:
         json.dump(compData, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
-    # ("NIC", "Ethernet 10G", )
 
     if len(compData["subComponents"]) != "":
+        print("Entering.....")
         totalSubComponents = len(compData["subComponents"])
         while subIndex < totalSubComponents:
             # print("Starting subComps: %d" % subIndex)
+            print("Here...")
+            if identifier not in compData["subComponents"][subIndex]["elementData"]["identifier"]:
+                subIndex += 1
+                continue
             if identifier in compData["subComponents"][subIndex]["elementData"]["identifier"]:
+                print("Here now...")
                 assert "uuid" in compData["subComponents"][subIndex], "Response detailed an empty group UUID."
                 assert "parentDeviceUuid" in compData["subComponents"][
                     subIndex], "Response not detail parent Group UUID."
@@ -315,9 +350,13 @@ def getComplianceDataDeviceSubComps(elementType, identifier, sysDefFilename, com
                     macAddress = compData["subComponents"][subIndex]["elementData"]["identifier"]
                     countColon = macAddress.count(":")
                     assert countColon == 5, "Unexpected MAC address format returned in Identifier value."
+                    print("MAC format verified.")
 
                 print("Done SubComp: %s\n" % elementType)
-            subIndex += 1
+                subIndex += 1
+                return
+
+    assert False, "Sub Comp details not included in discovered details response."
 
 
 def getComplianceData_INVALID(compUUID):
@@ -406,35 +445,35 @@ def test_getComplianceDataDevice1():
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice2():
-    getComplianceDataDeviceSubComps("NIC", "Ethernet 10G 2P", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataDeviceSubComps("NIC", "Ethernet 10G 2P", "R730XD", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice3():
-    getComplianceDataDeviceSubComps("NIC", "Ethernet 10G 4P", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataDeviceSubComps("NIC", "Gigabit 4P X520", "R730XD", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice4():
-    getComplianceDataDeviceSubComps("BIOS", "BIOS", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataDeviceSubComps("BIOS", "BIOS", "R730XD", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice5():
-    getComplianceDataDeviceSubComps("iDRAC", "Remote Access", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataDeviceSubComps("iDRAC", "Remote Access", "R730XD", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice6():
-    getComplianceDataDeviceSubComps("RAID", "PERC H730", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataDeviceSubComps("RAID", "PERC H730", "R730XD", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
 
@@ -446,31 +485,31 @@ def test_getComplianceDataDevice7():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice8():
-    getComplianceDataDeviceSubComps("NIC", "Ethernet 10G 2P", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataDeviceSubComps("NIC", "Ethernet 10G 2P", "R630", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice9():
-    getComplianceDataDeviceSubComps("NIC", "Ethernet 10G 4P", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataDeviceSubComps("NIC", "Gigabit 4P X520", "R630", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice10():
-    getComplianceDataDeviceSubComps("BIOS", "BIOS", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataDeviceSubComps("BIOS", "BIOS", "R630", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice11():
-    getComplianceDataDeviceSubComps("iDRAC", "Remote Access", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataDeviceSubComps("iDRAC", "Remote Access", "R630", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice12():
-    getComplianceDataDeviceSubComps("RAID", "PERC H730", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataDeviceSubComps("NonRAID", "Dell HBA330 Mini", "R630", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
 
@@ -489,7 +528,7 @@ def test_getComplianceDataDevice14():
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice15():
-    getComplianceDataDeviceSubComps("ESXI", "lab.vce.com", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataDeviceSubComps("ESXI", "lab.vce.com", "VCENTER-WINDOWS", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDeviceVCENTER.json", systemUUID)
 
 
