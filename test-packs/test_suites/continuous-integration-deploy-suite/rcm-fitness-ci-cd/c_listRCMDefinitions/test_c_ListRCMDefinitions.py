@@ -184,7 +184,6 @@ def resetTestQueues(testRequest, testResponse):
                                     exchange='exchange.dell.cpsd.rfds.rcm.definition.response', routing_key='#',
                                     ssl_enabled=False)
 
-
 # print("Publishing listRCM request....")
 
 

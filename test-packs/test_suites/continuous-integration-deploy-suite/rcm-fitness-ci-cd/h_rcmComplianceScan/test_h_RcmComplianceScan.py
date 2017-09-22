@@ -302,13 +302,14 @@ def getAvailableRCMs(family, model, train, version, option, filename):
 #    getRCMDefinition("Dell BIOS Firmware", path + "rcmRCMDefinitionDetails-VxRack.json")
 def getRCMDefinition(component, filename, option):
     contentIndex = 0
+    fileIndex = 0
 
     url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/definition/' + rcmUUID
     print(url)
     resp = requests.get(url)
     data = json.loads(resp.text)
     assert resp.status_code == 200, "Request has not been acknowledged as expected."
-
+    rcmContents = data["rcmDefinition"]["rcmContents"]
     global versionRCM
     versionRCM = data["rcmDefinition"]["rcmVersion"]
     global optionRCM
@@ -319,33 +320,40 @@ def getRCMDefinition(component, filename, option):
             with open(filename, 'a') as outfile:
                 json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
             if data["rcmDefinition"]["viewOption"] == option:
-                while contentIndex < len(data["rcmDefinition"]["rcmContents"]):
-                    if (data["rcmDefinition"]["rcmContents"][contentIndex]["component"]) == component:
+                print("Total rcmContents: %d" % len(rcmContents))
+                while contentIndex < len(rcmContents):
+                    if (rcmContents[contentIndex]["component"]) == component:
+                        print("ContentIndex: %d" % contentIndex)
                         assert "version" in data["rcmDefinition"]["rcmContents"][
                             contentIndex], "No version attribute returned for specified component."
-                        firmwareVersion = (data["rcmDefinition"]["rcmContents"][contentIndex]["version"])
-                        if "versionFileName" in data["rcmDefinition"]["rcmContents"][contentIndex]:
-                            assert "versionFileHash" in data["rcmDefinition"]["rcmContents"][contentIndex]
-                            assert data["rcmDefinition"]["rcmContents"][contentIndex][
-                                       "versionFileName"] != "", "No filename specified in definition."
-                            assert data["rcmDefinition"]["rcmContents"][contentIndex][
-                                       "versionFileHash"] != "", "No filename specified in definition."
-                            versFileName = data["rcmDefinition"]["rcmContents"][contentIndex]["versionFileName"]
-                            versFileHash = data["rcmDefinition"]["rcmContents"][contentIndex]["versionFileHash"]
-                            fileList.append(versFileName)
-                            fileHash.append(versFileHash)
-                        print("List of filenames:", fileList)
-                        print("List of filehashes:", fileHash)
+                        firmwareVersion = (rcmContents[contentIndex]["version"])
+                        if len(rcmContents[contentIndex]["remediationFiles"]) > 0:
+                            if rcmContents[contentIndex]["remediationFiles"][fileIndex]:
+                                if "cdnPath" in rcmContents[contentIndex]["remediationFiles"][fileIndex]:
+                                    # data["rcmDefinition"]["rcmContents"][contentIndex]["remediationFiles"][0]:
+                                    assert "fileHash" in rcmContents[contentIndex]["remediationFiles"][fileIndex]
+                                    assert rcmContents[contentIndex]["remediationFiles"][fileIndex][
+                                               "filename"] != "", "No filename specified in definition."
+                                    assert rcmContents[contentIndex]["remediationFiles"][fileIndex][
+                                               "fileHash"] != "", "No filename specified in definition."
+                                    versFileName = rcmContents[contentIndex]["remediationFiles"][fileIndex]["cdnPath"]
+                                    versFileHash = rcmContents[contentIndex]["remediationFiles"][fileIndex]["fileHash"]
+                                    fileList.append(versFileName)
+                                    fileHash.append(versFileHash)
+                                    print("List of filenames:", fileList)
+                                    print("List of filehashes:", fileHash)
 
-                        print("\nComponent: %s" % data["rcmDefinition"]["rcmContents"][contentIndex]["component"])
-                        print("Expected version: %s" % firmwareVersion)
+                                    print("\nComponent: %s" % rcmContents[contentIndex]["component"])
+                                    print("Expected version: %s" % firmwareVersion)
 
+                                    return
                         return
+
                     contentIndex += 1
 
     assert False, "No RCM definition returned."
 
-
+# ("Dell PERC H730P Firmware", "PERC H730 Mini", "VxRack", "1000 FLEX", "DELL", "POWEREDGE", "R630", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, product, model, filename, sysUUID):
     url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/evaluation/'
     payload = {'systemUuid': sysUUID, 'rcmUuid': rcmUUID}
@@ -367,8 +375,11 @@ def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, 
         json.dump(response, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
     while numResults < len(response["rcmEvaluationResults"]):
+        print(1)
         if identifier in response["rcmEvaluationResults"][numResults]["evaluatedVersionDatum"]["identity"]["identifier"] and response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"]["component"] == component:
+            print(2)
             if response["rcmEvaluationResults"][numResults]["evaluatedVersionDatum"]["definition"]["model"] == model:
+                print(3)
                 versionFound = (response["rcmEvaluationResults"][numResults]["actualValue"])
                 versionExpected = (response["rcmEvaluationResults"][numResults]["expectedValues"][0])
                 print("Product Family: %s" % response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"][
@@ -389,6 +400,7 @@ def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, 
                 assert response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"]["product"] == product
 
                 if versionFound == versionExpected:
+                    print(4)
                     assert (response["rcmEvaluationResults"][numResults][
                                 "evaluationResult"]) == "match", "Expected a match to be returned, not the case."
                     assert response["rcmEvaluationResults"][numResults]["expectedValues"][0] == \
@@ -405,6 +417,7 @@ def getRCMEvaluation(component, identifier, productFamily, modelFamily, vendor, 
                 assert response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"][
                            "component"] == component, "Unexpected component value returned."
                 if "versionFileName" in response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"]:
+                    print(5)
                     assert "versionFileHash" in response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"]
                     assert response["rcmEvaluationResults"][numResults]["evaluatedRcmDatum"][
                                "versionFileName"] in fileList, "No filename specified in definition."
@@ -442,7 +455,7 @@ def test_getComplianceDataSystem4():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getAvailableRCM5():
-    getAvailableRCMs("VxRack", "FLEX", "9.2", "9.2.33", "ORIGINAL", path + "rcmAvailableRCMs-VxRack.json")
+    getAvailableRCMs("VxRack", "1000 FLEX", "9.2", "9.2.1", "ORIGINAL", path + "rcmAvailableRCMs-VxRack.json")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
@@ -452,7 +465,7 @@ def test_getRCMDefinition6():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval7():
-    getRCMEvaluation("Dell BIOS Firmware", "BIOS", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD",
+    getRCMEvaluation("Dell BIOS Firmware", "BIOS", "VxRack", "1000 FLEX", "DELL", "POWEREDGE", "R730XD",
                      path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
@@ -470,14 +483,14 @@ def test_getRCMEval9():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition10():
-    getRCMDefinition("Dell Ethernet X520 NDCi350/X520/X540 Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json",
+    getRCMDefinition("VMware vSphere Hypervisor ESXi 6.0", path + "rcmRCMDefinitionDetails-VxRack2.json",
                      "ORIGINAL")
 
 
-@pytest.mark.rcm_fitness_mvp_extended
-def test_getRCMEval11():
-    getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "Intel(R) Ethernet 10G 2P X520 Adapter", "VxRack", "FLEX", "DELL",
-                     "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_getRCMEval11():
+#     getRCMEvaluation("VMware vSphere Hypervisor ESXi 6.0", "Intel(R) Ethernet 10G 2P X520 Adapter", "VxRack", "1000 FLEX", "DELL",
+#                      "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
@@ -487,7 +500,7 @@ def test_getRCMDefinition12():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval13():
-    getRCMEvaluation("Dell PERC H730P Firmware", "PERC H730 Mini", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD",
+    getRCMEvaluation("Dell PERC H730P Firmware", "PERC H730 Mini", "VxRack", "1000 FLEX", "DELL", "POWEREDGE", "R730XD",
                      path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
@@ -498,52 +511,52 @@ def test_getComplianceData14():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getAvailableRCM15():
-    getAvailableRCMs("VxRack", "FLEX", "9.2", "9.2.33.1", "ADDENDUM", path + "rcmAvailableRCMs-VxRack-Mismatch.json")
+    getAvailableRCMs("VxRack", "1000 FLEX", "9.2", "9.2.1", "MANUFACTURING", path + "rcmAvailableRCMs-VxRack-Mismatch.json")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition16():
-    getRCMDefinition("Dell BIOS Firmware", path + "rcmRCMDefinitionDetails-VxRack.json", "ADDENDUM")
+    getRCMDefinition("Dell BIOS Firmware", path + "rcmRCMDefinitionDetails-VxRack.json", "MANUFACTURING")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval17():
-    getRCMEvaluation("Dell BIOS Firmware", "BIOS", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD",
+    getRCMEvaluation("Dell BIOS Firmware", "BIOS", "VxRack", "1000 FLEX", "DELL", "POWEREDGE", "R730XD",
                      path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition18():
     getRCMDefinition("Dell iDRAC / Lifecycle Controller Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json",
-                     "ADDENDUM")
+                     "MANUFACTURING")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval19():
     getRCMEvaluation("Dell iDRAC / Lifecycle Controller Firmware", "Integrated Remote Access Controller", "VxRack",
-                     "FLEX", "DELL", "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
+                     "1000 FLEX", "DELL", "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition20():
-    getRCMDefinition("Dell Ethernet X520 NDCi350/X520/X540 Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json",
-                     "ADDENDUM")
+    getRCMDefinition("VMware vSphere Hypervisor ESXi 6.0", path + "rcmRCMDefinitionDetails-VxRack2.json",
+                     "MANUFACTURING")
 
 
-@pytest.mark.rcm_fitness_mvp_extended
-def test_getRCMEval21():
-    getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "Intel(R) Gigabit 4P X520/I350 rNDC", "VxRack", "FLEX", "DELL",
-                     "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_getRCMEval21():
+#     getRCMEvaluation("VMware vSphere Hypervisor ESXi 6.0", "Intel(R) Gigabit 4P X520/I350 rNDC", "VxRack", "1000 FLEX", "DELL",
+#                      "POWEREDGE", "R730XD", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition22():
-    getRCMDefinition("Dell PERC H730P Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ADDENDUM")
+    getRCMDefinition("Dell PERC H730P Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "MANUFACTURING")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval23():
-    getRCMEvaluation("Dell PERC H730P Firmware", "PERC H730 Mini", "VxRack", "FLEX", "DELL", "POWEREDGE", "R730XD",
+    getRCMEvaluation("Dell PERC H730P Firmware", "PERC H730 Mini", "VxRack", "1000 FLEX", "DELL", "POWEREDGE", "R730XD",
                      path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
@@ -559,50 +572,50 @@ def test_getComplianceDataSystem25():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getAvailableRCM26():
-    getAvailableRCMs("VxRack", "FLEX", "9.2", "9.2.33", "ORIGINAL", path + "rcmAvailableRCMs-VxRack.json")
+    getAvailableRCMs("VxRack", "1000 FLEX", "9.2", "9.2.1.1", "ADDENDUM", path + "rcmAvailableRCMs-VxRack.json")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition27():
-    getRCMDefinition("Dell BIOS Firmware", path + "rcmRCMDefinitionDetails-VxRack.json", "ORIGINAL")
+    getRCMDefinition("Dell BIOS Firmware", path + "rcmRCMDefinitionDetails-VxRack.json", "ADDENDUM")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval28():
-    getRCMEvaluation("Dell BIOS Firmware", "BIOS", "VxRack", "FLEX", "DELL", "POWEREDGE", "R630",
+    getRCMEvaluation("Dell BIOS Firmware", "BIOS", "VxRack", "1000 FLEX", "DELL", "POWEREDGE", "R630",
                      path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition29():
     getRCMDefinition("Dell iDRAC / Lifecycle Controller Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json",
-                     "ORIGINAL")
+                     "ADDENDUM")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval30():
     getRCMEvaluation("Dell iDRAC / Lifecycle Controller Firmware", "Integrated Remote Access Controller", "VxRack",
-                     "FLEX", "DELL", "POWEREDGE", "R630", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
+                     "1000 FLEX", "DELL", "POWEREDGE", "R630", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition31():
     getRCMDefinition("Dell Ethernet X520 NDCi350/X520/X540 Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json",
-                     "ORIGINAL")
+                     "ADDENDUM")
 
 
-@pytest.mark.rcm_fitness_mvp_extended
-def test_getRCMEval132():
-    getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "Intel(R) Ethernet 10G 2P X520 Adapter", "VxRack", "FLEX", "DELL",
-                     "POWEREDGE", "R630", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
-
-
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_getRCMEval132():
+#     getRCMEvaluation("Dell Ethernet X520 NDCi350/X520/X540 Firmware", "Intel(R) Ethernet 10G 2P X520 Adapter", "VxRack", "1000 FLEX", "DELL",
+#                      "POWEREDGE", "R630", path + "rcmEvaluationDetails-VxRack.json", systemUUID)
+#
+#
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDefinition33():
-    getRCMDefinition("Dell PERC HBA330 Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ORIGINAL")
+    getRCMDefinition("Dell PERC HBA330 Firmware", path + "rcmRCMDefinitionDetails-VxRack2.json", "ADDENDUM")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMEval34():
-    getRCMEvaluation("Dell PERC HBA330 Firmware", "Dell HBA330 Mini", "VxRack", "FLEX", "DELL", "POWEREDGE", "R630",
+    getRCMEvaluation("Dell PERC HBA330 Firmware", "Dell HBA330 Mini", "VxRack", "1000 FLEX", "DELL", "POWEREDGE", "R630",
                      path + "rcmEvaluationDetails-VxRack.json", systemUUID)
