@@ -59,8 +59,8 @@ def load_test_data():
 #####################################################################
 # These are the main tests.
 #####################################################################
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
+#@pytest.mark.dne_paqx_parent_mvp
+#@pytest.mark.dne_paqx_parent_mvp_extended
 def test_dne_discovered_node_handled():
     """
     Title           :       Verify that dne/nodes API has disocvered Dell nodes
