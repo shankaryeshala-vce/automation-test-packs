@@ -45,6 +45,33 @@ def load_test_data():
     cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS',
                                                              property='password')
 
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+def test_common_ui_install(setup):
+    """
+    Title: Verify that the common-ui rpm is installed correctly
+    Description: This test verifies that the common-ui service is installed correctly
+    Params: List of service names
+    Returns: None
+    """
+    print(test_common_ui_install.__doc__)
+
+    err = []
+
+    common_ui = "dell-cpsd-common-ui"
+
+    sendcommand = "yum install -y " + common_ui
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username,
+                                                             password=cli_password,
+                                                            command=sendcommand, return_output=True)
+
+    rpmcheck_ui = af_support_tools.check_for_installed_rpm(host=ipaddress, username=cli_username,
+                                                             password=cli_password, rpm_name=common_ui)
+
+    if rpmcheck_ui != True:
+        err.append(common_ui+ " did not install properly")
+    assert not err
+
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
@@ -54,7 +81,7 @@ def test_ConvergedSystem_RestAPI():
     """ Verify the Converged System Components Rest API V's JSON input file.
 
     Pre-requisite : The system has already been defined and discovered.
-                    You can open a browser to the Converged System Rest API (e.g. http://10.20.30.40:8088/convergedsystems)
+                    You can open a browser to the Converged System Rest API (e.g. http://10.20.30.40:10000/sds/convergedsystems)
     """
 
     # Check the JSON system definition input file
@@ -65,15 +92,16 @@ def test_ConvergedSystem_RestAPI():
     # =================================================================
     # Converged System Rest API
     time.sleep(5)
-    RestAPIurl = 'http://' + ipaddress + ':8088/convergedsystems'
+    RestAPIurl = 'http://' + ipaddress + ':10000/sds/convergedsystems'
     resp = requests.get(RestAPIurl)
-    Rest_data = json.loads(resp.text)    
-    print(Rest_data)
+    Rest_data = json.loads(resp.text)
+    time.sleep(5)
+
 
     # Find the Converged Systems UUID to build the Converged Systems Components Rest API
     #Rest_Component_element = Rest_data[0]["uuid"]
 
-    RestAPI_Component_url = u'http://' + ipaddress + u':8088/convergedsystems/' + Rest_data[0]["uuid"] + u'/components'
+    RestAPI_Component_url = u'http://' + ipaddress + u':10000/sds/convergedsystems/' + Rest_data[0]["uuid"] + u'/components'
     comp_resp = requests.get(RestAPI_Component_url)
     Rest_Component_data = json.loads(comp_resp.text)
 
