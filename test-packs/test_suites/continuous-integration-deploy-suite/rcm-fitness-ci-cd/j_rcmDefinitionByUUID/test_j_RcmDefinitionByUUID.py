@@ -114,13 +114,15 @@ def getRCMDefinition(family, model, train, version):
                 assert "priorComponent" in rcmContent[contentIndex], "No priorComponent returned in rcmContents."
                 assert "subType" in rcmContent[contentIndex], "No subType returned in rcmContents."
                 assert "type" in rcmContent[contentIndex] and rcmContent[contentIndex]["type"] != "", "No type returned in rcmContents."
-                assert "version" in rcmContent[contentIndex] and rcmContent[contentIndex]["version"] != "", "No version returned in rcmContents."
+                # assert "version" in rcmContent[contentIndex] and rcmContent[contentIndex]["version"] != "", "No version returned in rcmContents."
                 assert "remediationFiles" in rcmContent[contentIndex] and rcmContent[contentIndex]["remediationFiles"] != "", "No remediationFiles returned in rcmContents."
 
                 if "Compute" in rcmContent[contentIndex]["type"]:
+                    print("Compute")
                     assert rcmContent[contentIndex]["type"] == "Compute" or "Compute - Dell (R630/R730)"
 
                 if "Management" in rcmContent[contentIndex]["type"]:
+                    print("Mgt")
                     assert rcmContent[contentIndex]["type"] == "Management" or "Management - Dell (R630)"
 
 
@@ -201,26 +203,47 @@ def getRCMDefinition_Null(rcmUUID):
     print(resp.status_code)
     assert resp.status_code == 404, "Request has not been acknowledged as expected."
 
+@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef1():
     getRCMDefinition("VxRack", "1000 FLEX", "9.2", "9.2.2")
 
+@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef2():
     getRCMDefinition("VxRack", "1000 FLEX", "9.2", "9.2.1")
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef3():
-    getRCMDefinition_Invalid("12345678-1234-1234-1234-12347b7370a2", "VxRack", "FLEX")
+    getRCMDefinition("VxRack", "1000 FLEX", "3.2", "3.2.2")
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getRCMDef4():
+    getRCMDefinition("VxRack", "1000 FLEX", "3.2", "3.2.1")
+
+@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+def test_getRCMDef5():
+    getRCMDefinition("VxRack", "1000 FLEX", "3.2", "3.2.3")
+
+@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+def test_getRCMDef6():
+    getRCMDefinition("VxRack", "1000 FLEX", "9.2", "9.2.3")
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_getRCMDef7():
+    getRCMDefinition_Invalid("12345678-1234-1234-1234-12347b7370a2", "VxRack", "FLEX")
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_getRCMDef8():
     getRCMDefinition_Invalid("----", "VxRack", "1000 FLEX")
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_getRCMDef5():
+def test_getRCMDef9():
     getRCMDefinition_Invalid("1-1-1-1-1", "VxRack", "1000 FLEX")
 @pytest.mark.rcm_fitness_mvp_extended
-def test_getRCMDef6():
+def test_getRCMDef10():
     getRCMDefinition_Null("")
+
 
