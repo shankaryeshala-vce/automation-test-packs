@@ -61,8 +61,14 @@ def load_test_data():
     payload_dataModel = 'datamodel'
     global payload_dataFamily
     payload_dataFamily = 'datafamily'
-    global payload_dataVxRackVersion
-    payload_dataVxRackVersion = 'datavxrackversion'
+    global payload_dataVxRackVersion1
+    payload_dataVxRackVersion1 = 'datavxrackversion1'
+    global payload_dataVxRackVersion2
+    payload_dataVxRackVersion2 = 'datavxrackversion2'
+    global payload_dataVxRackVersion3
+    payload_dataVxRackVersion3 = 'datavxrackversion3'
+    global payload_dataVxRackVersion4
+    payload_dataVxRackVersion4 = 'datavxrackversion4'
     global payload_dataVxRackTrain
     payload_dataVxRackTrain = 'datavxracktrain'
     global payload_dataVxRackModel
@@ -110,8 +116,14 @@ def load_test_data():
                                                                 property=payload_dataInvalid7)
     messageInvalid8 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
                                                                 property=payload_dataInvalid8)
-    messageVxRackVersion = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
-                                                                     property=payload_dataVxRackVersion)
+    messageVxRackVersion1 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+                                                                     property=payload_dataVxRackVersion1)
+    messageVxRackVersion2 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+                                                                     property=payload_dataVxRackVersion2)
+    messageVxRackVersion3 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+                                                                     property=payload_dataVxRackVersion3)
+    messageVxRackVersion4 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+                                                                     property=payload_dataVxRackVersion4)
     messageVxRackTrain = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
                                                                    property=payload_dataVxRackTrain)
     messageVxRackModel = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
@@ -135,10 +147,13 @@ def load_test_data():
     insertListRequest(messageInvalid6, 'listRCMDefinitionRequest10.json', 'listRCMDefinitionResponse10.json')
     insertListRequest(messageInvalid7, 'listRCMDefinitionRequest11.json', 'listRCMDefinitionResponse11.json')
     insertListRequest(messageInvalid8, 'listRCMDefinitionRequest12.json', 'listRCMDefinitionResponse12.json')
-    insertListRequest(messageVxRackVersion, 'listRCMDefinitionRequest13.json', 'listRCMDefinitionResponse13.json')
-    insertListRequest(messageVxRackTrain, 'listRCMDefinitionRequest14.json', 'listRCMDefinitionResponse14.json')
-    insertListRequest(messageVxRackModel, 'listRCMDefinitionRequest15.json', 'listRCMDefinitionResponse15.json')
-    insertListRequest(messageVxRackFamily, 'listRCMDefinitionRequest16.json', 'listRCMDefinitionResponse16.json')
+    insertListRequest(messageVxRackVersion1, 'listRCMDefinitionRequest13.json', 'listRCMDefinitionResponse13.json')
+    insertListRequest(messageVxRackVersion2, 'listRCMDefinitionRequest14.json', 'listRCMDefinitionResponse14.json')
+    insertListRequest(messageVxRackVersion3, 'listRCMDefinitionRequest15.json', 'listRCMDefinitionResponse15.json')
+    insertListRequest(messageVxRackVersion4, 'listRCMDefinitionRequest16.json', 'listRCMDefinitionResponse16.json')
+    insertListRequest(messageVxRackTrain, 'listRCMDefinitionRequest17.json', 'listRCMDefinitionResponse17.json')
+    insertListRequest(messageVxRackModel, 'listRCMDefinitionRequest18.json', 'listRCMDefinitionResponse18.json')
+    insertListRequest(messageVxRackFamily, 'listRCMDefinitionRequest19.json', 'listRCMDefinitionResponse19.json')
 
 
 def ensurePathExists(dir):
@@ -561,6 +576,17 @@ def test_verifyPublishedAttributes15():
 def test_verifyPublishedAttributes16():
     verifyPublishedAttributes(path + 'listRCMDefinitionRequest16.json')
 
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyPublishedAttributes17():
+    verifyPublishedAttributes(path + 'listRCMDefinitionRequest17.json')
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyPublishedAttributes18():
+    verifyPublishedAttributes(path + 'listRCMDefinitionRequest18.json')
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyPublishedAttributes19():
+    verifyPublishedAttributes(path + 'listRCMDefinitionRequest19.json')
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes1():
@@ -640,5 +666,18 @@ def test_verifyConsumedAttributes15():
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes16():
     verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest16.json', path + 'listRCMDefinitionResponse16.json')
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyConsumedAttributes17():
+    verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest17.json', path + 'listRCMDefinitionResponse17.json')
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyConsumedAttributes18():
+    verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest18.json', path + 'listRCMDefinitionResponse18.json')
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyConsumedAttributes19():
+    verifyConsumedAttributesFamily(path + 'listRCMDefinitionRequest19.json', path + 'listRCMDefinitionResponse19.json')
+
 
 # #connection.close()
