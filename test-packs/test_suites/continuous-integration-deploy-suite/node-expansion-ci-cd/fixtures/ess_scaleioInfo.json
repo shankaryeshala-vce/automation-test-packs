@@ -2,32 +2,98 @@
   "messageProperties": {
     "timestamp": "2017-08-29T15:19:41.954Z",
     "correlationId": "148a375c-64a8-4408-b8e9-7447905c0f20",
-    "replyTo": "test"
+    "replyTo": "dne-paqx.b1d958050f7a"
   },
   "storagePools": [
     {
       "id": "74ff600500000000",
       "name": "RVX1-SP0",
       "numberOfDevices": "187",
-      "devices": []
+      "type": "HDD",
+      "devices": [
+        {
+          "id": "001",
+          "name": "Device-1",
+          "deviceState": "",
+          "type": "HDD"
+        }
+      ]
+    },
+    {
+      "id": "74ff600500000111",
+      "name": "RVX1-SP1",
+      "numberOfDevices": "150",
+      "type": "SSD",
+      "devices": [
+        {
+          "id": "001",
+          "name": "Device-1",
+          "deviceState": "",
+          "type": "SSD"
+        },
+        {
+          "id": "002",
+          "name": "Device-1",
+          "deviceState": "",
+          "type": "SSD"
+        },
+        {
+          "id": "003",
+          "name": "Device-1",
+          "deviceState": "",
+          "type": "SSD"
+        }
+      ]
     },
     {
       "id": "74ff600500012345",
       "name": "test1-SP0",
       "numberOfDevices": "500",
-      "devices": []
+      "type": "HDD",
+      "devices": [
+        {
+          "id": "001",
+          "name": "Device-1",
+          "deviceState": "",
+          "type": "HDD"
+        }
+      ]
     },
     {
       "id": "74ff600500054321",
       "name": "test2-SP1",
       "numberOfDevices": "300",
-      "devices": []
+      "type": "HDD",
+      "devices": [
+        {
+          "id": "001",
+          "name": "Device-1",
+          "deviceState": "",
+          "type": "HDD"
+        }
+      ]
     },
     {
-      "id": "74ff600512354321",
+      "id": "74ff600500055555",
       "name": "test3-SP1",
-      "numberOfDevices": "299",
-      "devices": []
+      "numberOfDevices": "200",
+      "type": "HDD",
+      "devices": [
+        {
+          "id": "001",
+          "name": "Device-0",
+          "deviceState": "",
+          "type": "HDD"
+        }
+      ]
+    }
+  ],
+  "newDevices": [
+    {
+      "id": "003",
+      "name": "Device-3",
+      "deviceState": "",
+      "type": "SSD"
     }
   ]
 }
