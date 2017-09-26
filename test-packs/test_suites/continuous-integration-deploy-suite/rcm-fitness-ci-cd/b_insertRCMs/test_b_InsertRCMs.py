@@ -74,6 +74,7 @@ def load_test_data():
     global payload_xdataOriginal
     global payload_vxrackDataOriginal
     global payload_vxrackDataOriginal2
+    global payload_vxrackDataOriginal3
     global payload_vxrackDataManu
     global payload_vxrackDataAddendum
     global payload_vxrackDataAddendum2
@@ -87,6 +88,7 @@ def load_test_data():
     payload_xdataOriginal = 'xdataoriginal'
     payload_vxrackDataOriginal = 'vxrackdataoriginal'
     payload_vxrackDataOriginal2 = 'vxrackdataoriginal2'
+    payload_vxrackDataOriginal3 = 'vxrackdataoriginal3'
     payload_vxrackDataManu = 'vxrackdatamanu'
     payload_vxrackDataAddendum = 'vxrackdataaddendum'
     payload_vxrackDataAddendum2 = 'vxrackdataaddendum2'
@@ -101,6 +103,7 @@ def load_test_data():
     global xmessageOriginal
     global vxrackMessageOriginal
     global vxrackMessageOriginal2
+    global vxrackMessageOriginal3
     global vxrackMessageManu
     global vxrackMessageAddendum
     global vxrackMessageAddendum2
@@ -125,6 +128,8 @@ def load_test_data():
                                                                       property=payload_vxrackDataOriginal)
     vxrackMessageOriginal2 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
                                                                       property=payload_vxrackDataOriginal2)
+    vxrackMessageOriginal3 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+                                                                      property=payload_vxrackDataOriginal3)
     vxrackMessageManu = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
                                                                   property=payload_vxrackDataManu)
     vxrackMessageAddendum = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
@@ -146,6 +151,7 @@ def load_test_data():
     insertDummyRCMRequest(xmessageOriginal, 'insertRCMRequest8.json', 'insertRCMResponse8.json')
     insertDummyRCMRequest(vxrackMessageOriginal, 'insertRCMRequest9.json', 'insertRCMResponse9.json')
     insertDummyRCMRequest(vxrackMessageOriginal2, 'insertRCMRequest13.json', 'insertRCMResponse13.json')
+    insertDummyRCMRequest(vxrackMessageOriginal3, 'insertRCMRequest14.json', 'insertRCMResponse14.json')
     insertDummyRCMRequest(vxrackMessageManu, 'insertRCMRequest10.json', 'insertRCMResponse10.json')
     insertDummyRCMRequest(vxrackMessageAddendum, 'insertRCMRequest11.json', 'insertRCMResponse11.json')
     insertDummyRCMRequest(vxrackMessageAddendum2, 'insertRCMRequest12.json', 'insertRCMResponse12.json')
@@ -433,6 +439,12 @@ def test_verifyPublishedAttributes13():
     verifyPublishedAttributes(path + 'insertRCMRequest13.json', "September 2019", 48, "9.2", "9.2.2", "VxRack", "1000 FLEX",
                               "ORIGINAL")
 
+@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyPublishedAttributes14():
+    verifyPublishedAttributes(path + 'insertRCMRequest14.json', "September 2018", 36, "9.2", "9.2.3", "VxRack", "1000 FLEX",
+                              "ORIGINAL")
+
 
 # @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
@@ -511,6 +523,11 @@ def test_verifyCorrectCorrelationID12():
 def test_verifyCorrectCorrelationID13():
     verifyCorrectCorrelationID(path + 'insertRCMRequest13.json', path + 'insertRCMResponse13.json')
 
+# @pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyCorrectCorrelationID14():
+    verifyCorrectCorrelationID(path + 'insertRCMRequest14.json', path + 'insertRCMResponse14.json')
+
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes1():
@@ -588,6 +605,10 @@ def test_verifyConsumedAttributes12():
 def test_verifyConsumedAttributes13():
     verifyConsumedAttributes(path + 'insertRCMResponse13.json', True, "9.2", "9.2.2", "VxRack", "1000 FLEX", "ORIGINAL")
 
+@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyConsumedAttributes14():
+    verifyConsumedAttributes(path + 'insertRCMResponse14.json', True, "9.2", "9.2.3", "VxRack", "1000 FLEX", "ORIGINAL")
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
