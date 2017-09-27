@@ -1,3 +1,4 @@
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 . $HOME/af_env.sh
 py3clean .
 export AF_TEST_SUITE_NAME='RCM Fitness MVP'
