@@ -28,7 +28,6 @@ def core_container(setup, request):
     yield containername
 
 
-@pytest.mark.tls_enabled
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_core_serviceup(setup, core_container):
@@ -50,7 +49,6 @@ def test_core_serviceup(setup, core_container):
     assert "Up" in my_return_status, " %s is not up" % core_container
 
 
-@pytest.mark.tls_enabled
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_coreamqpconnection(core_container, setup):
