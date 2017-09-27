@@ -29,6 +29,7 @@ def core_container(setup, request):
 
 
 @pytest.mark.tls_enabled
+@pytest.mark.tls_enabled
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_core_serviceup(setup, core_container):
