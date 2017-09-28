@@ -1,4 +1,3 @@
-# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 [![License](https://img.shields.io/badge/License-EPL%201.0-red.svg)](https://opensource.org/licenses/EPL-1.0)
 [![Build Status](https://travis-ci.org/dellemc-symphony/automation-test-packs.svg?branch=master)](https://travis-ci.org/dellemc-symphony/automation-test-packs)
 [![Slack](http://community.codedellemc.com/badge.svg)](https://codecommunity.slack.com/messages/symphony)
