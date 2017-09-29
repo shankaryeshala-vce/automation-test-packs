@@ -149,8 +149,8 @@ def test_dne_RegisterVcenter():
     assert registerVcenter(), 'Error: unable to register the vCenter endpoint'
 
 
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
+#@pytest.mark.dne_paqx_parent_mvp
+#@pytest.mark.dne_paqx_parent_mvp_extended
 def test_dne_RegisterScaleIO():
     assert registerScaleIO(), 'Error: unable to register the ScaleIO endpoint'
 

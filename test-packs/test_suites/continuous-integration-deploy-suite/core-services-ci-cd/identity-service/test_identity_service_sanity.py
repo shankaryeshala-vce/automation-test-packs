@@ -28,6 +28,7 @@ def load_test_data():
 
 ##############################################################################################
 
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_ident_status(hostConnection):
@@ -40,6 +41,7 @@ def test_ident_status(hostConnection):
     print("Identity Service Running")
 
 
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_identify_element(rabbitMq):
@@ -94,6 +96,7 @@ def test_identify_element(rabbitMq):
     print('\n*******************************************************')
 
 
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_describe_element(rabbitMq):
@@ -146,6 +149,7 @@ def test_describe_element(rabbitMq):
     print('\n*******************************************************')
 
 
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 @pytest.mark.parametrize('my_test_type',
@@ -213,6 +217,7 @@ def test_key_accuracy(my_test_type, rabbitMq):
     print('\n*******************************************************')
 
 
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 @pytest.mark.parametrize('my_test_type', ['ident_no_element_type', 'describe_no_element'])

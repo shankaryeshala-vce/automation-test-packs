@@ -59,8 +59,9 @@ def load_test_data():
 #####################################################################
 # These are the main tests.
 #####################################################################
+@pytest.mark.daily_status
 @pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
+#@pytest.mark.dne_paqx_parent_mvp_extended
 def test_dne_discovered_node_handled():
     """
     Title           :       Verify that dne/nodes API has disocvered Dell nodes
@@ -85,8 +86,9 @@ def test_dne_discovered_node_handled():
     time.sleep(2)
 
     # Step 1: Verify the api list is empty
-    currentNodes = listDellNodesAPI()
-    assert currentNodes == '[]', 'ERROR: New nodes are already discovered and waiting to be handled'
+    # Disabling this as it doesn't have to be empty/
+    #currentNodes = listDellNodesAPI()
+    #assert currentNodes == '[]', 'ERROR: New nodes are already discovered and waiting to be handled'
 
     # Step 2: Publish a message to dummy a node discovery. Values used here are all dummy values.
     the_payload = '{"data":{"ipMacAddresses":[{"ipAddress":"172.31.128.12","macAddress":"fb-43-62-54-d4-3a"},{"macAddress":"b9-ce-c4-73-10-35"},{"macAddress":"4d-63-c5-48-9f-5c"},{"macAddress":"1d-97-c3-a0-42-1a"},{"macAddress":"ce-1d-b5-a6-65-ad"},{"macAddress":"30-e5-72-6f-78-79"}],"nodeId":"123456789012345678909777","nodeType":"compute"},"messageProperties":{"timestamp":"2017-06-27T08:58:32.437+0000"},"action":"discovered","createdAt":"2017-06-27T08:58:31.871Z","nodeId":"123456789012345678909777","severity":"information","type":"node","typeId":"123456789012345678909777","version":"1.0"}'
@@ -96,7 +98,7 @@ def test_dne_discovered_node_handled():
                                          exchange='exchange.dell.cpsd.adapter.rackhd.node.discovered.event',
                                          routing_key='',
                                          headers={
-                                             '__TypeId__': 'com.dell.converged.capabilities.compute.discovered.nodes.api.NodeEventDiscovered'},
+                                             '__TypeId__': 'com.dell.cpsd.NodeEventDiscovered'},
                                          payload=the_payload, ssl_enabled=cpsd.props.rmq_ssl_enabled)
 
     # Step 3: Verify the node was discovered and returned a nodeID

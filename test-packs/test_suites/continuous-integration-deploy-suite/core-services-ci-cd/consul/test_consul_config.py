@@ -11,7 +11,7 @@ import pytest
 import requests
 import af_support_tools
 
-
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_consul_is_running(hostConnection):
@@ -36,6 +36,7 @@ def test_consul_is_running(hostConnection):
     assert my_return_status == 'Up', (service_name + " not running")
 
 
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 @pytest.mark.parametrize("service", ["consul", "vault", "api-gateway"])
@@ -61,7 +62,7 @@ def test_service_is_registered_with_consul(hostConnection, service):
     assert service_to_check in response.text, ('ERROR:', service, 'is not in Consul\n')
 
 
-
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 @pytest.mark.parametrize("service", ["vault", "api-gateway"])
