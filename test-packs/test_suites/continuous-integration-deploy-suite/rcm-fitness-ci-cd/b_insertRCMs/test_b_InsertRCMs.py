@@ -528,49 +528,41 @@ def test_verifyCorrectCorrelationID13():
 def test_verifyCorrectCorrelationID14():
     verifyCorrectCorrelationID(path + 'insertRCMRequest14.json', path + 'insertRCMResponse14.json')
 
-@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes1():
     verifyConsumedAttributes(path + 'insertRCMResponse1.json', True, "1.2", "1.2.33", "Vblock", "340", "MANUFACTURING")
 
 
-@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes2():
     verifyConsumedAttributes(path + 'insertRCMResponse2.json', True, "1.2", "1.2.33", "VxBlock", "340", "MANUFACTURING")
 
 
-@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes3():
     verifyConsumedAttributes(path + 'insertRCMResponse3.json', True, "1.2", "1.2.33.1", "Vblock", "340", "ADDENDUM")
 
 
-@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes4():
     verifyConsumedAttributes(path + 'insertRCMResponse4.json', True, "1.2", "1.2.33.2", "Vblock", "340", "ADDENDUM")
 
 
-@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes5():
     verifyConsumedAttributes(path + 'insertRCMResponse5.json', True, "1.2", "1.2.33.3", "Vblock", "340", "ADDENDUM")
 
 
-@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes6():
     verifyConsumedAttributes(path + 'insertRCMResponse6.json', True, "1.2", "1.2.33.1", "VxBlock", "340", "ADDENDUM")
 
 
-@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes7():
     verifyConsumedAttributes(path + 'insertRCMResponse7.json', True, "1.2", "1.2.33", "Vblock", "340", "ORIGINAL")
 
 
-@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes8():
     verifyConsumedAttributes(path + 'insertRCMResponse8.json', True, "1.2", "1.2.33", "VxBlock", "340", "ORIGINAL")
