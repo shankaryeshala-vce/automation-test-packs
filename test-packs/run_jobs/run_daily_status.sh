@@ -1,3 +1,4 @@
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 TEST_SUITE_NAME='Daily Status'
 REPORT_NAME='daily_status_report'
 SEARCH_PATH=$AF_TEST_SUITE_PATH/

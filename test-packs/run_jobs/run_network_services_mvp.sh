@@ -1,4 +1,4 @@
-
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 TEST_SUITE_NAME='Network Services MVP'
 REPORT_NAME='network_services_mvp_report'
 SEARCH_PATH=$AF_TEST_SUITE_PATH/

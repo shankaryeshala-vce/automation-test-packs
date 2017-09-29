@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # Author: cullia
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 # Revision: 2.0
 # Code Reviewed by:
 # Description: Configure a system and run the collectComponentVersions Message

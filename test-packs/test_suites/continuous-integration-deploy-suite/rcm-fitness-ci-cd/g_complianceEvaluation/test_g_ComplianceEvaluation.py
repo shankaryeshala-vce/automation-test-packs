@@ -1,3 +1,4 @@
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 import json
 import requests
 import pytest
