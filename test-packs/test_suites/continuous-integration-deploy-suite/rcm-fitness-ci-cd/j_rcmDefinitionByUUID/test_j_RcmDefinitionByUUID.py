@@ -213,18 +213,18 @@ def test_getRCMDef1():
 def test_getRCMDef2():
     getRCMDefinition("VxRack", "1000 FLEX", "9.2", "9.2.1")
 
-@pytest.mark.rcm_fitness_mvp_extended
-def test_getRCMDef3():
-    getRCMDefinition("VxRack", "1000 FLEX", "3.2", "3.2.2")
-
-@pytest.mark.rcm_fitness_mvp_extended
-def test_getRCMDef4():
-    getRCMDefinition("VxRack", "1000 FLEX", "3.2", "3.2.1")
-
-@pytest.mark.rcm_fitness_mvp
-@pytest.mark.rcm_fitness_mvp_extended
-def test_getRCMDef5():
-    getRCMDefinition("VxRack", "1000 FLEX", "3.2", "3.2.3")
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_getRCMDef3():
+#     getRCMDefinition("VxRack", "1000 FLEX", "3.2", "3.2.2")
+#
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_getRCMDef4():
+#     getRCMDefinition("VxRack", "1000 FLEX", "3.2", "3.2.1")
+#
+# @pytest.mark.rcm_fitness_mvp
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_getRCMDef5():
+#     getRCMDefinition("VxRack", "1000 FLEX", "3.2", "3.2.3")
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
