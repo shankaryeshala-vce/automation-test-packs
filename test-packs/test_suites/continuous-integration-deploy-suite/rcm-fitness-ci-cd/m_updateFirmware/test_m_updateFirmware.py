@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 import pika
 import json
 import time

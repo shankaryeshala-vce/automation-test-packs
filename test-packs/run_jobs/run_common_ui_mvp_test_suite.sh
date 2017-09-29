@@ -1,3 +1,4 @@
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 TEST_SUITE_NAME='Common UI MVP'
 REPORT_NAME='common_ui_mvp_report'
 SEARCH_PATH=$AF_TEST_SUITE_PATH/

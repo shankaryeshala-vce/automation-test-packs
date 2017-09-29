@@ -1,3 +1,4 @@
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 TEST_SUITE_NAME='Test Automation Framework MVP'
 REPORT_NAME='taf_mvp_test_suite_report'
 SEARCH_PATH=$AF_TEST_SUITE_PATH/
