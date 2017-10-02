@@ -547,7 +547,7 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
                             assert dataInput[x]["messageProperties"]["correlationId"] in data[i]["messageProperties"][
                                 "correlationId"], "Corr Ids don't match in consumed messages."
                             assert dataInput[x]["messageProperties"]["replyTo"] == data[i]["messageProperties"][
-                                "replyTo"], "Corr Ids don't match in consumed messages."
+                                "replyTo"], "Reply To values don't match in consumed messages."
                             print("Multiple Input verified.")
                         x += 1
                     else:
@@ -557,7 +557,7 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
                             assert dataInput["messageProperties"]["correlationId"] in data[i]["messageProperties"][
                                 "correlationId"], "Corr Ids don't match in consumed messages."
                             assert dataInput["messageProperties"]["replyTo"] == data[i]["messageProperties"][
-                                "replyTo"], "Corr Ids don't match in consumed messages."
+                                "replyTo"], "Reply To values don't match in consumed messages."
                             print("Single Input verified.")
                         x += 1
 
@@ -595,13 +595,16 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
                             if dataInput[x]["messageProperties"]["correlationId"] in dataCredentials[cred]["messageProperties"]["correlationId"]:
                                 if dataInput[x]["fileName"] in dataCredentials[cred]["fileName"]:
                                     assert dataInput[x]["messageProperties"]["replyTo"] == dataCredentials[cred]["messageProperties"][
-                                        "replyTo"], "Corr Ids don't match in consumed messages."
+                                        "origin"], "Reply To values don't match in consumed messages."
+                                    assert dataCredentials[cred]["messageProperties"]["replyTo"] == "no-reply", "Unexpected replyTo returned in credential response"
                             x += 1
                         else:
                             if dataInput["messageProperties"]["correlationId"] in dataCredentials[cred]["messageProperties"]["correlationId"]:
                                 if dataInput["fileName"] in dataCredentials[cred]["fileName"]:
                                     assert dataInput["messageProperties"]["replyTo"] == dataCredentials[cred]["messageProperties"][
-                                        "replyTo"], "Corr Ids don't match in consumed messages."
+                                        "origin"], "Reply To values don't match in consumed messages."
+                                    assert dataCredentials[cred]["messageProperties"][
+                                               "replyTo"] == "no-reply", "Unexpected replyTo returned in credential response"
                             x += 1
 
                     assert dataCredentials[cred]["hashType"] == hashType, "Incorrect hashType detailed."
@@ -712,7 +715,7 @@ def verifyMultiConsumedAttributes(requestFile, credentialsFile, responseFile, ha
                                     print(data[respCount]["messageProperties"]["correlationId"])
                                     print(dataCredentials[credCount]["messageProperties"]["correlationId"])
                                     assert data[respCount]["messageProperties"]["correlationId"] == dataCredentials[credCount]["messageProperties"]["correlationId"], "Corr Ids don't match in consumed messages."
-                                    assert data[respCount]["messageProperties"]["replyTo"] == dataCredentials[credCount]["messageProperties"]["replyTo"], "Reply To values don't match in consumed messages."
+                                    assert data[respCount]["messageProperties"]["replyTo"] == dataCredentials[credCount]["messageProperties"]["origin"], "Reply To values don't match in consumed messages."
                                     assert data[respCount]["size"] == dataCredentials[credCount]["size"], "Size values don't match in comsumed messages."
                                     assert data[respCount]["fileUUID"] == dataCredentials[credCount]["fileUUID"], "fileUUIDs don't match in consumed messages."
                                     print("2.2")
@@ -741,7 +744,8 @@ def verifyMultiConsumedAttributes(requestFile, credentialsFile, responseFile, ha
                                 print("Orig Corr ID: %s" % dataInput[inCount]["messageProperties"]["correlationId"])
                                 print("Cred Resp Corr ID: %s" % dataCredentials[credCount]["messageProperties"]["correlationId"])
                                 assert dataCredentials[credCount]["messageProperties"]["correlationId"] == dataInput[inCount]["messageProperties"]["correlationId"], "Corr Ids don't match in consumed messages."
-                                assert dataCredentials[credCount]["messageProperties"]["replyTo"] == dataInput[inCount]["messageProperties"]["replyTo"], "Reply To don't match in consumed messages."
+                                assert dataCredentials[credCount]["messageProperties"]["origin"] == dataInput[inCount]["messageProperties"]["replyTo"], "Reply To don't match in consumed messages."
+                                assert dataCredentials[credCount]["messageProperties"]["replyTo"] == "no-reply", "Unexpected Reply TO on Creds response."
                                 print("3.2")
                         # inCount += 1
                     print(len(data))
@@ -757,7 +761,7 @@ def verifyMultiConsumedAttributes(requestFile, credentialsFile, responseFile, ha
                                 assert dataCredentials[credCount]["url"] != data[respC]["url"], "URLs don't match in consumed messages."
                                 assert dataCredentials[credCount]["size"] == data[respC]["size"] or sizeMD5, "File sizes don't match in consumed messages."
                                 assert dataCredentials[credCount]["messageProperties"]["correlationId"] == data[respC]["messageProperties"]["correlationId"], "Corr Ids don't match in consumed messages."
-                                assert dataCredentials[credCount]["messageProperties"]["replyTo"] == data[respC]["messageProperties"]["replyTo"], "Reply To don't match in consumed messages."
+                                assert dataCredentials[credCount]["messageProperties"]["origin"] == data[respC]["messageProperties"]["replyTo"], "Reply To don't match in consumed messages."
                                 assert dataCredentials[credCount]["hashType"] == hashType, "Incorrect hashType detailed."
                                 print("3.3")
                                 print("Response attributes match those defined in request.")
@@ -819,7 +823,7 @@ def verifyConsumedAttributesInvalid(requestFile, credentialsFile, responseFile, 
                     assert dataInput["messageProperties"]["correlationId"] in dataCredentials["messageProperties"][
                         "correlationId"], "Corr Ids don't match in consumed messages."
                     assert dataInput["messageProperties"]["replyTo"] == dataCredentials["messageProperties"][
-                        "replyTo"], "ReplyTo values don't match in consumed messages."
+                        "origin"], "ReplyTo values don't match in consumed messages."
                     assert dataCredentials["hashType"] == hashType, "Incorrect hashType detailed."
                     print("Header key count: %d" % len(dataCredentials["header"].keys()))
                     assert len(dataCredentials[
@@ -844,7 +848,7 @@ def verifyConsumedAttributesInvalid(requestFile, credentialsFile, responseFile, 
             assert "fileUUID" in data[count].keys(), "File UUID not included in consumed attributes."
             assert data[count]["size"] == 0, "Size of ZERO not returned in error."
             assert dataInput["messageProperties"]["replyTo"] == data[count]["messageProperties"][
-                "replyTo"], "Corr Ids don't match in consumed messages."
+                "replyTo"], "Reply To don't match in consumed messages."
 
             print("Download response verified on failed request.")
 
@@ -1198,9 +1202,9 @@ def test_verifyConsumedAttributes11():
     verifyConsumedAttributes("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE", path + 'sasDownloadFWRequest.json', path + 'sasDownloadFWCredentials.json',
                              path + 'sasDownloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
 
-# # # #
-# # # # RCM/3.2.3/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE
-# # # #
+# # # # #
+# # # # # RCM/3.2.3/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE
+# # # # #
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti12():
     downloadFWFileMulti(message, messageSec, messageSas2, 'multiDownloadFWRequest.json',
