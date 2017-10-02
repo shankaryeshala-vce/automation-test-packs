@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # Author: cullia
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 # Revision: 2.0
 # Code Reviewed by:
 # Description: This will test the Credential Service. Feature & negative tests are include. This can be run on a system

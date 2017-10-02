@@ -62,7 +62,7 @@
     {
       "id": "74ff600500054321",
       "name": "test2-SP1",
-      "numberOfDevices": "300",
+      "numberOfDevices": "301",
       "type": "HDD",
       "devices": [
         {

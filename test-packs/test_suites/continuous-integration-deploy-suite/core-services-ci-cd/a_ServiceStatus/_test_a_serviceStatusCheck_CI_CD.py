@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # Author: Toqeer Akhtar
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 # Revision:2.0
 # Code Reviewed by: 
 # Description: This script will runt against newly deployed OVA and perform a sanitu check for Dockerise servecies.
