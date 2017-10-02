@@ -96,10 +96,10 @@ def load_test_data():
     payload_dataVxRack1 = 'datavxrack1'
     global payload_dataVxRack2
     payload_dataVxRack2 = 'datavxrack2'
-    global payload_dataVxRack3
-    payload_dataVxRack3 = 'datavxrack3'
-    global payload_dataVxRack4
-    payload_dataVxRack4 = 'datavxrack4'
+    # global payload_dataVxRack3
+    # payload_dataVxRack3 = 'datavxrack3'
+    # global payload_dataVxRack4
+    # payload_dataVxRack4 = 'datavxrack4'
 
     ensurePathExists(path)
     purgeOldOutput(path, "getRCMsRe")
@@ -139,10 +139,10 @@ def load_test_data():
                                                               property=payload_dataVxRack1)
     messageVxrack2 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
                                                               property=payload_dataVxRack2)
-    messageVxrack3 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
-                                                              property=payload_dataVxRack3)
-    messageVxrack4 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
-                                                              property=payload_dataVxRack4)
+    # messageVxrack3 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+    #                                                          property=payload_dataVxRack3)
+    # messageVxrack4 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+    #                                                          property=payload_dataVxRack4)
 
     updatedMessageInvalidCorrID = convertStrToDict(messageInvalidCorrID)
     updatedMessageIP = convertStrToDict(messageIP)
@@ -165,9 +165,9 @@ def load_test_data():
     # getAvailableRCMs("VxRack", "1000 FLEX", "9.2", "9.2.1")
     updatedMessageVxrack2['uuid'] = getAvailableRCMs("VxRack", "1000 FLEX", "9.2", "9.2.1")
     # getAvailableRCMs("VxRack", "1000 FLEX", "3.2", "3.2.2")
-    updatedMessageVxrack3['uuid'] = getAvailableRCMs("VxRack", "1000 FLEX", "3.2", "3.2.2")
+    # updatedMessageVxrack3['uuid'] = getAvailableRCMs("VxRack", "1000 FLEX", "3.2", "3.2.2")
     # getAvailableRCMs("VxRack", "1000 FLEX", "3.2", "3.2.3")
-    updatedMessageVxrack4['uuid'] = getAvailableRCMs("VxRack", "1000 FLEX", "3.2", "3.2.3")
+    # updatedMessageVxrack4['uuid'] = getAvailableRCMs("VxRack", "1000 FLEX", "3.2", "3.2.3")
 
     strMessageInvalidCorrID = str(updatedMessageInvalidCorrID)
     strMessageInvalidCorrID = restoreStr(strMessageInvalidCorrID)
@@ -185,10 +185,10 @@ def load_test_data():
     strMessageVxrack1 = restoreStr(strMessageVxrack1)
     strMessageVxrack2 = str(updatedMessageVxrack2)
     strMessageVxrack2 = restoreStr(strMessageVxrack2)
-    strMessageVxrack3 = str(updatedMessageVxrack3)
-    strMessageVxrack3 = restoreStr(strMessageVxrack3)
-    strMessageVxrack4 = str(updatedMessageVxrack4)
-    strMessageVxrack4 = restoreStr(strMessageVxrack4)
+    # strMessageVxrack3 = str(updatedMessageVxrack3)
+    # strMessageVxrack3 = restoreStr(strMessageVxrack3)
+    # strMessageVxrack4 = str(updatedMessageVxrack4)
+    # strMessageVxrack4 = restoreStr(strMessageVxrack4)
 
     getRCMRequest(message, 'getRCMsRequest1.json', 'getRCMsResponse1.json')
     getRCMRequest(strMessageInvalidCorrID, 'getRCMsRequest2.json', 'getRCMsResponse2.json')
@@ -203,8 +203,8 @@ def load_test_data():
     getRCMRequest(messageSpaces, 'getRCMsRequest11.json', 'getRCMsResponse11.json')
     getRCMRequest(strMessageVxrack1, 'getRCMsRequest12.json', 'getRCMsResponse12.json')
     getRCMRequest(strMessageVxrack2, 'getRCMsRequest13.json', 'getRCMsResponse13.json')
-    getRCMRequest(strMessageVxrack3, 'getRCMsRequest14.json', 'getRCMsResponse14.json')
-    getRCMRequest(strMessageVxrack4, 'getRCMsRequest15.json', 'getRCMsResponse15.json')
+    # getRCMRequest(strMessageVxrack3, 'getRCMsRequest14.json', 'getRCMsResponse14.json')
+    # getRCMRequest(strMessageVxrack4, 'getRCMsRequest15.json', 'getRCMsResponse15.json')
 
     deleteTestQueues('testGetRCMDetailsRequest', 'testGetRCMDetailsResponse')
 
@@ -450,13 +450,13 @@ def test_verifyPublishedAttributes12():
 def test_verifyPublishedAttributes13():
     verifyPublishedAttributes(path + 'getRCMsRequest13.json')
 
-@pytest.mark.rcm_fitness_mvp_extended
-def test_verifyPublishedAttributes14():
-    verifyPublishedAttributes(path + 'getRCMsRequest14.json')
-
-@pytest.mark.rcm_fitness_mvp_extended
-def test_verifyPublishedAttributes15():
-    verifyPublishedAttributes(path + 'getRCMsRequest15.json')
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_verifyPublishedAttributes14():
+#     verifyPublishedAttributes(path + 'getRCMsRequest14.json')
+#
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_verifyPublishedAttributes15():
+#     verifyPublishedAttributes(path + 'getRCMsRequest15.json')
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyConsumedAttributes1():
@@ -523,15 +523,15 @@ def test_verifyConsumedAttributes13():
     verifyConsumedAttributes(path + 'getRCMsRequest13.json', path + 'getRCMsResponse13.json', "9.2", "9.2.1", "1000 FLEX",
                              "VxRack")
 
-@pytest.mark.rcm_fitness_mvp_extended
-def test_verifyConsumedAttributes14():
-    verifyConsumedAttributes(path + 'getRCMsRequest14.json', path + 'getRCMsResponse14.json', "3.2", "3.2.2", "1000 FLEX",
-                             "VxRack")
-
-@pytest.mark.rcm_fitness_mvp_extended
-def test_verifyConsumedAttributes15():
-    verifyConsumedAttributes(path + 'getRCMsRequest15.json', path + 'getRCMsResponse15.json', "3.2", "3.2.3", "1000 FLEX",
-                             "VxRack")
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_verifyConsumedAttributes14():
+#     verifyConsumedAttributes(path + 'getRCMsRequest14.json', path + 'getRCMsResponse14.json', "3.2", "3.2.2", "1000 FLEX",
+#                              "VxRack")
+#
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_verifyConsumedAttributes15():
+#     verifyConsumedAttributes(path + 'getRCMsRequest15.json', path + 'getRCMsResponse15.json', "3.2", "3.2.3", "1000 FLEX",
+#                              "VxRack")
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrectCorrelationID1():
@@ -585,10 +585,10 @@ def test_verifyCorrectCorrelationID12():
 def test_verifyCorrectCorrelationID13():
     verifyCorrectCorrelationID(path + 'getRCMsRequest13.json', path + 'getRCMsResponse13.json')
 
-@pytest.mark.rcm_fitness_mvp_extended
-def test_verifyCorrectCorrelationID14():
-    verifyCorrectCorrelationID(path + 'getRCMsRequest14.json', path + 'getRCMsResponse14.json')
-
-@pytest.mark.rcm_fitness_mvp_extended
-def test_verifyCorrectCorrelationID15():
-    verifyCorrectCorrelationID(path + 'getRCMsRequest15.json', path + 'getRCMsResponse15.json')
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_verifyCorrectCorrelationID14():
+#     verifyCorrectCorrelationID(path + 'getRCMsRequest14.json', path + 'getRCMsResponse14.json')
+#
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_verifyCorrectCorrelationID15():
+#     verifyCorrectCorrelationID(path + 'getRCMsRequest15.json', path + 'getRCMsResponse15.json')
