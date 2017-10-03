@@ -153,8 +153,8 @@ def load_test_data():
     updatedMessageNoKey = convertStrToDict(messageNoKey)
     updatedMessageVxrack1 = convertStrToDict(messageVxrack1)
     updatedMessageVxrack2 = convertStrToDict(messageVxrack2)
-    updatedMessageVxrack3 = convertStrToDict(messageVxrack3)
-    updatedMessageVxrack4 = convertStrToDict(messageVxrack4)
+    # updatedMessageVxrack3 = convertStrToDict(messageVxrack3)
+    # updatedMessageVxrack4 = convertStrToDict(messageVxrack4)
 
     updatedMessageInvalidCorrID['uuid'] = getAvailableRCMs("VxRack", "1000 FLEX", "9.2", "9.2.2")
     updatedMessageIP['uuid'] = getAvailableRCMs("VxRack", "1000 FLEX", "9.2", "9.2.2")
