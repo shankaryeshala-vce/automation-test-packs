@@ -7,12 +7,6 @@ import af_support_tools
 import pytest
 
 
-# @pytest.fixture(scope="session",
-#                 params=["system-definition-service", "credentials", "hal-orchestrator-service", "identity-service",
-#                         "capability-registry-service", "endpoint-registration-service", "vcenter-adapter",
-#                         "hdp-poweredge-compute", "coprhd-adapter", "rackhd-adapter", "scaleio-adapter",
-#                         "hal-data-provider-vcenter"])
-
 @pytest.fixture(scope="session",
                 params=["vault", "postgres", "consul","rabbitmq"])
 def thirdparty_container(setup, request):
@@ -36,7 +30,7 @@ def thirdparty_container(setup, request):
 @pytest.mark.core_services_mvp_extended
 def test_thirdparty_containerup(setup, thirdparty_container):
     """
-    Title: Verify Third Part containers are UP
+    Title: Verify Third Party containers are UP
     Description: This test verifies that each core service container is up
     Params: List of Core service names
     Returns: None
@@ -53,66 +47,6 @@ def test_thirdparty_containerup(setup, thirdparty_container):
     assert "Up" in my_return_status, " %s is not up" % thirdparty_container
 
 
-# @pytest.mark.tls_enabled
-# @pytest.mark.core_services_mvp
-# @pytest.mark.core_services_mvp_extended
-# def test_thirdparty_connection(thirdparty_container, setup):
-#     """
-#     Title: Verify Third Part containers are connected to Rabbitmq
-#     Description: This test verifies that each core service container is connected to rabbitmq
-#     Params: List of Core service names
-#     Returns: None
-#
-#     """
-#     print(test_thirdparty_connection.__doc__)
-#     assert thirdparty_container, "container name not found, test fails"
-#
-#     cmd_1 = "docker exec " + thirdparty_container + " netstat -an 2>&1 | grep 5672 | awk '{print $6}'"
-#     response1 = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
-#                                                   password=setup['password'],
-#                                                   command=cmd_1, return_output=True)
-#     response1 = response1.splitlines()
-#     if "ESTABLISHED" in response1:
-#         print(thirdparty_container + " connected on port 5672")
-#
-#     cmd2 = "docker exec " + thirdparty_container + " netstat -an 2>&1 | grep 5671 | awk '{print $6}'"
-#     response2 = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
-#                                                   password=setup['password'],
-#                                                   command=cmd2, return_output=True)
-#     response2 = response2.splitlines()
-#     if "ESTABLISHED" in response2:
-#         print(thirdparty_container + " connected on port 5671")
-#
-#     response_list = [response1, response2]
-#
-#     assert any("ESTABLISHED" in s for s in response_list), " %s is not connected to amqp" % thirdparty_container
-
-
-@pytest.mark.skip(reason="Disabled until every service uses port 5671")
-@pytest.mark.core_services_mvp
-@pytest.mark.core_services_mvp_extended
-def test_thirdparty_tls(core_services, setup):
-    """
-    Title: Verify Third Part containers are connected to TLS port for Rabbit
-    Description: This test verifies that each core service container is connected to rabbitmq TLS Port
-    Params: List of Core service names
-    Returns: None
-
-    """
-    print(test_thirdparty_tls.__doc__)
-
-    err = []
-    for service in thirdparty_services:
-
-        sendcommand_amqp = "docker exec " + service + " netstat -an 2>&1 | grep 5671 | awk '{print $6}'"
-        response = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
-                                                     password=setup['password'],
-                                                     command=sendcommand_amqp, return_output=True)
-        if "ESTABLISHED" not in response:
-            err.append(service + " Rabbit not connected on TLS Port")
-
-    assert not err
-
 
 @pytest.mark.tls_enabled
 @pytest.mark.core_services_mvp_extended
@@ -127,12 +61,15 @@ def test_core_stop(thirdparty_container, setup):
     print(test_core_stop.__doc__)
     assert thirdparty_container, "container name not found, test fails immediately"
     sendcommand = "docker ps --filter name=" + thirdparty_container + "  --format '{{.Status}}' | awk '{print $1}'"
+
     my_return_status = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
                                                          password=setup['password'],
                                                          command=sendcommand, return_output=True)
+
     assert "Up" in my_return_status, "%s is not running so can't be stopped" % thirdparty_container
 
     cmd = "docker stop " + thirdparty_container
+
     response = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
                                                  password=setup['password'],
                                                  command=cmd, return_output=False)
@@ -140,6 +77,7 @@ def test_core_stop(thirdparty_container, setup):
     assert response == 0, "docker stop did not execute correctly"
 
     cmd2 = "docker ps -a --filter name=" + thirdparty_container + "  --format '{{.Status}}' | awk '{print $1}'"
+
     response2 = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
                                                   password=setup['password'],
                                                   command=cmd2, return_output=True)
@@ -162,18 +100,21 @@ def test_thirdparty_start(thirdparty_container, setup):
     assert thirdparty_container, "container name not found, test fails immediately"
 
     sendcommand = "docker ps -a --filter name=" + thirdparty_container + "  --format '{{.Status}}' | awk '{print $1}'"
+
     my_return_status = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
                                                          password=setup['password'],
                                                          command=sendcommand, return_output=True)
     assert "Exited" in my_return_status, "container is not in exited state, cannot start"
 
     cmd4 = "docker start " + thirdparty_container
+
     response = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
                                                  password=setup['password'],
                                                  command=cmd4, return_output=False)
     assert response == 0, "docker start did not execute correctly"
 
     cmd3 = "docker ps -a --filter name=" + thirdparty_container + "  --format '{{.Status}}' | awk '{print $1}'"
+
     response3 = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
                                                   password=setup['password'],
                                                   command=cmd3, return_output=True)
