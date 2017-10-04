@@ -21,9 +21,6 @@ def test_pam_uninstall(setup):
 
     print(test_pam_uninstall.__doc__)
 
-    err = []
-
-
     sendcommand = "yum -y remove " + pam
 
     my_return_status = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['user'],
