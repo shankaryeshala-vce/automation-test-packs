@@ -477,55 +477,57 @@ def test_getComplianceDataDevice6():
     getComplianceDataDeviceSubComps("RAID", "PERC H730", "R730XD", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice7():
     getComplianceData("VXRACK", "FLEX", "R630", "POWEREDGE", "SERVER", path + "complianceDataDevicePOWEREDGE.json",
                       systemUUID, 5, 5)
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice8():
     getComplianceDataDeviceSubComps("NIC", "Ethernet 10G 2P", "R630", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice9():
     getComplianceDataDeviceSubComps("NIC", "Gigabit 4P X520", "R630", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice10():
     getComplianceDataDeviceSubComps("BIOS", "BIOS", "R630", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice11():
     getComplianceDataDeviceSubComps("iDRAC", "Remote Access", "R630", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice12():
     getComplianceDataDeviceSubComps("NonRAID", "Dell HBA330 Mini", "R630", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice13():
     getComplianceData("VXRACK", "FLEX", "VCENTER-WINDOWS", "VCENTER", "VCENTER", path + "complianceDataDeviceVCENTER.json",
                       systemUUID, 3, 18)
 
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice14():
     getComplianceData("VXRACK", "FLEX", "VCENTER-APPLIANCE", "VCENTER", "VCENTER", path + "complianceDataDeviceVCENTER.json",
                       systemUUID, 3, 3)
 
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice15():
