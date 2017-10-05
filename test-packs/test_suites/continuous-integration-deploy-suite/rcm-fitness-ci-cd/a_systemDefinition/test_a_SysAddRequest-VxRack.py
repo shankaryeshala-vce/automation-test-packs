@@ -102,6 +102,7 @@ def serviceStart():
 #######################################################################################################################
 
 # *** THIS IS THE MAIN TEST *** Add a system
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_SystemAdditionRequested():
@@ -145,6 +146,7 @@ def test_SystemAdditionRequested():
 
 
 # *** Kick of the collectComponentVersion Msg
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_HAL_CollectComponentVersion():

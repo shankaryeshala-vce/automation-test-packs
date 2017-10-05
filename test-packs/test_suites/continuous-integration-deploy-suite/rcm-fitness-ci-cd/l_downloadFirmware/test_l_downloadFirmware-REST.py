@@ -431,19 +431,23 @@ def verifyRESTrepositoryStatus(filepath, filename):
         return
     assert False, "Failing....."
 
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifyRESTdownloadSingleFileRequest1():
     verifyRESTdownloadSingleFileRequest("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE")
 
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifyRESTdownloadSingleFileRequestSTATUS1():
     verifyRESTdownloadSingleFileRequestSTATUS("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE")
 
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyRESTrepositoryStatus1():
     verifyRESTrepositoryStatus("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/", "SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE")
+
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyRESTdownloadSingleFileRequest2():
