@@ -261,7 +261,9 @@ def downloadFWFileRequest(payLoad, requestFile, requestCredentials, responseFile
     af_support_tools.rmq_payload_to_file(my_response_credentials_body, path + requestCredentials)
 
     print("Download request and credential response(s) consumed.")
-    # time.sleep(delay)
+
+    time.sleep(15)
+
     checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     print(checkDisk)
     # assert False
@@ -315,6 +317,8 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
                                          ssl_enabled=False)
 
     print("Three file download requests published.")
+
+    time.sleep(15)
 
     checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     print(checkDisk)
