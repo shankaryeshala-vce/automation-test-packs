@@ -34,7 +34,7 @@ def get_tls_certs():
         ex = ex.wait()
         o = subprocess.check_output('ls')
         with open(tls_file,'w') as f:
-            f.write(o)
+            f.write(o.decode("utf-8") )
         print (o)
         p = subprocess.check_output('./tls_enable.sh')
         # p = subprocess.Popen('./tls-enable.sh', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
