@@ -33,11 +33,11 @@ def get_tls_certs():
         ex = subprocess.Popen('chmod +x tls_enable.sh', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         ex = ex.wait()
         o = subprocess.check_output('ls')
+        with open(tls_file,'w') as f:
+            f.write(o)
         print (o)
         p = subprocess.check_output('./tls_enable.sh')
         # p = subprocess.Popen('./tls-enable.sh', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         # p.wait()
         # out, err = p.communicate()
         print(p)
-        # with open(tls_file,'w') as f:
-        #     f.write(out)
