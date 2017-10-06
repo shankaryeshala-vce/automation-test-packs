@@ -950,12 +950,12 @@ def test_verifyCorrelationIDs():
     verifyCorrelationIDs()
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_verifyRESTupdateRequest():
     verifyRESTupdateRequest("out_restRequest.json")
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_verifyRESTupdateResponse():
     verifyRESTupdateResponse("out_restResponse.json")
 
