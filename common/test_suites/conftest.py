@@ -3,6 +3,11 @@ import af_support_tools
 import os
 import pytest
 import subprocess
+from common.common_libs import cpsd
+
+
+passwords = cpsd.get_rmq_credentials()
+print(passwords)
 
 
 @pytest.fixture(autouse=True, scope='session')
@@ -30,4 +35,4 @@ def get_tls_certs():
         result_status = result.wait()
         print(result)
         with open(tls_file,'w') as f:
-            f.write('whatever')
+            f.write(result)
