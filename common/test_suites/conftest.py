@@ -18,14 +18,14 @@ def cpsd_common_properties():
 #     print(result_status)
 
 
-@pytest.fixture(autouse=True, scope='session')
-def get_tls_certs():
-    print('Getting tls certs from tls_service')
-    tls_file = '/home/autouser/PycharmProjects/auto-framework/test_suites/tls_certs_exist'
-    if os.path.isfile(tls_file):
-        print('TLS Certs exist already')
-    else:
-        result = subprocess.check_output([". /home/autouser/PycharmProjects/auto-framework/run_jobs/tls_enable.sh"], stderr=subprocess.STDOUT)
-        print(result)
-        f = open(tls_file,'w')
-        print >>f, 'whatever'
+# @pytest.fixture(autouse=True, scope='session')
+# def get_tls_certs():
+#     print('Getting tls certs from tls_service')
+#     tls_file = '/home/autouser/PycharmProjects/auto-framework/test_suites/tls_certs_exist'
+#     if os.path.isfile(tls_file):
+#         print('TLS Certs exist already')
+#     else:
+#         result = subprocess.check_output([". /home/autouser/PycharmProjects/auto-framework/run_jobs/tls_enable.sh"], stderr=subprocess.STDOUT)
+#         print(result)
+#         f = open(tls_file,'w')
+#         print >>f, 'whatever'
