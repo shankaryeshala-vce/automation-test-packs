@@ -25,7 +25,7 @@ def get_tls_certs():
     if os.path.isfile(tls_file):
         print('TLS Certs exist already')
     else:
-        result = subprocess.check_output(["./tls_enable.sh"], stderr=subprocess.STDOUT)
+        result = subprocess.check_output([". /home/autouser/PycharmProjects/auto-framework/run_jobs/tls_enable.sh"], stderr=subprocess.STDOUT)
         print(result)
         f = open(tls_file,'w')
         print >>f, 'whatever'
