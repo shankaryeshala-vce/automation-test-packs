@@ -9,6 +9,7 @@ from cryptography.hazmat.primitives.serialization import load_der_public_key
 import datetime
 import json
 import time
+import requests
 
 class props(object):
     # Set env.ini file name
@@ -20,18 +21,34 @@ class props(object):
     base_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
     base_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 
-    # Rabbit MQ
-    rmq_username = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='username')
-    rmq_password = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='password')
-    rmq_ssl_enabled = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='ssl_enabled')
-    if rmq_ssl_enabled == 'True':
-        rmq_ssl_enabled = True
-        rmq_port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='ssl_port')
-        rmq_cert_path = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='cert_path')
-    else:
-        rmq_ssl_enabled = False
-        rmq_port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='port')
-        rmq_cert_path = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='cert_path')
+
+    # # Rabbit MQ
+    # rmq_username = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='username')
+    # rmq_password = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='password')
+    # rmq_ssl_enabled = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='ssl_enabled')
+    # if rmq_ssl_enabled == 'True':
+    #     rmq_ssl_enabled = True
+    #     rmq_port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='ssl_port')
+    #     rmq_cert_path = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='cert_path')
+    # else:
+    #     rmq_ssl_enabled = False
+    #     rmq_port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='port')
+    #     rmq_cert_path = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='cert_path')
+
+def get_rmq_credentials():
+    api_url = "https://credential-service.cpsd.dell:9090/credential-service/v1/accesscontrol/credentials?name=amqp&type=rabbitmq"
+    r = requests.get(api_url, verify=False)
+    resp = json.loads(r.text)
+
+    assert resp['status']['code'] == 200, "Rabbitmq credentials not returned"
+
+    rmq_user = resp['response']['username']
+    rmq_password = resp['response']['password']
+    print(rmq_user)
+    print(rmq_password)
+
+    return {'rmq_user': rmq_user, 'rmq_password': rmq_password}
+
 
 def cs_encrypt_credential_elements(my_json):
     '''
