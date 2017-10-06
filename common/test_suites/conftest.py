@@ -3,11 +3,11 @@ import af_support_tools
 import os
 import pytest
 import subprocess
-from common.common_libs import cpsd
-
-
-passwords = cpsd.get_rmq_credentials()
-print(passwords)
+# from common.common_libs import cpsd
+#
+#
+# passwords = cpsd.get_rmq_credentials()
+# print(passwords)
 
 
 @pytest.fixture(autouse=True, scope='session')
