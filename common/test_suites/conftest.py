@@ -30,7 +30,10 @@ def get_tls_certs():
     if os.path.isfile(tls_file):
         print('TLS Certs exist already')
     else:
-        ex = subprocess.Popen('chmod +x tls_enable.sh', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).wait()
+        ex = subprocess.Popen('chmod +x tls_enable.sh', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        ex = ex.wait()
+        o = subprocess.check_output('ls')
+        print (o)
         p = subprocess.check_output('./tls_enable.sh')
         # p = subprocess.Popen('./tls-enable.sh', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         # p.wait()
