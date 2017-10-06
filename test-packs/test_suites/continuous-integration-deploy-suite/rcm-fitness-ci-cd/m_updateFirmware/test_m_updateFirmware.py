@@ -828,6 +828,12 @@ def verifyRESTupdateRequest(filename):
             # statusResp = requests.get(statusURL)
             statusData = requests.get(statusURL)
             statusResp = json.loads(statusData.text)
+            if data["state"] != "IN_PROGRESS":
+                print("In here still....")
+                statusURL = data["link"]["href"]
+                # statusResp = requests.get(statusURL)
+                statusData = requests.get(statusURL)
+                statusResp = json.loads(statusData.text)
             if statusResp["state"] == "IN_PROGRESS":
                 print("Now here....")
                 restResponse(statusResp)
