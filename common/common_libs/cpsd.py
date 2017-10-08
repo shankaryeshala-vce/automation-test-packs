@@ -36,16 +36,13 @@ class props(object):
     #     rmq_cert_path = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='cert_path')
 
 def get_rmq_credentials():
-    api_url = "https://credential-service.cpsd.dell:9090/credential-service/v1/accesscontrol/credentials?name=amqp&type=rabbitmq"
+    api_url = "https://credential-service.cpsd.dell:9090/v1/accesscontrol/credentials?name=amqp&type=rabbitmq&raw=true"
     r = requests.get(api_url, verify=False)
     resp = json.loads(r.text)
-
     assert resp['status']['code'] == 200, "Rabbitmq credentials not returned"
 
     rmq_user = resp['response']['username']
     rmq_password = resp['response']['password']
-    print(rmq_user)
-    print(rmq_password)
 
     return {'rmq_user': rmq_user, 'rmq_password': rmq_password}
 
