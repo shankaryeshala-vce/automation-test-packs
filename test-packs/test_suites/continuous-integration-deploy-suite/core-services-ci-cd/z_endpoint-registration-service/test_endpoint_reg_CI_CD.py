@@ -25,6 +25,7 @@ def load_test_data(hostIpAddress):
 # *******************************************************************************************
 #
 
+@pytest.mark.tls_enabled
 @pytest.mark.core_services_mvp_extended
 def test_registerServiceWithNoAddress(rabbitMq):
     with pytest.raises(NoMessageConsumedException):
@@ -48,6 +49,7 @@ def test_registerServiceWithNoAddress(rabbitMq):
         rabbitMq.consume_message_from_queue('testQueue')
 # # *******************************************************************************************
 #
+@pytest.mark.tls_enabled
 @pytest.mark.core_services_mvp_extended
 def test_registerServiceWithNoPort(rabbitMq):
     with pytest.raises(NoMessageConsumedException):
@@ -70,6 +72,7 @@ def test_registerServiceWithNoPort(rabbitMq):
         rabbitMq.consume_message_from_queue('testQueue')
 # # *******************************************************************************************
 
+@pytest.mark.tls_enabled
 @pytest.mark.core_services_mvp_extended
 def test_registerServiceWithNoHealthCheck(rabbitMq):
     with pytest.raises(NoMessageConsumedException):
