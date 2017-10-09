@@ -318,19 +318,20 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
 
     print("Three file download requests published.")
 
-    time.sleep(15)
-
+    time.sleep(5)
+    # return
     checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     print(checkDisk)
     while checkDisk < expectedDiskSize:
-        timeout += 1
+        timeout += 5
         time.sleep(1)
         print("File 1")
         checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
         print(checkDisk)
-        if timeout > 1000:
+        if timeout > 60:
             assert False, "ERROR: Download attempt doesn't appear to have completed in a timely manner."
-
+        #return
+    #return
     checkDisk2 = checkWritesComplete(filename2, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     print(checkDisk2)
     while checkDisk2 < expectedDiskSize2:
@@ -339,7 +340,7 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
         print("File 2")
         checkDisk2 = checkWritesComplete(filename2, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
         print(checkDisk2)
-        if timeout > 1000:
+        if timeout > 60:
             assert False, "ERROR: Download attempt doesn't appear to have completed in a timely manner."
 
     while q_len < 3:
@@ -651,16 +652,18 @@ def verifyMultiConsumedAttributes(requestFile, credentialsFile, responseFile, ha
     print("Credential count: %d" % len(dataCredentials))
     print("Response count: %d" % len(data))
 
-    sizeBIOS = checkFileSize("RCM/3.2.2/VxRack_1000_FLEX/Component/BIOS/2.2.5/BIOS_PFWCY_WN64_2.2.5.EXE",
-                             "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
-    sizeDAS = checkFileSize("DAS_Cache_Linux_1.zip",
-                            "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
-    sizeESX = checkFileSize("VMW-ESX-6.0.0-lsi_mr3-6.903.85.00_MR-3818071.zip",
-                             "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
+    # sizeBIOS = checkFileSize(filename,
+    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
+    # sizeDAS = checkFileSize(secFilename,
+    #                         "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
+    # assert False, "Exiting...."
+    # sizeSAS = checkFileSize(thirdFilename,
+    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
 
 
     print("Total messages consumed: %d" % len(data))
-
+    # assert False, "Exiting...."
+    # assert False, "Exiting...."
     while count < len(data):
         if "errorCode" in data[count].keys():
             print(data[count]["errorCode"])
@@ -770,9 +773,9 @@ def verifyMultiConsumedAttributes(requestFile, credentialsFile, responseFile, ha
                                 assert dataCredentials[credCount]["hashType"] == hashType, "Incorrect hashType detailed."
                                 print("3.3")
                                 print("Response attributes match those defined in request.")
-                                print("Downloaded BIOS file size: %s" % sizeBIOS)
-                                print("Downloaded ZIP file size: %s" % sizeDAS)
-                                print("Downloaded ESX file size: %s" % sizeESX)
+                                # print("Downloaded BIOS file size: %s" % sizeBIOS)
+                                # print("Downloaded ZIP file size: %s" % sizeDAS)
+                                # print("Downloaded SAS file size: %s" % sizeSAS)
                                 return
                         # respC += 1
                     credCount += 1
@@ -980,11 +983,22 @@ def deletePreviousDownloadFiles(filename, filepath):
         print(filename + "not found in the repo directory.")
 
 def checkFileSize(filename, filepath):
+    #sendCommand = "find / -print0 | grep -FzZ " + filename + " | awk '{printf '%s\n', $0}' "
     sendCommand = "find / -print0 | grep -FzZ " + filename
     print(sendCommand)
     fileStatus = af_support_tools.send_ssh_command(host=host, username=cli_username, password=cli_password,
                                                    command=sendCommand, return_output=True)
+
+    print(fileStatus)
+    while fileStatus is "":
+        time.sleep(5)
+        fileStatus = af_support_tools.send_ssh_command(host=host, username=cli_username, password=cli_password,
+                                                       command=sendCommand, return_output=True)
+
+    print(fileStatus)
+
     if fileStatus is not "":
+        #assert False, ("Getting in here at least.....")
         fileStatus = fileStatus.rstrip()
         if filepath in fileStatus:
             sendCommand = "du -b " + fileStatus + " | cut -f 1-1"
@@ -996,15 +1010,29 @@ def checkFileSize(filename, filepath):
             fileSize = int(fileSize.split("/", 1)[0])
             print("Size: %s" % fileSize)
             return fileSize
-    else:
-        pass
-    #assert False, ("Attempt to check File Size is unsuccessful.")
+    # else:
+    #     pass
+    assert False, ("Attempt to check File Size is unsuccessful.")
 
 def checkWritesComplete(filename, filepath):
+
+    # sendCommand = "find / -print0 | grep -FzZ " + filename + "| awk '{printf '%s\n', $0}'"
     sendCommand = "find / -print0 | grep -FzZ " + filename
     fileStatus = af_support_tools.send_ssh_command(host=host, username=cli_username, password=cli_password,
                                                    command=sendCommand, return_output=True)
+    print("In here....")
+
+    print(fileStatus)
+    while fileStatus is "":
+        time.sleep(5)
+        fileStatus = af_support_tools.send_ssh_command(host=host, username=cli_username, password=cli_password,
+                                                       command=sendCommand, return_output=True)
+
+    print(fileStatus)
+    #assert False, "Exiting"
+
     if fileStatus is not "":
+        #assert False, ("Getting in here at least.....")
         fileStatus = fileStatus.rstrip()
         if filepath in fileStatus:
             sendCommand = "du -b " + fileStatus + " | cut -f 1-1"
@@ -1017,16 +1045,25 @@ def checkWritesComplete(filename, filepath):
             #print("Size: %d" % totalRepoSize)
             print("File status: %s" % fileStatus)
             return totalRepoSize
-    else:
-        pass
-    #assert False, ("Attempt to check Repo Disk Usage is unsuccessful.")
+    # else:
+    #     pass
+    assert False, ("Attempt to check Repo Disk Usage is unsuccessful.")
 
 def checkFileHash(filename, filepath):
+    # sendCommand = "find / -print0 | grep -FzZ " + filename + "| awk '{printf '%s\n', $0}'"
     sendCommand = "find / -print0 | grep -FzZ " + filename
     fileStatus = af_support_tools.send_ssh_command(host=host, username=cli_username, password=cli_password,
                                                    command=sendCommand, return_output=True)
 
+    print(fileStatus)
+    while fileStatus is "":
+        time.sleep(5)
+        fileStatus = af_support_tools.send_ssh_command(host=host, username=cli_username, password=cli_password,
+                                                       command=sendCommand, return_output=True)
+
+    print(fileStatus)
     if fileStatus is not "":
+        #assert False, ("Getting in here at least.....")
         fileStatus = fileStatus.rstrip()
         if filepath in fileStatus:
             # sendCommand = "ls -ltr " + fileStatus + " | awk \'FNR == 1 {print$5}\'"
@@ -1041,9 +1078,9 @@ def checkFileHash(filename, filepath):
             print("File status: %s" % fileStatus)
             return fileHash
 
-    else:
-        pass
-    # assert False, "Attempt to check File Hash is unsuccessful."
+    # else:
+    #     pass
+    assert False, "Attempt to check File Hash is unsuccessful."
 
 def profileESRSResponseTimes(payLoad):
     messageReqHeader = {'__TypeId__': 'com.dell.cpsd.prepositioning.downloader.file.download.request'}
@@ -1206,10 +1243,10 @@ def test_downloadFWFileRequest11():
 def test_verifyConsumedAttributes11():
     verifyConsumedAttributes("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE", path + 'sasDownloadFWRequest.json', path + 'sasDownloadFWCredentials.json',
                              path + 'sasDownloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
-
-# # # # #
-# # # # # RCM/3.2.3/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE
-# # # # #
+#
+# # # # # #
+# # # # # # RCM/3.2.3/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE
+# # # # # #
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti12():
     downloadFWFileMulti(message, messageSec, messageSas2, 'multiDownloadFWRequest.json',
@@ -1226,7 +1263,7 @@ def test_verifyMultiConsumedAttributes12():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti13():
-    downloadFWFileMulti(message, messageSec, messageThird, 'secMultiDownloadFWRequest.json',
+    downloadFWFileMulti(message, messageSec, message, 'secMultiDownloadFWRequest.json',
                         'secMultiDownloadFWCredentials.json', 'secMultiDownloadFWResponse.json', "BIOS_PFWCY_WN64_2.2.5.EXE", 24992920, "DAS_Cache_Linux_1.zip", 109300)
 
 @pytest.mark.rcm_fitness_mvp_extended
@@ -1237,7 +1274,7 @@ def test_verifyMultiPublishedAttributes13():
 def test_verifyMultiConsumedAttributes13():
     verifyMultiConsumedAttributes(path + 'secMultiDownloadFWRequest.json', path + 'secMultiDownloadFWCredentials.json',
                                   path + 'secMultiDownloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
-# # # #
+# # #
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequest14():
@@ -1271,7 +1308,7 @@ def test_downloadFWFileRequest16():
 def test_verifyMultiConsumedAttributes16():
     verifyMultiConsumedAttributes(path + 'downloadAllEsxiFWRequest.json', path + 'downloadAllEsxiFWCredentials.json',
                              path + 'downloadAllEsxiFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
-
-@pytest.mark.rcm_fitness_mvp_extended
-def test_profileESRSResponseTimes17():
-    profileESRSResponseTimes(message)
+#
+# @pytest.mark.rcm_fitness_mvp_extended
+# def test_profileESRSResponseTimes17():
+#     profileESRSResponseTimes(message)
