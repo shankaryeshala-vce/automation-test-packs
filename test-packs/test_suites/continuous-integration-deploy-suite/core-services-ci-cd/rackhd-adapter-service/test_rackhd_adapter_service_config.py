@@ -287,8 +287,7 @@ def test_rackHD_adapter_full_ListCapabilities():
     originalcorrelationID = 'capability-registry-list-rackhd-adapter-corID'
     the_payload = '{}'
 
-    af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
-                                         rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+    af_support_tools.           rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
                                          exchange='exchange.dell.cpsd.hdp.capability.registry.request',
                                          routing_key='dell.cpsd.hdp.capability.registry.request',
                                          headers={
@@ -296,6 +295,7 @@ def test_rackHD_adapter_full_ListCapabilities():
                                          payload=the_payload,
                                          payload_type='json',
                                          correlation_id={originalcorrelationID}, ssl_enabled=cpsd.props.rmq_ssl_enabled)
+    rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
 
     # Wait for and consume the Capability Response Message
     assert waitForMsg('test.capability.registry.response'), 'Error: No List Capability Responce message received'
