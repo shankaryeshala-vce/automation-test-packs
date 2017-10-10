@@ -328,7 +328,7 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
         print("File 1")
         checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
         print(checkDisk)
-        if timeout > 60:
+        if timeout > 200:
             assert False, "ERROR: Download attempt doesn't appear to have completed in a timely manner."
         #return
     #return
@@ -340,7 +340,7 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
         print("File 2")
         checkDisk2 = checkWritesComplete(filename2, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
         print(checkDisk2)
-        if timeout > 60:
+        if timeout > 200:
             assert False, "ERROR: Download attempt doesn't appear to have completed in a timely manner."
 
     while q_len < 3:
@@ -1308,7 +1308,7 @@ def test_downloadFWFileRequest16():
 def test_verifyMultiConsumedAttributes16():
     verifyMultiConsumedAttributes(path + 'downloadAllEsxiFWRequest.json', path + 'downloadAllEsxiFWCredentials.json',
                              path + 'downloadAllEsxiFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
-#
-# @pytest.mark.rcm_fitness_mvp_extended
-# def test_profileESRSResponseTimes17():
-#     profileESRSResponseTimes(message)
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_profileESRSResponseTimes17():
+    profileESRSResponseTimes(message)
