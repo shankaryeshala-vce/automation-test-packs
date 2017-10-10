@@ -319,27 +319,27 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
     print("Three file download requests published.")
 
     time.sleep(5)
-    # return
+
     checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
-    print(checkDisk)
+
     while checkDisk < expectedDiskSize:
-        timeout += 5
-        time.sleep(1)
+        timeout += 1
+        time.sleep(5)
         print("File 1")
         checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
-        print(checkDisk)
+
         if timeout > 200:
             assert False, "ERROR: Download attempt doesn't appear to have completed in a timely manner."
-        #return
-    #return
+
     checkDisk2 = checkWritesComplete(filename2, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
-    print(checkDisk2)
+
+    timeout = 0
     while checkDisk2 < expectedDiskSize2:
         timeout += 1
         time.sleep(5)
         print("File 2")
         checkDisk2 = checkWritesComplete(filename2, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
-        print(checkDisk2)
+
         if timeout > 200:
             assert False, "ERROR: Download attempt doesn't appear to have completed in a timely manner."
 
@@ -351,7 +351,6 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
                                                            rmq_username=rmq_username, rmq_password=rmq_username,
                                                            queue='testCredentialsResponse', ssl_enabled=False)
 
-        # If the test queue doesn't get a message them something is wrong. Time out needs to be high as msg can take 3+ minutes
         if timeout > 60:
             print("ERROR: ESRS Credential response took too long to return.")
             break
@@ -505,10 +504,6 @@ def verifyConsumedAttributes(filename, requestFile, credentialsFile, responseFil
 
     size = checkFileSize(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
     hash = checkFileHash(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
-    # sizeMD5 = checkFileSize("VMW-ESX-6.0.0-lsi_mr3-6.903.85.00_MR-3818071.zip.md5",
-    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
-    # sizeRAID = checkFileSize("VMW-ESX-6.0.0-lsi_mr3-6.903.85.00_MR-3818071.zip",
-    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
 
     maxCount = len(data)
     maxCreds = len(dataCredentials)
@@ -652,15 +647,6 @@ def verifyMultiConsumedAttributes(requestFile, credentialsFile, responseFile, ha
     print("Credential count: %d" % len(dataCredentials))
     print("Response count: %d" % len(data))
 
-    # sizeBIOS = checkFileSize(filename,
-    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
-    # sizeDAS = checkFileSize(secFilename,
-    #                         "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
-    # assert False, "Exiting...."
-    # sizeSAS = checkFileSize(thirdFilename,
-    #                          "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
-
-
     print("Total messages consumed: %d" % len(data))
     # assert False, "Exiting...."
     # assert False, "Exiting...."
@@ -773,16 +759,12 @@ def verifyMultiConsumedAttributes(requestFile, credentialsFile, responseFile, ha
                                 assert dataCredentials[credCount]["hashType"] == hashType, "Incorrect hashType detailed."
                                 print("3.3")
                                 print("Response attributes match those defined in request.")
-                                # print("Downloaded BIOS file size: %s" % sizeBIOS)
-                                # print("Downloaded ZIP file size: %s" % sizeDAS)
-                                # print("Downloaded SAS file size: %s" % sizeSAS)
+
                                 return
                         # respC += 1
                     credCount += 1
 
         count += 1
-
-        #return
 
     assert False, "Consumed response messages not complete."
 
