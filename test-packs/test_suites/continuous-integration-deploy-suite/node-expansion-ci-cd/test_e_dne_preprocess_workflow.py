@@ -32,7 +32,7 @@ def load_test_data():
     global env_file
     env_file = 'env.ini'
 
-    # Test VM Details
+    # ~~~~~~~~Test VM Details
     global ipaddress
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
 
@@ -43,7 +43,8 @@ def load_test_data():
     global cli_password
     cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS',
                                                              property='password')
-    # Common API details
+
+    #  ~~~~~~~~ Common API details
     global headers
     headers = {'Content-Type': 'application/json'}
 
@@ -57,7 +58,7 @@ def load_test_data():
     my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/setup_config.properties'
     af_support_tools.set_config_file_property_by_data_file(my_data_file)
 
-    # RackHD VM IP & Creds details
+    # ~~~~~~~~ .ini file and header details
     global setup_config_file
     setup_config_file = 'continuous-integration-deploy-suite/setup_config.ini'
 
@@ -89,6 +90,25 @@ def load_test_data():
     rackHD_cli_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                                     heading=setup_config_header,
                                                                     property='rackhd_cli_password')
+
+    # ~~~~~~~~Customer VCenter Details
+    global vcenter_IP
+    vcenter_IP = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                           heading=setup_config_header,
+                                                           property='vcenter_dne_ipaddress_scaleio')
+
+    global vcenter_username
+    vcenter_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                 heading=setup_config_header,
+                                                                 property='vcenter_username')
+
+    global vcenter_password
+    vcenter_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                 heading=setup_config_header,
+                                                                 property='vcenter_password_rtp')
+
+    global vcenter_port
+    vcenter_port = '443'
 
     # ~~~~~~~~Test Node IP & Creds Details
     global testNodeMAC
@@ -131,31 +151,10 @@ def load_test_data():
                                                                        heading=setup_config_header,
                                                                        property='idrac_factory_password')
 
-    global vcenter_IP
-    vcenter_IP = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                           heading=setup_config_header,
-                                                           property='vcenter_dne_ipaddress_scaleio')
-
-    global vcenter_port
-    vcenter_port = '443'
-
-    global vcenter_username
-    vcenter_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                 heading=setup_config_header,
-                                                                 property='vcenter_username')
-    global vcenter_password
-    vcenter_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                 heading=setup_config_header,
-                                                                 property='vcenter_password_rtp')
-
-    global serviceName
-    serviceName = 'dell-wsman-obm-service'
-
-
     global esxiManagementGatewayIpAddress
     esxiManagementGatewayIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                       heading=setup_config_header,
-                                                                       property='esxi_management_gateway_ipaddress')
+                                                                               heading=setup_config_header,
+                                                                               property='esxi_management_gateway_ipaddress')
 
     global esxiManagementHostname
     esxiManagementHostname = af_support_tools.get_config_file_property(config_file=setup_config_file,
@@ -164,13 +163,18 @@ def load_test_data():
 
     global esxiManagementIpAddress
     esxiManagementIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                       heading=setup_config_header,
-                                                                       property='esxi_management_ipaddress')
+                                                                        heading=setup_config_header,
+                                                                        property='esxi_management_ipaddress')
 
     global esxiManagementSubnetMask
     esxiManagementSubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                       heading=setup_config_header,
-                                                                       property='esxi_management_subnet_mask')
+                                                                         heading=setup_config_header,
+                                                                         property='esxi_management_subnet_mask')
+
+    global symphonyUuid
+
+    global serviceName
+    serviceName = 'dell-wsman-obm-service'
 
     ####################
 
@@ -190,13 +194,13 @@ def load_test_data():
 
 
 # ######################################################################################
-#@pytest.mark.dne_paqx_parent_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp_extended
 def test_pre_test_verification():
     """
-    Description     :       This is a pre test check list. It checks:
-                                1)
-                                2)
-                                3) Any other checks...
+    Description     : This is a pre test check list. It:
+                        1) Determines the correct IP to use
+                        2) Notes the original boos settings
+                        3) Any other checks...
 
     Parameters      :       none
     Returns         :       None
@@ -209,6 +213,7 @@ def test_pre_test_verification():
     global New_Node
 
     response = os.system("ping -c 1 -w2 " + Alpha_Node['Node_IP'] + " > /dev/null 2>&1")
+
     if response == 0:  # node is alive
         Current_Node = Alpha_Node
         New_Node = Beta_Node
@@ -216,24 +221,11 @@ def test_pre_test_verification():
         Current_Node = Beta_Node
         New_Node = Alpha_Node
 
-    print (New_Node)
-
-    # ####################
-    # # Export the current bios configuration of the node to a temporary file and store the DNE relevant attributes
-    # # These will be used as comparison later
-    # response = get_BIOS_settings(Current_Node)
-    # assert response.status_code == 200, 'Error, pre-test BIOS Configuration export failed '
-    # time.sleep(60)
-    # # 'HddSeq' is one of the attributes that will be changed during the 'Configure Boot Device Idrac' step.
-    # # Here we record it's initial value when exported.
-    # initial_HddSeq_value = get_exported_bios_setting('HddSeq')
-    # initial_BiosBootSeq_value = get_exported_bios_setting('BiosBootSeq')
-    # print('initial_HddSeq_value', initial_HddSeq_value)
-    # print('initial_BiosBootSeq_value', initial_BiosBootSeq_value)
-    # ####################
+    print('\nNode Idrac IP details:')
+    print(New_Node)
 
 
-#@pytest.mark.dne_paqx_parent_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp_extended
 def test_preporcess_POST_workflow():
     """
     Title           :       Verify the POST function on /dne/preprocess API
@@ -246,19 +238,19 @@ def test_preporcess_POST_workflow():
     Pre-requisites  :       The DNE-PAQX has already discovered a node and that it is booted into the micro-kernel
     """
 
-
-    #########################
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Prepare the Request message body with valid details: IP, Gateway, Mask
     assert update_preprocess_params_json(), 'Error: Unable to update the POST message body'
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    #########################
-
+    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     print('\nSend POST /dne/nodes REST API call to provision an unallocated node...\n')
     global preprocess_workflow_id  # set this value as global as it will be used in the next test.
 
     endpoint = '/dne/preprocess'
     url_body = protocol + ipaddress + dne_port + endpoint
 
+    # Get & Read the message body from the fixture
     filePath = os.environ[
                    'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_preprocess.json'
     with open(filePath) as fixture:
@@ -270,7 +262,7 @@ def test_preporcess_POST_workflow():
         data = response.json()
 
         preprocess_workflow_id = data['workflowId']
-        print ('WorkflowID: ', preprocess_workflow_id)
+        print('WorkflowID: ', preprocess_workflow_id)
 
         error_list = []
 
@@ -285,7 +277,7 @@ def test_preporcess_POST_workflow():
 
         assert not error_list, 'Error: missing fields from dne/preprocess response'
 
-        print('Valid /dne/preprocess request has been sent')
+        print('Valid /dne/preprocess POST request has been sent')
         time.sleep(2)
 
     except Exception as err:
@@ -295,7 +287,7 @@ def test_preporcess_POST_workflow():
 
 
 #@pytest.mark.skip(reason="Test not ready")
-#@pytest.mark.dne_paqx_parent_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp_extended
 def test_preprocess_GET_workflow_status():
     """
     Title           :       Verify the GET function on /dne/preprocess/<jobId> API
@@ -312,24 +304,22 @@ def test_preprocess_GET_workflow_status():
 
     print("\n\nGET /dne/preprocess/<jobId> REST API call to get the nodes job status...\n")
     workflow_status = ''
-    #preprocess_workflow_id =''
+    # preprocess_workflow_id =''    # This is used for test purposes
     json_number = 0
 
-    workflow_step1 = 'Finding discovered Nodes'
-    # workflow_step2 = 'List ScaleIO Components'
-    workflow_step3 = 'List VCenter Components'
-    #workflow_step4 = 'Discover ScaleIO'
-    workflow_step5 = 'Discover VCenter'
-    workflow_step6 = 'Discover Rackhd Node Inventory'
-    workflow_step7 = 'Configuring Out of Band Management'
-    workflow_step8 = 'Ping iDRAC IP Address'
-    # workflow_step9 = 'Find ScaleIO'
-    workflow_step10 = 'Configuring Obm Settings'
-    workflow_step11 = 'Configure Boot Device Idrac'
-    workflow_step12 = 'Configure Pxe boot'
-    workflow_step13 = 'Find vcluster'
-
-
+    #workflow_step1 = 'Finding discovered Nodes'
+    workflow_step1 = 'List ScaleIO Components'
+    workflow_step2 = 'List VCenter Components'
+    workflow_step3 = 'Discover ScaleIO'
+    workflow_step4 = 'Discover VCenter'
+    workflow_step5 = 'Discover Rackhd Node Inventory'
+    workflow_step6 = 'Configuring Out of Band Management'
+    workflow_step7 = 'Ping iDRAC IP Address'
+    workflow_step8 = 'Configuring Obm Settings'
+    workflow_step9 = 'Configure Boot Device Idrac'
+    #workflow_step10 = 'Find ScaleIO'
+    workflow_step11 = 'Find VCluster'
+    workflow_step12 = 'Find ProtectionDomain'
 
     endpoint = '/dne/preprocess/'
     url_body = protocol + ipaddress + dne_port + endpoint + preprocess_workflow_id
@@ -343,92 +333,104 @@ def test_preprocess_GET_workflow_status():
             # If the process has failed immediately then fail the test outright
             assert data['status'] != 'FAILED', 'ERROR: The preprocess workflow overall status = Failed'
 
-
-            # Finding discovered Nodes
-            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step1:
-                check_the_workflow_task(url_body, data, json_number, workflow_step1)
-                assert check_step1_findNode(data, json_number), 'Check on ' + workflow_step1 + ' failed'
-                json_number += 1
-
-            # # List ScaleIO Components
-            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step2:
-            #     check_the_workflow_task(url_body, data, json_number, workflow_step2)
+            # # Finding discovered Nodes
+            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step1:
+            #     check_the_workflow_task(url_body, data, json_number, workflow_step1)
+            #     assert check_step1_findNode(data, json_number), 'Check on ' + workflow_step1 + ' failed'
             #     json_number += 1
 
+            data = get_latest_api_response(url_body)
+
+            # List ScaleIO Components
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step1:
+                check_the_workflow_task(url_body, data, json_number, workflow_step1)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
             # List VCenter Components
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step2:
+                check_the_workflow_task(url_body, data, json_number, workflow_step2)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # Discover ScaleIO
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step3:
                 check_the_workflow_task(url_body, data, json_number, workflow_step3)
                 json_number += 1
 
-            # # Discover ScaleIO
-            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step4:
-            #     check_the_workflow_task(url_body, data, json_number, workflow_step4)
-            #     json_number += 1
+            data = get_latest_api_response(url_body)
 
             # Discover VCenter
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step4:
+                check_the_workflow_task(url_body, data, json_number, workflow_step4)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # Discover Rackhd Node Inventory
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step5:
                 check_the_workflow_task(url_body, data, json_number, workflow_step5)
                 json_number += 1
 
             data = get_latest_api_response(url_body)
 
-            # Discover Rackhd Node Inventory
+            # Configuring Out of Band Management
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step6:
                 check_the_workflow_task(url_body, data, json_number, workflow_step6)
-                json_number += 1
-
-            # Configuring Out of Band Management
-            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step7:
-                check_the_workflow_task(url_body, data, json_number, workflow_step7)
-                # assert check_step7_IPchange(data, json_number), 'Check on ' + workflow_step7 + ' failed'
+                assert check_step6_ConfigIP(data, json_number, url_body), 'Check on ' + workflow_step6 + ' failed'
                 json_number += 1
 
             data = get_latest_api_response(url_body)
 
             # Ping iDRAC IP Address
-            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step8:
-                check_the_workflow_task(url_body, data, json_number, workflow_step8)
-                assert check_step8_PingIP(New_Node), 'Check on ' + workflow_step8 + ' failed'
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step7:
+                check_the_workflow_task(url_body, data, json_number, workflow_step7)
+                assert check_step7_PingIP(), 'Check on ' + workflow_step7 + ' failed'
                 json_number += 1
-
-            # # Find ScaleIO
-            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step9:
-            #     check_the_workflow_task(url_body, data, json_number, workflow_step9)
-            #     assert check_step9_FindScaleIO(data), 'Check on ' + workflow_step9 + ' failed'
-            #     json_number += 1
 
             data = get_latest_api_response(url_body)
 
             # Configuring Obm Settings
-            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
-                check_the_workflow_task(url_body, data, json_number, workflow_step10)
-                json_number += 1
-
-            # Configure Boot Device Idrac
-            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step11:
-                check_the_workflow_task(url_body, data, json_number, workflow_step11)
-                assert check_step11_biosChange(New_Node), 'Check on ' + workflow_step11 + ' failed'
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step8:
+                check_the_workflow_task(url_body, data, json_number, workflow_step8)
                 json_number += 1
 
             data = get_latest_api_response(url_body)
 
-            # Configure PXE Boot
+            # Configure Boot Device Idrac
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step9:
+                check_the_workflow_task(url_body, data, json_number, workflow_step9)
+                assert check_step9_biosChange(), 'Check on ' + workflow_step9 + ' failed'
+                json_number += 1
+
+                #data = get_latest_api_response(url_body)
+
+                # Find ScaleIO
+                #if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
+                #   check_the_workflow_task(url_body, data, json_number, workflow_step10)
+                #assert check_step9_FindScaleIO(data), 'Check on ' + workflow_step10 + ' failed'
+                #  json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # Find vcluster
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step11:
+                check_the_workflow_task(url_body, data, json_number, workflow_step11)
+                assert check_step11_findVcluster(data), 'Check on ' + workflow_step11 + ' failed'
+                json_number += 1
+
+            # Find Protection Domain
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step12:
                 check_the_workflow_task(url_body, data, json_number, workflow_step12)
                 json_number += 1
-
-            # Find vcluster
-            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step13:
-                check_the_workflow_task(url_body, data, json_number, workflow_step13)
-                assert check_step13_findVcluster(data), 'Check on ' + workflow_step13 + ' failed'
-                json_number += 1
-
 
             ######################### Done
 
             workflow_status = data['status']
 
-            print('Valid /dne/nodes/{jobId} status returned')
+            print('\nPreprocess Workflow Completed Successfully')
 
         # Error check the response
         except Exception as err:
@@ -459,7 +461,6 @@ def update_preprocess_params_json():
     Returns:        0 or 1 (Boolean)
     """
 
-    global symphonyUuid
     symphonyUuid = get_SymphonyUuid_of_discovered_node()
 
     filePath = os.environ[
@@ -476,13 +477,15 @@ def update_preprocess_params_json():
     data['esxiManagementHostname'] = esxiManagementHostname
     data['esxiManagementIpAddress'] = esxiManagementIpAddress
     data['esxiManagementSubnetMask'] = esxiManagementSubnetMask
+    data['esxiManagementGatewayIpAddress'] = esxiManagementGatewayIpAddress
     data['symphonyUuid'] = symphonyUuid
-    data['serviceName'] = serviceName
+
 
     with open(filePath, 'w') as outfile:
         json.dump(data, outfile)
 
-    print (data)
+    print('\nPreProcess POST message body:')
+    print(data)
 
     return 1
 
@@ -514,30 +517,19 @@ def check_the_workflow_task(url_body, data, json_number, workflow_step):
                 break
 
             if data['workflowTasksResponseList'][json_number]['workFlowTaskStatus'] == 'FAILED':
-                print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                print (data['workflowTasksResponseList'][json_number]['errors'])
+                print('(Note: Task took', timeout, 'seconds to fail)\n')
+                print(data['workflowTasksResponseList'][json_number]['errors'])
                 assert data['workflowTasksResponseList'][json_number][
                            'workFlowTaskStatus'] != 'FAILED', 'Error in Step 1: ' + workflow_step + ' failed'
                 # If the task has failed then fail the entire test.
 
 
-#Functions to check the steps of the workflow actually did something ###########
-# Check that a node was discovered
-def check_step1_findNode(data, json_num):
-    node_status = data['workflowTasksResponseList'][json_num]['results']['nodeStatus']
-    # assert node_status == 'DISCOVERED', 'Error, node not discovered'
-
-    if node_status == 'DISCOVERED':
-        print('Node is available in a DISCOVERED State')
-        return 1
-    else:
-        return 0
-
+# Functions to check the steps of the workflow actually did something ###########
 
 # Check the new IP address is returned in the results
-def check_step7_IPchange(data, json_num):
-    ip = New_Node['Node_IP']
-
+def check_step6_ConfigIP(data, json_num, url_body):
+    time.sleep(3)
+    data = get_latest_api_response(url_body)
     error_list = []
     if data['workflowTasksResponseList'][json_num]['workFlowTaskName'] == 'Configuring Out of Band Management':
         if data['workflowTasksResponseList'][json_num]['results']['idracIpAddress'] != New_Node['Node_IP']:
@@ -557,11 +549,13 @@ def check_step7_IPchange(data, json_num):
 
 
 # Check we can ping the new IP address
-def check_step8_PingIP(New_Node):
+def check_step7_PingIP():
     # Contact the new IP address and check the network settings
     error_list = []
+
     ipaddres = New_Node['Node_IP']
-    sendCommand = 'ping '+ipaddres+ ' -c 2'
+
+    sendCommand = 'ping ' + ipaddres + ' -c 2'
 
     my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
                                                          command=sendCommand, return_output=True)
@@ -572,13 +566,13 @@ def check_step8_PingIP(New_Node):
         error_list.append('Error : System not pining')
         return 0
     else:
-        print ('System is pinging')
+        print('System is pinging')
         return 1
 
 
 # Check that ScaleIO data (volumes ...) is returned
 def check_step9_FindScaleIO(data):
-    #TODO this needs to be expanded to valiadte at source.
+    # TODO this needs to be expanded to valiadte at source.
     error_list = []
     for step in data['workflowTasksResponseList']:
         if step['workFlowTaskName'] == 'Find ScaleIO':
@@ -592,7 +586,7 @@ def check_step9_FindScaleIO(data):
 
 
 # Check the bios setting has changed.
-def check_step11_biosChange(New_Node):
+def check_step9_biosChange():
     # export the bios configuration again and check the DNE relevant attributes have been updated
     response = get_BIOS_settings(New_Node)
     assert response.status_code == 200, 'Error, '
@@ -601,20 +595,21 @@ def check_step11_biosChange(New_Node):
 
     error_list = []
 
-    if updated_HddSeq_value != "Disk.SATAEmbedded.D-1,RAID.Integrated.1-1":
+    if 'Disk.SATAEmbedded.D-1, NonRAID.Integrated.1-1' not in updated_HddSeq_value:
         error_list.append('Error : The new HddSeq value is not correct')
 
-    if updated_BiosBootSeq_value != "HardDisk.List.1-1,NIC.Integrated.1-1-1":
+    if 'NIC.Integrated.1-1-1, HardDisk.List.1-1' not in updated_BiosBootSeq_value:
         error_list.append('Error : The new BiosBootSeq value is not correct')
 
     if error_list == []:
+        print('Bios Settings are verified')
         return 1
     else:
         return 0
 
 
 # Check the cluster retunred is retunred from source also
-def check_step13_findVcluster(data):
+def check_step11_findVcluster(data):
     actualvCenterClusterList = getRealVcenterInfo()
 
     error_list = []
@@ -633,10 +628,10 @@ def check_step13_findVcluster(data):
     else:
         return 0
 
+
 ######## Supporting Function to get the symphonyUuid of the discovered node ############
 
 def get_SymphonyUuid_of_discovered_node():
-
     endpoint = '/dne/nodes'
     url_body = protocol + ipaddress + dne_port + endpoint
     response = requests.get(url_body)
@@ -644,7 +639,7 @@ def get_SymphonyUuid_of_discovered_node():
     assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
     data = response.json()
 
-    global symphonyUuid
+    #global symphonyUuid
     symphonyUuid = data[0]['symphonyUuid']
 
     return symphonyUuid
@@ -664,7 +659,7 @@ def get_BIOS_settings(Node):
                 "serverPassword": "' + Node['Node_Pass'] + '", \
                 "serverUsername": "' + Node['Node_User'] + '", \
                 "shareAddress": "' + rackHD_IP + '", \
-                "shareName": "/opt/dell/public", \
+                "shareName": "/opt/dell/public/write", \
                 "shareType": 0, \
                 "shutdownType": 0}'
 
@@ -680,9 +675,8 @@ def get_BIOS_settings(Node):
 
 
 def get_exported_bios_setting(attribute):
-    # check if the ipmitool is installed. this tool is used to communicate with the iDRAC
-    grepCommand = 'grep "Name="\"' + attribute + '\"" /opt/dell/public/tempExport.xml \
-                         | cut -f 2 -d ">" | cut -f 1 -d "<" '
+
+    grepCommand = 'cat /opt/dell/public/write/tempExport.xml | grep ' + attribute
 
     returnedAttributeValue = af_support_tools.send_ssh_command(
         host=rackHD_IP,
@@ -692,84 +686,6 @@ def get_exported_bios_setting(attribute):
         return_output=True)
 
     return returnedAttributeValue
-
-
-######## Supporting Functions ##########
-
-def get_network_settings_from_iDRAC(node):
-    """ Access the iDRAC of a node via the ipmitool and return the network settings currently configured.
-        Paramters : 'node' is a dictionary containing network settings for a node
-        eg. node = {'Node_IP':'10.1.10.1',
-                'Node_User':'root',
-                'Node_Pass':'password',
-                'Node_GW':'10.1.10.225',
-                'Node_Mask':'255.255.255.224'}
-
-        Returned : A dictionary with the following key/value pairs as retrieved from the iDRAC :
-        'IP Address' , 'Subnet Mask' and 'Default Gateway IP'     """
-
-    # The 'ipmitool' is used to query the iDRAC. It may need installing on the test VM.
-    check_for_and_install_ipmitool()
-
-    # create the command to query the iDRAC network settings
-    commandGetSettings = " ipmitool -I lanplus -H " + node['Node_IP'] + " -U " + node['Node_User'] + " -P " + node[
-        'Node_Pass'] + " lan print 1"
-
-    # ssh onto the test VM and run the ipmitool qury from there
-    network_settings = af_support_tools.send_ssh_command(
-        host=ipaddress,
-        username=cli_username,
-        password=cli_password,
-        command=commandGetSettings,
-        return_output=True)
-
-    # create a dictionary containing just the settings we are interested in
-    dictAttributes = {}
-    # the returned data is one big long string. Split it before processing
-    tempArray = network_settings.splitlines(True)
-
-    # extract the network settings we are interested in
-    for line in tempArray:
-        if 'IP Address' in line or 'Subnet Mask' in line or 'Default Gateway IP' in line:
-            (key, val) = line.split(':')
-            dictAttributes[(key.strip())] = val.strip()
-
-    return dictAttributes
-
-
-def check_for_and_install_ipmitool():
-    # check if the ipmitool is installed. this tool is used to communicate with the iDRAC
-    commandCheckForIPMITOOL = "yum list installed | grep ipmitool"
-
-    ipmitool_Installed = af_support_tools.send_ssh_command(
-        host=ipaddress,
-        username=cli_username,
-        password=cli_password,
-        command=commandCheckForIPMITOOL,
-        return_output=True)
-
-    # install the ipmitool if it is not already installed
-    if not ipmitool_Installed:
-        commandInstallIPMITOOL = "yum -y install ipmitool"
-        ipmitool_Installed = af_support_tools.send_ssh_command(
-            host=ipaddress,
-            username=cli_username,
-            password=cli_password,
-            command=commandInstallIPMITOOL,
-            return_output=True)
-
-
-def rebootIDRAC(Node):
-    commandReboot = " ipmitool -I lanplus -H " + Node['Node_IP'] + " -U " + Node['Node_User'] + " -P " + Node[
-        'Node_Pass'] + " chassis power reset"
-    network_settings = af_support_tools.send_ssh_command(
-        host=rackHD_IP,
-        username=rackHD_cli_username,
-        password=rackHD_cli_password,
-        command=commandReboot,
-        return_output=True)
-
-
 
 
 ######## Supporting Functions for Vcenter ##########
@@ -804,7 +720,7 @@ def getRealVcenterInfo():
     clusterList = []
 
     for cluster_obj in get_obj(content, vim.ComputeResource):
-        #cluster = {'name': (cluster_obj.name), 'numberOfHosts': (len(cluster_obj.host))}
+        # cluster = {'name': (cluster_obj.name), 'numberOfHosts': (len(cluster_obj.host))}
         cluster = (cluster_obj.name)
         clusterList.append(cluster)
 
@@ -885,8 +801,8 @@ def test_GETjobid_using_invalid_jobid(endpoint):
 
 
 @pytest.mark.parametrize('endpoint', [('/dne/preprocess/')])
-# @pytest.mark.dne_paqx_parent_mvp
-# @pytest.mark.dne_paqx_parent_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
 def test_GETjobid_using_valid_but_incorrect_jobid(endpoint):
     """
     Title           :       Verify the dne REST API handles valid, but incorrect, job-id's correctly
