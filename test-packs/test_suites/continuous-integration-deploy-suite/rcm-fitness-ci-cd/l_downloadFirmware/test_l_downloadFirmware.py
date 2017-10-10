@@ -1308,7 +1308,7 @@ def test_downloadFWFileRequest16():
 def test_verifyMultiConsumedAttributes16():
     verifyMultiConsumedAttributes(path + 'downloadAllEsxiFWRequest.json', path + 'downloadAllEsxiFWCredentials.json',
                              path + 'downloadAllEsxiFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
-#
-# @pytest.mark.rcm_fitness_mvp_extended
-# def test_profileESRSResponseTimes17():
-#     profileESRSResponseTimes(message)
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_profileESRSResponseTimes17():
+    profileESRSResponseTimes(message)
