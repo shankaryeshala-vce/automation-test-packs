@@ -328,7 +328,7 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
         print("File 1")
         checkDisk = checkWritesComplete(filename, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
         print(checkDisk)
-        if timeout > 60:
+        if timeout > 200:
             assert False, "ERROR: Download attempt doesn't appear to have completed in a timely manner."
         #return
     #return
@@ -340,7 +340,7 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
         print("File 2")
         checkDisk2 = checkWritesComplete(filename2, "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
         print(checkDisk2)
-        if timeout > 60:
+        if timeout > 200:
             assert False, "ERROR: Download attempt doesn't appear to have completed in a timely manner."
 
     while q_len < 3:
