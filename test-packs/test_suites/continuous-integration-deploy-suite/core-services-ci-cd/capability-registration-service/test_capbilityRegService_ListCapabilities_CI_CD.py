@@ -53,6 +53,7 @@ def load_test_data():
     ('coprhd-adapter', 'coprhd-consul-register'),
     ('endpoint-registry', 'endpoint-registry-lookup'),
     ('scaleio-adapter', 'scaleio-consul-register')])
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_ListCapabilities_core_1(param_providerName, param_capabilities1):
@@ -95,6 +96,7 @@ def test_capabilityRegistry_ListCapabilities_core_1(param_providerName, param_ca
 @pytest.mark.parametrize('param_providerName, param_capabilities1, param_capabilities2', [
     ('poweredge-compute-data-provider', 'device-data-discovery', 'device-endpoint-validation'),
     ('vcenter-compute-data-provider', 'device-data-discovery', 'device-endpoint-validation')])
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_capabilityRegistry_ListCapabilities_core_2(param_providerName, param_capabilities1, param_capabilities2):
@@ -139,6 +141,7 @@ def test_capabilityRegistry_ListCapabilities_core_2(param_providerName, param_ca
 
 @pytest.mark.parametrize('param_providerName, param_capabilities1, param_capabilities2', [
     ('node-discovery-paqx', 'list-discovered-nodes', 'manage-node-allocation')])
+@pytest.mark.daily_status
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_capabilityRegistry_ListCapabilities_dne_2(param_providerName, param_capabilities1, param_capabilities2):

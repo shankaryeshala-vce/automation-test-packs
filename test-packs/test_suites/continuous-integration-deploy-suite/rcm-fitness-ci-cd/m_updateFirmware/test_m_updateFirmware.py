@@ -95,8 +95,8 @@ def load_test_data():
 
     getSystemDefinition()
     registerRackHD(message_rackHD, "out_registerRackHDResp.json")
-    # time.sleep(2)
-    # registerVcenter(message_vcenter, "out_registerVcenterResp.json")
+    time.sleep(2)
+    registerVcenter(message_vcenter, "out_registerVcenterResp.json")
 
 def ensurePathExists(dir):
     if not os.path.exists(dir):
@@ -206,7 +206,7 @@ def registerRackHD(payLoad, responseRegRackHD):
                                                                         ssl_enabled=False)
     af_support_tools.rmq_payload_to_file(my_response_credentials_body, path + responseRegRackHD)
     print("\nRegister response consumed.")
-    data_RackHD = open(responseRegRackHD, 'rU')
+    data_RackHD = open(path + responseRegRackHD, 'rU')
     dataRackHD = json.load(data_RackHD)
 
     af_support_tools.rmq_purge_queue(host=host, port=port, rmq_username=rmq_username, rmq_password=rmq_username,
@@ -248,7 +248,7 @@ def registerVcenter(payLoad, responseRegVcenter):
                                     routing_key='#', ssl_enabled=False)
 
     af_support_tools.rmq_publish_message(host=host, port=port, rmq_username=rmq_username, rmq_password=rmq_username,
-                                         exchange="exchange.cpsd.controlplane.vcenter.request",
+                                         exchange="exchange.dell.cpsd.controlplane.vcenter.request",
                                          routing_key="controlplane.hypervisor.vcenter.endpoint.register",
                                          headers=messageReqHeader, payload=payLoad, payload_type='json',
                                          ssl_enabled=False)
@@ -263,7 +263,7 @@ def registerVcenter(payLoad, responseRegVcenter):
                                                                         ssl_enabled=False)
     af_support_tools.rmq_payload_to_file(my_response_credentials_body, path + responseRegVcenter)
     print("\nRegister response consumed.")
-    data_Vcenter = open(responseRegVcenter, 'rU')
+    data_Vcenter = open(path + responseRegVcenter, 'rU')
     dataVcenter = json.load(data_Vcenter)
 
     af_support_tools.rmq_purge_queue(host=host, port=port, rmq_username=rmq_username, rmq_password=rmq_username,
@@ -891,33 +891,33 @@ def test_updateFWRequest():
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifyPublishedAttributes():
-    verifyPublishedAttributes("out_updateRequest.json")
+    verifyPublishedAttributes(path + "out_updateRequest.json")
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifyConsumedAttributes():
-    verifyConsumedAttributes("out_updateRequest.json", "out_updateResponse.json")
+    verifyConsumedAttributes(path + "out_updateRequest.json", path + "out_updateResponse.json")
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifySystemDefRequest():
-    verifySystemDefRequest("out_systemDefReq.json", "VXRACKFLEX")
+    verifySystemDefRequest(path + "out_systemDefReq.json", "VXRACKFLEX")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifySystemDefResponse():
-    verifySystemDefResponse("out_systemDefResp.json", "VXRACKFLEX")
+    verifySystemDefResponse(path + "out_systemDefResp.json", "VXRACKFLEX")
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifyCredentialRequest():
-    verifyCredentialRequest("out_updateRequest.json", "out_requestCreds.json", "RACKHD")
+    verifyCredentialRequest(path + "out_updateRequest.json", path + "out_requestCreds.json", "RACKHD")
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifyCredentialResponse():
-    verifyCredentialResponse("out_updateRequest.json", "out_requestCreds.json", "out_responseCreds.json", "RACKHD")
+    verifyCredentialResponse(path + "out_updateRequest.json", path +  "out_requestCreds.json", path + "out_responseCreds.json", "RACKHD")
 
 
 @pytest.mark.rcm_fitness_mvp_extended

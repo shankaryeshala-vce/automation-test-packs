@@ -11,71 +11,55 @@ import af_support_tools
 import pytest
 import json
 import random
-import time
+from conftest import JsonMessage
+
 
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
     # Set config ini file name
     global config_file
     config_file = 'continuous-integration-deploy-suite/identity_service.ini'
-    global env_file
-    env_file = 'env.ini'
-
-    # Set Vars
-    global ipaddress
-    ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-    global user
-    user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
-    global password
-    password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
 
     global identifyelement
-    identifyelement = af_support_tools.get_config_file_property(config_file=config_file, heading='identity_service_payloads', property='identifyelement')
+    identifyelement = af_support_tools.get_config_file_property(config_file=config_file,
+                                                                heading='identity_service_payloads',
+                                                                property='identifyelement')
 
-    global rmq_username
-    rmq_username = 'guest'
-    global rmq_password
-    rmq_password = 'guest'
 
 ##############################################################################################
 
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_ident_status():
-    print('\nRunning Identity Status test on system: ', ipaddress)
+def test_ident_status(hostConnection):
+    print('\nRunning Identity Status test on system: ', hostConnection.ipAddress)
     status_command = 'docker ps | grep identity-service'
-    status = af_support_tools.send_ssh_command(host=ipaddress, username=user, password=password,
+    status = af_support_tools.send_ssh_command(host=hostConnection.ipAddress, username=hostConnection.username,
+                                               password=hostConnection.password,
                                                command=status_command, return_output=True)
     assert "Up" in status, "Identity Service not Running"
     print("Identity Service Running")
-    # Cleanup Any old Queues Before main testing starts
-    cleanup()
 
+
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_identify_element():
-    cleanup()
-    bind_queues()
+def test_identify_element(rabbitMq):
+    bind_queues(rabbitMq)
     identified_errors = []
     global elementUuid
 
     print('Sending Identify Element Message\n')
-    # Publish the message
-    af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username,
-                                         rmq_password=rmq_password,
-                                         exchange='exchange.dell.cpsd.eids.identity.request',
-                                         routing_key='dell.cpsd.eids.identity.request',
-                                         headers={'__TypeId__': 'dell.cpsd.core.identity.identify.element'},
-                                         payload=identifyelement,
-                                         payload_type='json')
 
-    assert waitForMsg('test.identity.request'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.identity.request')
+    headers = {'__TypeId__': 'dell.cpsd.core.identity.identify.element'}
+    json_message = JsonMessage(headers, identifyelement);
+    rabbitMq.publish_message(exchange='exchange.dell.cpsd.eids.identity.request',
+                             routing_key='dell.cpsd.eids.identity.request',
+                             message=json_message)
+
+    return_json = rabbitMq.consume_message_from_queue('test.identity.request')
 
     published_json = json.loads(identifyelement, encoding='utf-8')
-    return_json = json.loads(return_message, encoding='utf-8')
 
     # Compare the 2 files. If they match the message was successfully published & received to rabbitMQ test queue.
     print("Verifying Message sent to RabbitMQ...")
@@ -85,13 +69,7 @@ def test_identify_element():
     print('\nConsuming Response Message...')
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    assert waitForMsg('test.identity.response'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.identity.response')
-
-    # Convert the returned message to json format and run asserts on the expected output.
-    return_json = json.loads(return_message, encoding='utf-8')
+    return_json = rabbitMq.consume_message_from_queue('test.identity.response')
 
     # Verify the response message has the expected format & parameters
     print("Checking Response Message attributes...")
@@ -117,33 +95,27 @@ def test_identify_element():
     print('TEST: All requested CorrelationUuid have had elementUuid values returned: PASSED')
     print('\n*******************************************************')
 
+
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-def test_describe_element():
-    cleanup()
-    bind_queues()
+def test_describe_element(rabbitMq):
+    bind_queues(rabbitMq)
     describe_errors = []
 
     # Define Describe message using elementUuid from previous test
     describeelement = '{"timestamp":"2017-01-27T14:51:00.570Z","correlationId":"5d7f6d34-4271-4593-9bad-1b95589e5189","reply-to":"dell.cpsd.eids.identity.request.hal.gouldc-mint","elementUuids":["' + elementUuid + '"]}'
     print("Sending Describe Element for elementUUID: {}...".format(elementUuid))
 
-    # Publish the message
-    af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username,
-                                         rmq_password=rmq_password,
-                                         exchange='exchange.dell.cpsd.eids.identity.request',
-                                         routing_key='dell.cpsd.eids.identity.request',
-                                         headers={'__TypeId__': 'dell.cpsd.core.identity.describe.element'},
-                                         payload=describeelement,
-                                         payload_type='json')
+    headers = {'__TypeId__': 'dell.cpsd.core.identity.describe.element'}
+    json_message = JsonMessage(headers, describeelement);
+    rabbitMq.publish_message(exchange='exchange.dell.cpsd.eids.identity.request',
+                             routing_key='dell.cpsd.eids.identity.request',
+                             message=json_message)
 
-    assert waitForMsg('test.identity.request'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.identity.request')
+    return_json = rabbitMq.consume_message_from_queue('test.identity.request')
 
     published_json = json.loads(describeelement, encoding='utf-8')
-    return_json = json.loads(return_message, encoding='utf-8')
 
     # Compare the 2 files. If they match the message was successfully published & received.
     print("Verifying Message sent to RabbitMQ...")
@@ -153,13 +125,7 @@ def test_describe_element():
     print('\nConsuming Response Message...')
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    assert waitForMsg('test.identity.response'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.identity.response')
-
-    # Convert the returned message to json format and run asserts on the expected output.
-    return_json = json.loads(return_message, encoding='utf-8')
+    return_json = rabbitMq.consume_message_from_queue('test.identity.response')
 
     # Verify the response message has the expected format & parameters
     print("Checking Response Message attributes...")
@@ -182,34 +148,32 @@ def test_describe_element():
     print('TEST: All requested CorrelationUuid have had element description values returned: PASSED')
     print('\n*******************************************************')
 
+
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
-@pytest.mark.parametrize('my_test_type', ['keyaccuracyid_abc', 'keyaccuracyid_ab', 'keyaccuracyid_ac', 'keyaccuracyid_neg'])
-def test_key_accuracy(my_test_type):
-    cleanup()
-    bind_queues()
+@pytest.mark.parametrize('my_test_type',
+                         ['keyaccuracyid_abc', 'keyaccuracyid_ab', 'keyaccuracyid_ac', 'keyaccuracyid_neg'])
+def test_key_accuracy(my_test_type, rabbitMq):
+    bind_queues(rabbitMq)
     accuracy_errors = []
     global assigned_uuid
 
-    payload_message = af_support_tools.get_config_file_property(config_file=config_file, heading='identity_service_payloads', property=my_test_type)
+    payload_message = af_support_tools.get_config_file_property(config_file=config_file,
+                                                                heading='identity_service_payloads',
+                                                                property=my_test_type)
 
     print('Sending Identify Element Key Accuracy Messages\n')
     # Publish the message
-    af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username,
-                                         rmq_password=rmq_password,
-                                         exchange='exchange.dell.cpsd.eids.identity.request',
-                                         routing_key='dell.cpsd.eids.identity.request',
-                                         headers={'__TypeId__': 'dell.cpsd.core.identity.identify.element'},
-                                         payload=payload_message,
-                                         payload_type='json')
+    headers = {'__TypeId__': 'dell.cpsd.core.identity.identify.element'}
+    json_message = JsonMessage(headers, payload_message);
+    rabbitMq.publish_message(exchange='exchange.dell.cpsd.eids.identity.request',
+                             routing_key='dell.cpsd.eids.identity.request',
+                             message=json_message)
 
-    assert waitForMsg('test.identity.request'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.identity.request')
+    return_json = rabbitMq.consume_message_from_queue('test.identity.request')
 
     published_json = json.loads(payload_message, encoding='utf-8')
-    return_json = json.loads(return_message, encoding='utf-8')
 
     # Compare the 2 files. If they match the message was successfully published & received.
     print("Verifying Message sent to RabbitMQ...")
@@ -220,13 +184,7 @@ def test_key_accuracy(my_test_type):
 
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    assert waitForMsg('test.identity.response'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.identity.response')
-
-    # Convert the returned message to json format and run asserts on the expected output.
-    return_json = json.loads(return_message, encoding='utf-8')
+    return_json = rabbitMq.consume_message_from_queue('test.identity.response')
 
     # Verify the response message has the expected format & parameters
     print("Checking Response Message attributes...")
@@ -258,38 +216,37 @@ def test_key_accuracy(my_test_type):
     print('TEST: KeyAccuracy test pass.')
     print('\n*******************************************************')
 
+
+@pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 @pytest.mark.parametrize('my_test_type', ['ident_no_element_type', 'describe_no_element'])
-def test_negative_messages(my_test_type):
-    cleanup()
-    bind_queues()
+def test_negative_messages(my_test_type, rabbitMq):
+    bind_queues(rabbitMq)
     negative_errors = []
 
     if my_test_type == 'describe_no_element':
-        payload_message = af_support_tools.get_config_file_property(config_file=config_file, heading='identity_service_payloads', property='describe_no_element')
-        header = 'dell.cpsd.core.identity.describe.element'
+        payload_message = af_support_tools.get_config_file_property(config_file=config_file,
+                                                                    heading='identity_service_payloads',
+                                                                    property='describe_no_element')
+        headers = {'__TypeId__': 'dell.cpsd.core.identity.describe.element'}
     if my_test_type == 'ident_no_element_type':
-        payload_message = af_support_tools.get_config_file_property(config_file=config_file, heading='identity_service_payloads', property='ident_no_element_type')
-        header = 'dell.cpsd.core.identity.identify.element'
+        payload_message = af_support_tools.get_config_file_property(config_file=config_file,
+                                                                    heading='identity_service_payloads',
+                                                                    property='ident_no_element_type')
+        headers = {'__TypeId__': 'dell.cpsd.core.identity.identify.element'}
+
+    json_message = JsonMessage(headers, payload_message);
 
     # Publish the message
     print('Sending Negative test Messages\n')
-    af_support_tools.rmq_publish_message(host=ipaddress, rmq_username=rmq_username,
-                                         rmq_password=rmq_password,
-                                         exchange='exchange.dell.cpsd.eids.identity.request',
-                                         routing_key='dell.cpsd.eids.identity.request',
-                                         headers={'__TypeId__': header},
-                                         payload=payload_message,
-                                         payload_type='json')
+    rabbitMq.publish_message(exchange='exchange.dell.cpsd.eids.identity.request',
+                             routing_key='dell.cpsd.eids.identity.request',
+                             message=json_message)
 
-    assert waitForMsg('test.identity.request'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.identity.request')
+    return_json = rabbitMq.consume_message_from_queue('test.identity.request')
 
     published_json = json.loads(payload_message, encoding='utf-8')
-    return_json = json.loads(return_message, encoding='utf-8')
 
     # Compare the 2 files. If they match the message was successfully published & received.
     print("Verifying Message sent to RabbitMQ...")
@@ -298,14 +255,10 @@ def test_negative_messages(my_test_type):
     print('\nConsuming Response Message...')
     # At this stage we have verified that a message was published & received.
     # Next we need to check that we got the expected Response to our request.
-    assert waitForMsg('test.identity.response'), "Message took too long to return"
-    return_message = af_support_tools.rmq_consume_message(host=ipaddress, rmq_username=rmq_username,
-                                                          rmq_password=rmq_password,
-                                                          queue='test.identity.response')
+    return_json = rabbitMq.consume_message_from_queue('test.identity.response')
 
     # Convert the returned message to json format and run asserts on the expected output.
     print("Checking Response Message attributes...")
-    return_json = json.loads(return_message, encoding='utf-8')
 
     # Verify the response message has the expected format & parameters
     if not return_json['timestamp']:
@@ -317,68 +270,20 @@ def test_negative_messages(my_test_type):
         if return_json['errorMessage'] != 'EIDS1004E Invalid request message':
             negative_errors.append("Error message incorrect")
             print("Incorrect error message responce" + return_json)
-    if my_test_type == 'describe_no_element':
-        if return_json['errorMessage'] != 'EIDS1006E Failed to describe element':
-            negative_errors.append("Error message incorrect")
-            print("Incorrect error message responce" + return_json)
 
     assert not negative_errors
     print("Negative Message Test Passed")
 
+
 #######################################################################################################################
 
-# Delete the test queue
-def cleanup():
-    print('Cleaning up...')
-
-    af_support_tools.rmq_delete_queue(host=ipaddress, rmq_username=rmq_username, rmq_password=rmq_password,
-                                      queue='test.identity.request')
-
-    af_support_tools.rmq_delete_queue(host=ipaddress, rmq_username=rmq_username, rmq_password=rmq_password,
-                                      queue='test.identity.response')
-
-
 # Create & bind the test queues
-def bind_queues():
+def bind_queues(rabbitMq):
     print('Creating the test EIDS Queues')
-    af_support_tools.rmq_bind_queue(host=ipaddress,
-                                    rmq_username=rmq_username, rmq_password=rmq_password,
-                                    queue='test.identity.request',
-                                    exchange='exchange.dell.cpsd.eids.identity.request',
-                                    routing_key='#')
+    rabbitMq.bind_queue_with_key(exchange='exchange.dell.cpsd.eids.identity.request',
+                                 queue='test.identity.request',
+                                 routing_key='#')
 
-    af_support_tools.rmq_bind_queue(host=ipaddress,
-                                    rmq_username=rmq_username, rmq_password=rmq_password,
-                                    queue='test.identity.response',
-                                    exchange='exchange.dell.cpsd.eids.identity.response',
-                                    routing_key='#')
-
-
-def waitForMsg(queue):
-    print("Waiting for message on queue:" + queue)
-    # This function keeps looping until a message is in the specified queue. We do need it to timeout and throw an error
-    # if a message never arrives. Once a message appears in the queue the function is complete and main continues.
-    # The length of the queue, it will start at 0 but as soon as we get a response it will increase
-    q_len = 0
-    # Represents the number of seconds that have gone by since the method started
-    timeout = 0
-    # Max number of seconds to wait
-    max_timeout = 10
-    # Amount of time in seconds that the loop is going to wait on each iteration
-    sleeptime = 1
-
-    while q_len < 1:
-        time.sleep(sleeptime)
-        timeout += sleeptime
-
-        q_len = af_support_tools.rmq_message_count(host=ipaddress,
-                                                   port=5672,
-                                                   rmq_username=rmq_username,
-                                                   rmq_password=rmq_password,
-                                                   queue=queue)
-
-        if timeout > max_timeout:
-            print('ERROR: Message took too long to return. Something is wrong')
-            cleanup()
-            return False
-    return True
+    rabbitMq.bind_queue_with_key(exchange='exchange.dell.cpsd.eids.identity.response',
+                                 queue='test.identity.response',
+                                 routing_key='#')

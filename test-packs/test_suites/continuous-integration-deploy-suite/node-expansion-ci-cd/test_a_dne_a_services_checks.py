@@ -25,6 +25,7 @@ def setup():
 @pytest.mark.parametrize('service_name',["cpsd-node-expansion-ui", "symphony-engineering-standards-service", "symphony-dne-paqx",
                           "symphony-node-discovery-paqx", "symphony-vcenter-adapter-service",
                           "cpsd-scaleio-adapter-service", "symphony-rackhd-adapter-service", "cpsd-api-gateway"])
+@pytest.mark.daily_status
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_dne_services_up(service_name, setup):
@@ -59,6 +60,7 @@ def test_dne_services_up(service_name, setup):
 @pytest.mark.parametrize('service_name',["symphony-engineering-standards-service", "symphony-dne-paqx",
                           "symphony-vcenter-adapter-service",
                           "cpsd-scaleio-adapter-service", "symphony-rackhd-adapter-service"])
+@pytest.mark.daily_status
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_dne_amqpconnection_tls_port(service_name, setup):
@@ -165,6 +167,7 @@ def test_dne_service_stop_start(service_name, setup):
 
 
 @pytest.mark.parametrize('directory',["vcenter-adapter", "rackhd-adapter", "dne-paqx", "ess", "node-discovery-paqx"])
+@pytest.mark.daily_status
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_dne_services_log_files_exceptions(directory, setup):
