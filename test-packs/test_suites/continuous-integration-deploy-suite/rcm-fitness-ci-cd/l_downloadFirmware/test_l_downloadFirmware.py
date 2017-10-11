@@ -58,14 +58,20 @@ def load_test_data():
     payload_bios1 = 'bios_download1'
     global payload_bios2
     payload_bios2 = 'bios_download2'
+    global payload_bios3
+    payload_bios3 = 'bios_download3'
     global payload_sas1
     payload_sas1 = 'sas_download1'
     global payload_sas2
     payload_sas2 = 'sas_download2'
+    global payload_sas3
+    payload_sas3 = 'sas_download3'
     global payload_esxi1
     payload_esxi1 = 'esxi_download1'
     global payload_esxi2
     payload_esxi2 = 'esxi_download2'
+    global payload_esxi3
+    payload_esxi3 = 'esxi_download3'
     global payload_messageInvalidFile
     payload_messageInvalidFile = 'invalid_file'
     global payload_messageInvalidReplyTo
@@ -124,6 +130,15 @@ def load_test_data():
     global messageEsxi2
     messageEsxi2 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
                                                              property=payload_esxi2)
+    global messageBios3
+    messageBios3 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+                                                             property=payload_bios3)
+    global messageSas3
+    messageSas3 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+                                                             property=payload_sas3)
+    global messageEsxi3
+    messageEsxi3 = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
+                                                             property=payload_esxi3)
     global messageInvalidFile
     messageInvalidFile = af_support_tools.get_config_file_property(config_file=payload_file, heading=payload_header,
                                                                property=payload_messageInvalidFile)
@@ -193,7 +208,7 @@ def resetTestQueues():
                                     routing_key='#', ssl_enabled=False)
     af_support_tools.rmq_bind_queue(host=host, port=port, rmq_username=rmq_username, rmq_password=rmq_username,
                                     queue='testDownloadFWResponse',
-                                    exchange='exchange.dell.cpsd.prepositioning.assetmanager.response',
+                                    exchange='exchange.dell.cpsd.prepositioning.downloader.response',
                                     routing_key='#', ssl_enabled=False)
     af_support_tools.rmq_bind_queue(host=host, port=port, rmq_username=rmq_username, rmq_password=rmq_username,
                                     queue='testCredentialsRequest', exchange='exchange.dell.cpsd.esrs.request',
@@ -1245,7 +1260,7 @@ def test_verifyMultiConsumedAttributes12():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti13():
-    downloadFWFileMulti(message, messageSec, message, 'secMultiDownloadFWRequest.json',
+    downloadFWFileMulti(message, messageSec, messageBios2, 'secMultiDownloadFWRequest.json',
                         'secMultiDownloadFWCredentials.json', 'secMultiDownloadFWResponse.json', "BIOS_PFWCY_WN64_2.2.5.EXE", 24992920, "DAS_Cache_Linux_1.zip", 109300)
 
 @pytest.mark.rcm_fitness_mvp_extended
@@ -1260,7 +1275,7 @@ def test_verifyMultiConsumedAttributes13():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequest14():
-    downloadFWFileMulti(message, messageBios1, messageBios2, 'downloadAllBiosFWRequest.json', 'downloadAllBiosFWCredentials.json',
+    downloadFWFileMulti(messageBios1, messageBios2, messageBios3, 'downloadAllBiosFWRequest.json', 'downloadAllBiosFWCredentials.json',
                           'downloadAllBiosFWResponse.json', "BIOS_PFWCY_WN64_2.2.5.EXE", 24992920, "BIOS_6YDCM_WN64_2.4.3.EXE", 22808880)
 
 @pytest.mark.rcm_fitness_mvp_extended
@@ -1271,7 +1286,7 @@ def test_verifyMultiConsumedAttributes14():
 # # #
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequest15():
-    downloadFWFileMulti(messageSas1, messageSas1, messageSas2, 'downloadAllSasFWRequest.json', 'downloadAllSasFWCredentials.json',
+    downloadFWFileMulti(messageSas1, messageSas3, messageSas2, 'downloadAllSasFWRequest.json', 'downloadAllSasFWCredentials.json',
                           'downloadAllSasFWResponse.json', "SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE", 16505448, "SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE", 16729560)
 
 @pytest.mark.rcm_fitness_mvp_extended
@@ -1282,7 +1297,7 @@ def test_verifyMultiConsumedAttributes15():
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequest16():
-    downloadFWFileMulti(messageEsxi1, messageEsxi1, messageEsxi2, 'downloadAllEsxiFWRequest.json', 'downloadAllEsxiFWCredentials.json',
+    downloadFWFileMulti(messageEsxi1, messageEsxi3, messageEsxi2, 'downloadAllEsxiFWRequest.json', 'downloadAllEsxiFWCredentials.json',
                           'downloadAllEsxiFWResponse.json', "ESXi600-201610001-Build-4510822.zip", 366458004, "ESXi600-201703001-Build-5224934.zip", 367863254)
 
 
