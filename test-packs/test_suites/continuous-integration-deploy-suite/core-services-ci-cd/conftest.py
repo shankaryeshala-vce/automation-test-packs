@@ -90,13 +90,16 @@ def hostConnection(hostIpAddress):
 @pytest.fixture(scope="session")
 def rabbitMq(hostIpAddress):
     from common_libs import cpsd
+    print("jk rabbit credentials 1/4")
     creds = cpsd.get_rmq_credentials()
+    print("jk rabbit credentials 2/4")
     username = creds['rmq_user']
     password = creds['rmq_password']
+    print("jk rabbit credentials 3/4")
     port = 5671
 
     rmq_connection = RmqConnection(hostIpAddress, username, password, port)
-    print(rmq_connection)
+    print("jk rabbit credentials 4/4",username, " ",password")
     return RabbitMq(rmq_connection)
 
 
