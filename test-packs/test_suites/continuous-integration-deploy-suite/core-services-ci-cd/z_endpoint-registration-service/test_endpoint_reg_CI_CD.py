@@ -351,7 +351,7 @@ def registerServiceWithConsul(apidata):
     # request Consul to register a new service
     apipath = "/v1/agent/service/register"
     apiheaders = {"content-type": "application/json"}
-    url = 'http://' + consulHost + ':8500' + apipath
+    url = 'https://' + consulHost + ':8500' + apipath
     resp = requests.put(url, data=json.dumps(apidata), headers = apiheaders)
     return resp.status_code
 
@@ -359,7 +359,7 @@ def registerServiceWithConsul(apidata):
 def verifyServiceWasRegisteredSuccessfully(service_name, service_id, service_host, service_tag_1):
     # check the contents stored for the service in Consul
     apipath = "/v1/agent/services"
-    url = 'http://' + consulHost + ':8500' + apipath
+    url = 'https://' + consulHost + ':8500' + apipath
     resp = requests.get(url)
     data = json.loads(resp.text)
     assert service_name in data[service_id]['Service']
@@ -372,7 +372,7 @@ def verifyServiceWasRegisteredSuccessfully(service_name, service_id, service_hos
 def verifyServiceNotRegistered(service_id):
     # check the contents stored for the service in Consul
     apipath = "/v1/agent/services"
-    url = 'http://' + consulHost + ':8500' + apipath
+    url = 'https://' + consulHost + ':8500' + apipath
     resp = requests.get(url)
     data = json.loads(resp.text)
     assert service_id not in data, "The Service should not be registered at this time"
@@ -382,7 +382,7 @@ def verifyServiceNotRegistered(service_id):
 def deregisterServiceFromConsul(serviceID):
     # deregister the service at consul
     apipath = "/v1/agent/service/deregister/" + serviceID
-    url = 'http://' + consulHost + ':8500' + apipath
+    url = 'https://' + consulHost + ':8500' + apipath
     resp = requests.put(url)
     return resp.status_code
 
