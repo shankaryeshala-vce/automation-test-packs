@@ -93,7 +93,7 @@ def rabbitMq(hostIpAddress):
     creds = cpsd.get_rmq_credentials()
     username = creds['rmq_user']
     password = creds['rmq_password']
-    port = 5672
+    port = 5671
 
     rmq_connection = RmqConnection(hostIpAddress, username, password, port)
     print(rmq_connection)
