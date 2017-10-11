@@ -14,7 +14,7 @@ import pytest
 #                         "hal-data-provider-vcenter"])
 
 @pytest.fixture(scope="session",
-                params=["core-tls-service", "core-pam-service", "credential-service"])
+                params=["core-tls-service", "core-pam-service", "credential-service", "endpoint-registration-service"])
 def core_container(setup, request):
     ''' Fixture to get names of core service containers'''
 
