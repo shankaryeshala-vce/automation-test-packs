@@ -96,6 +96,7 @@ def rabbitMq(hostIpAddress):
     port = 5672
 
     rmq_connection = RmqConnection(hostIpAddress, username, password, port)
+    print(rmq_connection)
     return RabbitMq(rmq_connection)
 
 

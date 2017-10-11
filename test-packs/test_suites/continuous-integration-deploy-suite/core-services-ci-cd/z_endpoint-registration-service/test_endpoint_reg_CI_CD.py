@@ -33,6 +33,7 @@ def test_registerServiceWithNoAddress(rabbitMq):
         # does not advertise its existence
 
         # setup, delete any lingering AMQP testQueue and create a new one before any messaging starts
+        print(rmq_connection)
         service_id="testService1"
         cleanup(service_id)
         rabbitMq.bind_queue_with_key(endpointExchange, 'testQueue', 'dell.cpsd.endpoint.discovered')
