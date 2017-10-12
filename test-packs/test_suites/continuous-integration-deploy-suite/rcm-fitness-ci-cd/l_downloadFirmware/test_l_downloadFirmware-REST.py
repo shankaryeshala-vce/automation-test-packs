@@ -179,6 +179,7 @@ def verifyRESTdownloadSingleFileRequest(filename):
     assert False, ("Initial REST update request not complete.")
 
 def verifyRESTdownloadInvalidFileRequest(filename):
+    timeout = 0
     resetTestQueues()
     print("Queues reset.")
     deletePreviousDownloadFiles("100mbfiletest.zip",
@@ -203,16 +204,26 @@ def verifyRESTdownloadInvalidFileRequest(filename):
         statusData = requests.get(statusURL)
         statusResp = json.loads(statusData.text)
 
-        while statusResp["state"] != "FAILED":
+        while statusResp["state"] != "ERROR":
+            timeout += 1
             time.sleep(0.5)
             statusURL = data["link"]["href"]
             statusData = requests.get(statusURL)
             statusResp = json.loads(statusData.text)
             print("Checking for failed status....")
+            if timeout > 60:
+                assert False, "Expected error state not returned in timely manner."
 
-        if statusResp["state"] == "FAILED":
+        if statusResp["state"] == "ERROR":
+            assert statusResp["url"] is None, "Expected a NULL url in error response."
+            assert statusResp["hashVal"] is None, "Expected a NULL hashVal in error response."
+            assert statusResp["downloadedSize"] is None, "Expected a NULL downloadedSize in error response."
+            assert statusResp["size"] is None, "Expected a NULL size in error response."
             assert statusResp["error"] is not None, "Expected error message not included in response."
-        return
+            assert "PDS3001:" in statusResp["error"], "Expected error code not included in error message returned."
+            if filename is not None:
+                assert filename in statusResp["error"], "Expected file requested to be included in error message returned."
+            return
     assert False, ("Initial REST update request not complete.")
 
 def verifyRESTdownloadSingleFileRequestSTATUS(filename):
@@ -461,42 +472,44 @@ def test_verifyRESTdownloadSingleFileRequestSTATUS2():
 def test_verifyRESTrepositoryStatus2():
     verifyRESTrepositoryStatus("", "100mbfiletest.zip")
 
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
+def test_verifyRESTdownloadInvalidFileRequest3():
+    verifyRESTdownloadInvalidFileRequest("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/")
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyRESTdownloadInvalidFileRequest4():
+    verifyRESTdownloadInvalidFileRequest("BIOS_PFWCY_WN64_2.2.5.EXE")
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyRESTdownloadInvalidFileRequest5():
+    verifyRESTdownloadInvalidFileRequest("////")
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyRESTdownloadInvalidFileRequest6():
+    verifyRESTdownloadInvalidFileRequest(" ")
 
 # @pytest.mark.rcm_fitness_mvp
-# def test_verifyRESTdownloadInvalidFileRequest3():
-#     verifyRESTdownloadInvalidFileRequest("RCM/3.2.1/SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE")
-
-
-# @pytest.mark.rcm_fitness_mvp
-# def test_verifyRESTdownloadInvalidFileRequest4():
-#     verifyRESTdownloadInvalidFileRequest("////")
-
-# @pytest.mark.rcm_fitness_mvp
-# def test_verifyRESTdownloadInvalidFileRequest5():
+# def test_verifyRESTdownloadInvalidFileRequest7():
 #     verifyRESTdownloadInvalidFileRequest("")
-#
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
-def test_verifyRESTdownloadMultiFileRequest6():
+def test_verifyRESTdownloadMultiFileRequest8():
     verifyRESTdownloadMultiFileRequest("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE", "100mbfiletest.zip", "RCM/3.2.2/VxRack_1000_FLEX/Component/BIOS/2.2.5/BIOS_PFWCY_WN64_2.2.5.EXE")
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
-def test_verifyRESTrepositoryStatus6():
+def test_verifyRESTrepositoryStatus8():
     verifyRESTrepositoryStatus("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/", "SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE")
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
-def test_verifyRESTrepositoryStatus6a():
+def test_verifyRESTrepositoryStatus8a():
     verifyRESTrepositoryStatus("", "100mbfiletest.zip")
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
-def test_verifyRESTrepositoryStatus6b():
+def test_verifyRESTrepositoryStatus8b():
     verifyRESTrepositoryStatus("RCM/3.2.2/VxRack_1000_FLEX/Component/BIOS/2.2.5/", "BIOS_PFWCY_WN64_2.2.5.EXE")
 
-# @pytest.mark.rcm_fitness_mvp_extended
-# @pytest.mark.rcm_fitness_mvp
-# def test_verifyRESTdownloadSingleFileRequest7():
-#     verifyRESTdownloadSingleFileRequest("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE")
