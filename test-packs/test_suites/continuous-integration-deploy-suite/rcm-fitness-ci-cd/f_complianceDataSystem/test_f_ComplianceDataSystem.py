@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 import json
 import requests
 import pytest
@@ -392,14 +393,14 @@ def getComplianceDataSystem_NULL():
 
     print("\nReturned response codes are as expected.")
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem1():
     getComplianceDataSystem("VXRACK", "FLEX", "VXRACKFLEX", "730", "R730XD", "SERVER",
                             path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem2():
@@ -434,13 +435,13 @@ def test_getComplianceDataSystem6():
     getComplianceDataSystemSubComps("R730XD", "RAID", "PERC H730", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem7():
     getComplianceDataSystem("VXRACK", "FLEX", "VXRACKFLEX", "630", "R630", "SERVER",
                             path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem8():
     getComplianceDataSystemSubComps("R630", "NIC", "Ethernet 10G 2P", path + "rcmSystemDefinition-VxRack.json",
@@ -470,19 +471,21 @@ def test_getComplianceDataSystem12():
     getComplianceDataSystemSubComps("R630", "NonRAID", "Dell HBA330", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem13():
     getComplianceDataSystem("VXRACK", "FLEX", "VXRACKFLEX", "VCENTER", "VCENTER-WINDOWS", "VCENTER",
                             path + "complianceDataSystemVCENTER.json", systemUUID)
 
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem14():
     getComplianceDataSystem("VXRACK", "FLEX", "VXRACKFLEX", "VCENTER", "VCENTER-APPLIANCE", "VCENTER",
                             path + "complianceDataSystemVCENTER.json", systemUUID)
 
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem15():

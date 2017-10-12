@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 import pika
 import json
 import time
@@ -97,6 +98,8 @@ def load_test_data():
     registerRackHD(message_rackHD, "out_registerRackHDResp.json")
     time.sleep(2)
     registerVcenter(message_vcenter, "out_registerVcenterResp.json")
+
+    time.sleep(150)
 
 def ensurePathExists(dir):
     if not os.path.exists(dir):
@@ -355,7 +358,7 @@ def updateFWRequest(payLoad, requestFile, requestCredentials, responseCredential
 
 
 def restResponse(input):
-    assert "10000/rcm-fitness-paqx/rcm-fitness-api/api/install/firmware" in input["link"][
+    assert "19080/rcm-fitness-api/api/install/firmware" in input["link"][
         "href"], "No URL included in response to query subsequent progress."
     assert input["link"]["method"] == "GET", "Unexpected method returned in response."
     assert len(input["uuid"]) > 16, "Unexpected correlation ID returned"
@@ -804,7 +807,8 @@ def verifyRESTupdateRequest(filename):
     print("SubComp: %s" % subComp)
     print("subCompUUID: %s" % subCompUUID)
     mode = 'on'
-    url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/install/firmware/'
+    # url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/install/firmware/'
+    url = 'http://' + host + ':19080/rcm-fitness-api/api/install/firmware/'
     payload = {'filePath': updatePath, 'subComponentType': subComp, 'deviceId': subCompUUID, 'emulationMode': mode}
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     resp = requests.post(url, data=json.dumps(payload), headers=headers)
@@ -820,14 +824,27 @@ def verifyRESTupdateRequest(filename):
 
     print(data)
     if data != "":
-        if data["state"] == "IN_PROGRESS":
-            restResponse(data)
-            global origRestCorrID
-            origRestCorrID = data["uuid"]
-            global progURL
-            progURL = data["link"]["href"]
-            print("Update request's initial response verified.")
-            return
+        if data["state"] == "ACKNOWLEDGED":
+            print("In here....")
+            statusURL = data["link"]["href"]
+            # statusResp = requests.get(statusURL)
+            statusData = requests.get(statusURL)
+            statusResp = json.loads(statusData.text)
+            if data["state"] != "IN_PROGRESS":
+                print("In here still....")
+                statusURL = data["link"]["href"]
+                # statusResp = requests.get(statusURL)
+                statusData = requests.get(statusURL)
+                statusResp = json.loads(statusData.text)
+            if statusResp["state"] == "IN_PROGRESS":
+                print("Now here....")
+                restResponse(statusResp)
+                global origRestCorrID
+                origRestCorrID = statusResp["uuid"]
+                global progURL
+                progURL = statusResp["link"]["href"]
+                print("Update request's initial response verified.")
+                return
     assert False, ("Initial REST update request not complete.")
 
 def verifyRESTupdateResponse(filename):
@@ -848,6 +865,10 @@ def verifyRESTupdateResponse(filename):
     time.sleep(100)
     resp = requests.get(url)
     data = json.loads(resp.text)
+
+    with open(filename, 'a') as outfile:
+        json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
+
     if data != "":
         if data["state"] == "IN_PROGRESS":
             restResponse(data)
@@ -856,6 +877,10 @@ def verifyRESTupdateResponse(filename):
     time.sleep(100)
     resp = requests.get(url)
     data = json.loads(resp.text)
+
+    with open(filename, 'a') as outfile:
+        json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
+
     if data != "":
         if data["state"] == "COMPLETE":
             restResponse(data)
@@ -864,6 +889,10 @@ def verifyRESTupdateResponse(filename):
     time.sleep(5)
     resp = requests.get(url)
     data = json.loads(resp.text)
+
+    with open(filename, 'a') as outfile:
+        json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
+
     if data != "":
         if data["state"] == "COMPLETE":
             restResponse(data)
@@ -882,58 +911,55 @@ def verifyRESTupdateResponse(filename):
     assert False, ("At least one of REST update response not complete.")
 
 
-
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_updateFWRequest():
     updateFWRequest(message_update, "out_updateRequest.json", "out_requestCreds.json", "out_responseCreds.json", "out_updateResponse.json", "out_systemDefReq.json", "out_systemDefResp.json")
 
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifyPublishedAttributes():
     verifyPublishedAttributes(path + "out_updateRequest.json")
 
+@pytest.mark.daily_status
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
 def test_verifyConsumedAttributes():
     verifyConsumedAttributes(path + "out_updateRequest.json", path + "out_updateResponse.json")
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
 def test_verifySystemDefRequest():
     verifySystemDefRequest(path + "out_systemDefReq.json", "VXRACKFLEX")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
 def test_verifySystemDefResponse():
     verifySystemDefResponse(path + "out_systemDefResp.json", "VXRACKFLEX")
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
 def test_verifyCredentialRequest():
     verifyCredentialRequest(path + "out_updateRequest.json", path + "out_requestCreds.json", "RACKHD")
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
 def test_verifyCredentialResponse():
     verifyCredentialResponse(path + "out_updateRequest.json", path +  "out_requestCreds.json", path + "out_responseCreds.json", "RACKHD")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
 def test_verifyCorrelationIDs():
     verifyCorrelationIDs()
 
-# @pytest.mark.rcm_fitness_mvp_extended
-# @pytest.mark.rcm_fitness_mvp
-# def test_verifyRESTupdateRequest():
-#     verifyRESTupdateRequest("out_restRequest.json")
-#
-# @pytest.mark.rcm_fitness_mvp_extended
-# @pytest.mark.rcm_fitness_mvp
-# def test_verifyRESTupdateResponse():
-#     verifyRESTupdateResponse("out_restResponse.json")
+@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp
+def test_verifyRESTupdateRequest():
+    verifyRESTupdateRequest("out_restRequest.json")
+
+@pytest.mark.rcm_fitness_mvp_extended
+#@pytest.mark.rcm_fitness_mvp
+def test_verifyRESTupdateResponse():
+    verifyRESTupdateResponse("out_restResponse.json")
 
 #@pytest.mark.rcm_fitness_mvp_extended
 #@pytest.mark.rcm_fitness_mvp

@@ -1,3 +1,4 @@
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 import af_support_tools
 import base64
 from cryptography.hazmat.backends import default_backend

@@ -1,12 +1,10 @@
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 import af_support_tools
 import pytest
 import os
 import json
 import requests
 import time
-
-
-
 
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():

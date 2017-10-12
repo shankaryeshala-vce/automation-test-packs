@@ -1,3 +1,4 @@
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 TEST_SUITE_NAME='Automation Test Packs Test Suite'
 REPORT_NAME='automation_test_packs_report'
 SEARCH_PATH=$AF_TEST_SUITE_PATH/

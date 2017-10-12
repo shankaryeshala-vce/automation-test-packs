@@ -78,7 +78,7 @@ def load_test_data():
                                                                 property='rackhd_password')
 
     global rackHD_body
-    rackHD_body = ':9090/ui/'
+    rackHD_body = ':32080/ui/'
 
     global vcenter_IP
     vcenter_IP = af_support_tools.get_config_file_property(config_file=setup_config_file,
@@ -149,8 +149,8 @@ def test_dne_RegisterVcenter():
     assert registerVcenter(), 'Error: unable to register the vCenter endpoint'
 
 
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
+#@pytest.mark.dne_paqx_parent_mvp
+#@pytest.mark.dne_paqx_parent_mvp_extended
 def test_dne_RegisterScaleIO():
     assert registerScaleIO(), 'Error: unable to register the ScaleIO endpoint'
 
