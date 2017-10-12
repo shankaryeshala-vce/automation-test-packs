@@ -77,10 +77,27 @@ def load_test_data():
                                                                 heading=setup_config_header,
                                                                 property='rackhd_password')
 
+    #Enable rabbitmq management
+
 
 #####################################################################
 # These are the main tests.
 #####################################################################
+@pytest.mark.network_services_mvp
+def test_enable_rabbitmq_management():
+    """
+    Title           : Enable rabbitMQ management to bring up port 15762
+    Description     : Since symphony ova turns off rabbitmq management by default, need enable it
+                      to run following test
+    Parameters      : none
+    Returns         : none
+    """
+    sendCommand = "docker exec -d amqp rabbitmq-plugins enable rabbitmq_management"
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+                                                         command=sendCommand, return_output=True)
+    my_return_status = my_return_status.strip()
+    print('\namqp rabbitmq-plugins enable rabbitmq_management :', my_return_status, '\n')
+
 
 @pytest.mark.network_services_mvp
 def test_rackHD_adapter_servicerunning():
