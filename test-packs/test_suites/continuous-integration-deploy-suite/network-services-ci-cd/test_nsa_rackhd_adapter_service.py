@@ -77,9 +77,6 @@ def load_test_data():
                                                                 heading=setup_config_header,
                                                                 property='rackhd_password')
 
-    #Enable rabbitmq management
-
-
 #####################################################################
 # These are the main tests.
 #####################################################################
