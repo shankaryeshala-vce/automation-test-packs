@@ -1,0 +1,57 @@
+{
+  "messageProperties": {
+    "timestamp": "2017-08-29T15:19:41.954Z",
+    "correlationId": "148a375c-64a8-4408-b8e9-7447905c0f20",
+    "replyTo": "dne-paqx.b1d958050f7a"
+  },
+  "storagePools": [
+    {
+      "id": "74ff6005valid",
+      "name": "Pool-1",
+      "numberOfDevices": "301",
+      "type": "SSD",
+      "devices": [
+        {
+          "id": "001",
+          "name": "Device-1",
+          "deviceState": "",
+          "type": "SSD"
+        },
+        {
+          "id": "002",
+          "name": "Device-2",
+          "deviceState": "",
+          "type": "HDD"
+        }
+      ]
+    },
+    {
+      "id": "74ff6006valid",
+      "name": "Pool-2",
+      "numberOfDevices": "150",
+      "type": "HDD",
+      "devices": [
+        {
+          "id": "003",
+          "name": "Device-3",
+          "deviceState": "",
+          "type": "HDD"
+        }
+      ]
+    }
+  ],
+  "newDevices": [
+    {
+      "id": "004",
+      "name": "Device-4",
+      "deviceState": "",
+      "type": "SSD"
+    },
+    {
+      "id": "005",
+      "name": "Device-5",
+      "deviceState": "",
+      "type": "SSD"
+    }
+  ]
+}
