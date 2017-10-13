@@ -264,7 +264,7 @@ def test_rackHD_adapter_full_ListCapabilities():
     originalcorrelationID = 'capability-registry-list-rackhd-adapter-corID'
     the_payload = '{}'
 
-    af_support_tools.           rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+    af_support_tools.rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
                                          exchange='exchange.dell.cpsd.hdp.capability.registry.request',
                                          routing_key='dell.cpsd.hdp.capability.registry.request',
                                          headers={
