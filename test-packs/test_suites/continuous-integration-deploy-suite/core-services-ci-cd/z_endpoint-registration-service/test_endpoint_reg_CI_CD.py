@@ -19,6 +19,7 @@ def load_test_data(hostIpAddress):
 
     global consulHost
     consulHost = hostIpAddress
+    consulHost = 'consul.cpsd.dell'
 
     global endpointExchange
     endpointExchange = "exchange.dell.cpsd.endpoint.registration.event"
@@ -29,11 +30,11 @@ def load_test_data(hostIpAddress):
 @pytest.mark.core_services_mvp_extended
 def test_registerServiceWithNoAddress(rabbitMq):
     with pytest.raises(NoMessageConsumedException):
-        # Testing that even tho Consul accepts a registration with no Address field, the Endpoint Registry
+        # Testing that even though Consul accepts a registration with no Address field, the Endpoint Registry
         # does not advertise its existence
 
         # setup, delete any lingering AMQP testQueue and create a new one before any messaging starts
-        print(rmq_connection)
+        # print(rmq_connection)
         service_id="testService1"
         cleanup(service_id)
         rabbitMq.bind_queue_with_key(endpointExchange, 'testQueue', 'dell.cpsd.endpoint.discovered')
@@ -41,7 +42,7 @@ def test_registerServiceWithNoAddress(rabbitMq):
 
         #add service to consul
         test_serivce = {"ID": "testService1", "Name": "testService",
-                        "Tags": ["testTag1"], "Check": {"HTTP":  rabbitMq.connection.url, "Interval": "5s"}}
+                        "Tags": ["testTag1"], "Check": {"HTTPS":  rabbitMq.connection.url, "Interval": "5s"}}
         status_code = registerServiceWithConsul(test_serivce)
         assert status_code == 200, "The Register Service task was unsuccessful"
 
@@ -54,7 +55,7 @@ def test_registerServiceWithNoAddress(rabbitMq):
 @pytest.mark.core_services_mvp_extended
 def test_registerServiceWithNoPort(rabbitMq):
     with pytest.raises(NoMessageConsumedException):
-        # Testing that even tho Consul accepts a registration with no Address field, the Endpoint Registry
+        # Testing that even though Consul accepts a registration with no Address field, the Endpoint Registry
         # does not advertise its existence
 
         # setup, delete any lingering AMQP testQueue and create a new one before any messaging starts
@@ -77,7 +78,7 @@ def test_registerServiceWithNoPort(rabbitMq):
 @pytest.mark.core_services_mvp_extended
 def test_registerServiceWithNoHealthCheck(rabbitMq):
     with pytest.raises(NoMessageConsumedException):
-        # Testing that even tho Consul accepts a registration with no Address field, the Endpoint Registry
+        # Testing that even though Consul accepts a registration with no Address field, the Endpoint Registry
         # does not advertise its existence
 
         # setup, delete any lingering AMQP testQueue and create a new one before any messaging starts
@@ -352,7 +353,8 @@ def registerServiceWithConsul(apidata):
     apipath = "/v1/agent/service/register"
     apiheaders = {"content-type": "application/json"}
     url = 'https://' + consulHost + ':8500' + apipath
-    resp = requests.put(url, data=json.dumps(apidata), headers = apiheaders)
+    #resp = requests.put(url, data=json.dumps(apidata), headers = apiheaders)
+    resp = requests.put(url, data=json.dumps(apidata), headers = apiheaders,verify='/usr/local/share/ca-certificates/taf.cpsd.dell.ca.crt')
     return resp.status_code
 
 
@@ -360,7 +362,8 @@ def verifyServiceWasRegisteredSuccessfully(service_name, service_id, service_hos
     # check the contents stored for the service in Consul
     apipath = "/v1/agent/services"
     url = 'https://' + consulHost + ':8500' + apipath
-    resp = requests.get(url)
+    #resp = requests.get(url)
+    resp = requests.get(url, verify='/usr/local/share/ca-certificates/taf.cpsd.dell.ca.crt')
     data = json.loads(resp.text)
     assert service_name in data[service_id]['Service']
     assert service_id in data[service_id]['ID']
@@ -373,7 +376,8 @@ def verifyServiceNotRegistered(service_id):
     # check the contents stored for the service in Consul
     apipath = "/v1/agent/services"
     url = 'https://' + consulHost + ':8500' + apipath
-    resp = requests.get(url)
+    #resp = requests.get(url)
+    resp = requests.put(url, verify='/usr/local/share/ca-certificates/taf.cpsd.dell.ca.crt')
     data = json.loads(resp.text)
     assert service_id not in data, "The Service should not be registered at this time"
     return "True"
@@ -383,7 +387,8 @@ def deregisterServiceFromConsul(serviceID):
     # deregister the service at consul
     apipath = "/v1/agent/service/deregister/" + serviceID
     url = 'https://' + consulHost + ':8500' + apipath
-    resp = requests.put(url)
+    #resp = requests.put(url)
+    resp = requests.put(url, verify='/usr/local/share/ca-certificates/taf.cpsd.dell.ca.crt')
     return resp.status_code
 
 
