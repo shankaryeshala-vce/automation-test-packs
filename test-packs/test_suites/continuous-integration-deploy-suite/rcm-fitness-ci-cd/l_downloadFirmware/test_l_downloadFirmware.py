@@ -256,12 +256,12 @@ def downloadFWFileRequest(payLoad, requestFile, requestCredentials, responseFile
 
         q_len = af_support_tools.rmq_message_count(host=host, port=port,
                                                            rmq_username=rmq_username, rmq_password=rmq_username,
-                                                           queue='testCredentialsResponse', ssl_enabled=False)
+                                                           queue='testDownloadFWResponse', ssl_enabled=False)
 
         # If the test queue doesn't get a message them something is wrong. Time out needs to be high as msg can take 3+ minutes
         if timeout > 60:
-            print("ERROR: ESRS Credential response took too long to return.")
-            break
+            assert False, "ERROR: ESRS Credential response took too long to return."
+
 
     my_request_body = af_support_tools.rmq_consume_message(host=host, port=port,
                                                            rmq_username=rmq_username, rmq_password=rmq_username,
@@ -364,11 +364,10 @@ def downloadFWFileMulti(payLoad, secPayLoad, thirdPayLoad, requestFile, requestC
 
         q_len = af_support_tools.rmq_message_count(host=host, port=port,
                                                            rmq_username=rmq_username, rmq_password=rmq_username,
-                                                           queue='testCredentialsResponse', ssl_enabled=False)
+                                                           queue='testDownloadFWResponse', ssl_enabled=False)
 
         if timeout > 60:
-            print("ERROR: ESRS Credential response took too long to return.")
-            break
+            assert False, "ERROR: ESRS Credential response took too long to return."
 
     my_request_body = af_support_tools.rmq_consume_all_messages(host=host, port=port,
                                                            rmq_username=rmq_username, rmq_password=rmq_username,
@@ -422,12 +421,11 @@ def downloadFWFileRequestInvalid(payLoad, requestFile, requestCredentials, respo
 
         q_len = af_support_tools.rmq_message_count(host=host, port=port,
                                                            rmq_username=rmq_username, rmq_password=rmq_username,
-                                                           queue='testCredentialsResponse', ssl_enabled=False)
+                                                           queue='testDownloadFWResponse', ssl_enabled=False)
 
         # If the test queue doesn't get a message them something is wrong. Time out needs to be high as msg can take 3+ minutes
         if timeout > 60:
-            print("ERROR: ESRS Credential response took too long to return.")
-            break
+            assert False, "ERROR: ESRS Credential response took too long to return."
 
     my_request_body = af_support_tools.rmq_consume_message(host=host, port=port,
                                                            rmq_username=rmq_username, rmq_password=rmq_username,
@@ -442,6 +440,66 @@ def downloadFWFileRequestInvalid(payLoad, requestFile, requestCredentials, respo
                                                                         ssl_enabled=False)
     af_support_tools.rmq_payload_to_file(my_response_credentials_body, path + requestCredentials)
     print("Download request and credential response consumed.")
+
+    time.sleep(2)
+    my_response_download_body = af_support_tools.rmq_consume_all_messages(host=host, port=port,
+                                                                     rmq_username=rmq_username,
+                                                                     rmq_password=rmq_username,
+                                                                     queue='testDownloadFWResponse', ssl_enabled=False)
+    af_support_tools.rmq_payload_to_file(my_response_download_body, path + responseFileComplete)
+    print("All download responses consumed.")
+    time.sleep(1)
+
+def downloadFWFileRequestNone(payLoad, requestFile, responseFileComplete):
+    messageReqHeader = {'__TypeId__': 'com.dell.cpsd.prepositioning.downloader.file.download.request'}
+    resetTestQueues()
+    print("Queues reset.")
+    time.sleep(2)
+    deletePreviousDownloadFiles("BIOS_PFWCY_WN64_2.2.5.EXE",
+                                "/opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads/")
+
+    print("Previous downloads deleted.")
+
+    # af_support_tools.rmq_publish_message(host=host, port=port, rmq_username=uname, rmq_password=password,
+    #                                      exchange="exchange.dell.cpsd.esrs.request",
+    #                                      routing_key="dell.cpsd.esrs.download.request",
+    #                                      headers=messageReqHeader, payload=payLoad, ssl_enabled=False)
+
+    af_support_tools.rmq_publish_message(host=host, port=port, rmq_username=rmq_username, rmq_password=rmq_username,
+                                         exchange="exchange.dell.cpsd.prepositioning.downloader.request",
+                                         routing_key="dell.cpsd.prepositioning.downloader.request",
+                                         headers=messageReqHeader, payload=payLoad, payload_type='json',
+                                         ssl_enabled=False)
+    print("Download request with no filename published.")
+    time.sleep(2)
+    q_len = 0
+    timeout = 0
+
+    while q_len < 1:
+        time.sleep(1)
+        timeout += 1
+
+        q_len = af_support_tools.rmq_message_count(host=host, port=port,
+                                                           rmq_username=rmq_username, rmq_password=rmq_username,
+                                                           queue='testDownloadFWResponse', ssl_enabled=False)
+
+        # If the test queue doesn't get a message them something is wrong. Time out needs to be high as msg can take 3+ minutes
+        if timeout > 60:
+            assert False, "ERROR: Download response took too long to return."
+
+    my_request_body = af_support_tools.rmq_consume_message(host=host, port=port,
+                                                           rmq_username=rmq_username, rmq_password=rmq_username,
+                                                           queue='testDownloadFWRequest', ssl_enabled=False)
+    af_support_tools.rmq_payload_to_file(my_request_body, path + requestFile)
+
+
+    # my_response_credentials_body = af_support_tools.rmq_consume_message(host=host, port=port,
+    #                                                                     rmq_username=rmq_username,
+    #                                                                     rmq_password=rmq_username,
+    #                                                                     queue='testCredentialsResponse',
+    #                                                                     ssl_enabled=False)
+    # af_support_tools.rmq_payload_to_file(my_response_credentials_body, path + requestCredentials)
+    # print("Download request and credential response consumed.")
 
     time.sleep(2)
     my_response_download_body = af_support_tools.rmq_consume_all_messages(host=host, port=port,
@@ -880,6 +938,42 @@ def verifyConsumedAttributesInvalid(requestFile, credentialsFile, responseFile, 
 
     assert False, "Response attributes do not match those defined in request."
 
+def verifyConsumedAttributesNone(requestFile, responseFile, hashType, family):
+    count = 0
+    path = "file:///opt/dell/cpsd/rcm-fitness/prepositioning-downloader-service/repository/downloads"
+    requestData = open(requestFile, "rU")
+    dataInput = json.load(requestData)
+
+    dataFile = open(responseFile, "rU")
+    data = json.load(dataFile)
+    print(data)
+    print("\nName of file: %s" % dataFile.name)
+
+    maxCount = len(data)
+
+    for count in range(maxCount):
+        if ("errorCode") in data[count].keys():
+            print(data[count]["errorCode"])
+            print(data[count]["errorMessage"])
+            assert "fileName" in data[count].keys(), "No fileName included in response."
+            assert "remedy" in data[count].keys(), "No Remedy key included in response."
+            assert "errorMessage" in data[count].keys(), "No ErrorMessage key included in response."
+            assert data[count]["fileUUID"] == "", "FileUUID should be empty."
+            assert data[count]["fileName"] == "", "FileName should be empty."
+            assert data[count]["hashVal"] == "", "HashVal should be empty."
+            assert data[count]["hashType"] == "", "HashType should be empty."
+            assert dataInput["messageProperties"]["correlationId"] == data[count]["messageProperties"]["correlationId"], "Corr Ids don't match in consumed messages."
+            assert dataInput["messageProperties"]["replyTo"] == data[count]["messageProperties"]["replyTo"], "replyTo don't match in consumed messages."
+            assert data[count]["errorCode"] == "PDS3026", "Unexpected error code returned in response."
+            assert data[count]["errorCode"] in data[count]["errorMessage"], "Error code not included in message returned."
+            assert "File name is required to perform download." in data[count]["errorMessage"], "Unexpected error message included in response."
+            print("Download response verified on failed request.")
+            return
+        else:
+            assert False, "Response attributes do not match those defined in request."
+
+    assert False, "No error returned."
+
 def verifyProgressMessage(requestFile, credentialsFile, responseFile):
     numRCMs = 0
     count = 0
@@ -1118,8 +1212,7 @@ def profileESRSResponseTimes(payLoad):
             timeout += 1
             time.sleep(0.1)
             if timeout > 500:
-                print("ERROR: ESRS Credential response took too long to return.")
-                break
+                assert False, "ERROR: ESRS Credential response took too long to return."
 
         print (datetime.datetime.utcnow())
         t2 = datetime.datetime.utcnow()
@@ -1131,7 +1224,9 @@ def profileESRSResponseTimes(payLoad):
         file = open('esrsProfile.txt', 'a')
         file.write("Loop: {} \tDelta: {}\n".format(*write_to_file))
         file.close
+
         assert timeDelta < 5, "Significant delay in response from ESRS."
+
         listDelta.append(timeDelta)
         averageDelta = sum(listDelta[0:(len(listDelta)-1)])/(len(listDelta))
         count += 1
@@ -1142,7 +1237,6 @@ def profileESRSResponseTimes(payLoad):
             sortedDelta = sortedDelta[-5:]
             print("Five longest response times: ")
             print(sortedDelta)
-
             print("Average delta: %0.3f" % averageDelta)
         else:
             continue
@@ -1185,14 +1279,12 @@ def test_verifyConsumedInvalidAttributes5():
 
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_downloadFWFileRequestInvalid8():
-    downloadFWFileRequestInvalid(messageNoAll, 'noAllFWRequest.json', 'noAllFWCredentials.json',
-                                 'noAllFWResponse.json')
+def test_downloadFWFileRequestNone8():
+    downloadFWFileRequestNone(messageNoAll, 'noAllFWRequest.json', 'noAllFWResponse.json')
 
 @pytest.mark.rcm_fitness_mvp_extended
-def test_verifyConsumedInvalidAttributes8():
-    verifyConsumedAttributesInvalid(path + 'noAllFWRequest.json', path + 'noAllFWCredentials.json',
-                                    path + 'noAllFWResponse.json', "SHA-256", "VCEVision")
+def test_verifyConsumedNoneAttributes8():
+    verifyConsumedAttributesNone(path + 'noAllFWRequest.json', path + 'noAllFWResponse.json', "SHA-256", "VCEVision")
 
 @pytest.mark.rcm_fitness_mvp_extended
 @pytest.mark.rcm_fitness_mvp
