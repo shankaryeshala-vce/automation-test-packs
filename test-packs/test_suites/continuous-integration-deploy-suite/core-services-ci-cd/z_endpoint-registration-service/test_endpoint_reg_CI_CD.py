@@ -18,8 +18,8 @@ from conftest import NoMessageConsumedException
 def load_test_data(hostIpAddress):
 
     global consulHost
-    consulHost = hostIpAddress
     consulHost = 'consul.cpsd.dell'
+    #print("jk ",consulHost)
 
     global endpointExchange
     endpointExchange = "exchange.dell.cpsd.endpoint.registration.event"
@@ -30,11 +30,11 @@ def load_test_data(hostIpAddress):
 @pytest.mark.core_services_mvp_extended
 def test_registerServiceWithNoAddress(rabbitMq):
     with pytest.raises(NoMessageConsumedException):
-        # Testing that even though Consul accepts a registration with no Address field, the Endpoint Registry
+        # Testing that even tho Consul accepts a registration with no Address field, the Endpoint Registry
         # does not advertise its existence
 
         # setup, delete any lingering AMQP testQueue and create a new one before any messaging starts
-        # print(rmq_connection)
+        #TA## print(rmq_connection)
         service_id="testService1"
         cleanup(service_id)
         rabbitMq.bind_queue_with_key(endpointExchange, 'testQueue', 'dell.cpsd.endpoint.discovered')
@@ -55,7 +55,7 @@ def test_registerServiceWithNoAddress(rabbitMq):
 @pytest.mark.core_services_mvp_extended
 def test_registerServiceWithNoPort(rabbitMq):
     with pytest.raises(NoMessageConsumedException):
-        # Testing that even though Consul accepts a registration with no Address field, the Endpoint Registry
+        # Testing that even tho Consul accepts a registration with no Address field, the Endpoint Registry
         # does not advertise its existence
 
         # setup, delete any lingering AMQP testQueue and create a new one before any messaging starts
@@ -78,7 +78,7 @@ def test_registerServiceWithNoPort(rabbitMq):
 @pytest.mark.core_services_mvp_extended
 def test_registerServiceWithNoHealthCheck(rabbitMq):
     with pytest.raises(NoMessageConsumedException):
-        # Testing that even though Consul accepts a registration with no Address field, the Endpoint Registry
+        # Testing that even tho Consul accepts a registration with no Address field, the Endpoint Registry
         # does not advertise its existence
 
         # setup, delete any lingering AMQP testQueue and create a new one before any messaging starts
@@ -353,7 +353,6 @@ def registerServiceWithConsul(apidata):
     apipath = "/v1/agent/service/register"
     apiheaders = {"content-type": "application/json"}
     url = 'https://' + consulHost + ':8500' + apipath
-    #resp = requests.put(url, data=json.dumps(apidata), headers = apiheaders)
     resp = requests.put(url, data=json.dumps(apidata), headers = apiheaders,verify='/usr/local/share/ca-certificates/taf.cpsd.dell.ca.crt')
     return resp.status_code
 
@@ -386,9 +385,10 @@ def verifyServiceNotRegistered(service_id):
 def deregisterServiceFromConsul(serviceID):
     # deregister the service at consul
     apipath = "/v1/agent/service/deregister/" + serviceID
-    url = 'https://' + consulHost + ':8500' + apipath
-    #resp = requests.put(url)
+    url = 'https://' + 'consul.cpsd.dell' + ':8500' + apipath
+    print("jk consul url ",url)
     resp = requests.put(url, verify='/usr/local/share/ca-certificates/taf.cpsd.dell.ca.crt')
+    #resp = requests.put(url, verify='/home/autouser/PycharmProjects/auto-framework/test_suites/continuous-integration-deploy-suite/core-services-ci-cd/z_endpoint-registration-service/certs/taf.cpsd.dell.ca.crt')
     return resp.status_code
 
 
