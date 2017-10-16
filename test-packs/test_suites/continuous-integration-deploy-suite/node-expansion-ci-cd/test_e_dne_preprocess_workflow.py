@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # Author:
-# Revision: 1.0
+# Revision:
 # Code Reviewed by:
 # Description: This test should only be run once a day.
 #
@@ -95,7 +95,7 @@ def load_test_data():
     global vcenter_IP
     vcenter_IP = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                            heading=setup_config_header,
-                                                           property='vcenter_dne_ipaddress_scaleio')
+                                                           property='vcenter_dne_ipaddress_customer')
 
     global vcenter_username
     vcenter_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
@@ -105,7 +105,7 @@ def load_test_data():
     global vcenter_password
     vcenter_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                                  heading=setup_config_header,
-                                                                 property='vcenter_password_rtp')
+                                                                 property='vcenter_password_fra')
 
     global vcenter_port
     vcenter_port = '443'
@@ -151,11 +151,6 @@ def load_test_data():
                                                                        heading=setup_config_header,
                                                                        property='idrac_factory_password')
 
-    global esxiManagementGatewayIpAddress
-    esxiManagementGatewayIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                               heading=setup_config_header,
-                                                                               property='esxi_management_gateway_ipaddress')
-
     global esxiManagementHostname
     esxiManagementHostname = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                                        heading=setup_config_header,
@@ -166,10 +161,70 @@ def load_test_data():
                                                                         heading=setup_config_header,
                                                                         property='esxi_management_ipaddress')
 
+    global esxiManagementGatewayIpAddress
+    esxiManagementGatewayIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                               heading=setup_config_header,
+                                                                               property='esxi_management_gateway_ipaddress')
+
     global esxiManagementSubnetMask
     esxiManagementSubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                                          heading=setup_config_header,
                                                                          property='esxi_management_subnet_mask')
+
+    global vMotionManagementIpAddress
+    vMotionManagementIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                           heading=setup_config_header,
+                                                                           property='vmotion_ip')
+
+    global vMotionManagementSubnetMask
+    vMotionManagementSubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                            heading=setup_config_header,
+                                                                            property='vmotion_mask')
+
+    global scaleIoSvmManagementIpAddress
+    scaleIoSvmManagementIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                              heading=setup_config_header,
+                                                                              property='scaleio_vm_ip')
+
+    global scaleIoSvmManagementSubnetMask
+    scaleIoSvmManagementSubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                               heading=setup_config_header,
+                                                                               property='scaleio_vm_mask')
+
+    global scaleIoSvmManagementGatewayAddress
+    scaleIoSvmManagementGatewayAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                                   heading=setup_config_header,
+                                                                                   property='scaleio_vm_gateway')
+
+    global scaleIoData1KernelIpAddress
+    scaleIoData1KernelIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                            heading=setup_config_header,
+                                                                            property='data1_kernal_ip')
+
+    global scaleIoData1SvmIpAddress
+    scaleIoData1SvmIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                         heading=setup_config_header,
+                                                                         property='data1_svm_ip')
+
+    global scaleIoData1KernelAndSvmSubnetMask
+    scaleIoData1KernelAndSvmSubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                                   heading=setup_config_header,
+                                                                                   property='data1_svm_kernal_mask')
+
+    global scaleIoData2KernelIpAddress
+    scaleIoData2KernelIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                            heading=setup_config_header,
+                                                                            property='data2_kernal_ip')
+
+    global scaleIoData2SvmIpAddress
+    scaleIoData2SvmIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                         heading=setup_config_header,
+                                                                         property='data2_svm_ip')
+
+    global scaleIoData2KernelAndSvmSubnetMask
+    scaleIoData2KernelAndSvmSubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                                   heading=setup_config_header,
+                                                                                   property='data2_svm_kernal_mask')
 
     global symphonyUuid
 
@@ -286,7 +341,6 @@ def test_preporcess_POST_workflow():
         raise Exception(err)
 
 
-#@pytest.mark.skip(reason="Test not ready")
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_preprocess_GET_workflow_status():
     """
@@ -307,19 +361,19 @@ def test_preprocess_GET_workflow_status():
     # preprocess_workflow_id =''    # This is used for test purposes
     json_number = 0
 
-    #workflow_step1 = 'Finding discovered Nodes'
+    # workflow_step1 = 'Finding discovered Nodes'
     workflow_step1 = 'List ScaleIO Components'
     workflow_step2 = 'List VCenter Components'
     workflow_step3 = 'Discover ScaleIO'
     workflow_step4 = 'Discover VCenter'
-    workflow_step5 = 'Discover Rackhd Node Inventory'
+    # workflow_step5 = 'Discover Rackhd Node Inventory'
     workflow_step6 = 'Configuring Out of Band Management'
-    workflow_step7 = 'Ping iDRAC IP Address'
+    workflow_step7 = 'Ping Out of Band Management IP Address'
     workflow_step8 = 'Configuring Obm Settings'
     workflow_step9 = 'Configure Boot Device Idrac'
-    #workflow_step10 = 'Find ScaleIO'
+    # workflow_step10 = 'Find ScaleIO'
     workflow_step11 = 'Find VCluster'
-    workflow_step12 = 'Find ProtectionDomain'
+    workflow_step12 = 'Protection Domain'
 
     endpoint = '/dne/preprocess/'
     url_body = protocol + ipaddress + dne_port + endpoint + preprocess_workflow_id
@@ -367,12 +421,12 @@ def test_preprocess_GET_workflow_status():
                 check_the_workflow_task(url_body, data, json_number, workflow_step4)
                 json_number += 1
 
-            data = get_latest_api_response(url_body)
-
-            # Discover Rackhd Node Inventory
-            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step5:
-                check_the_workflow_task(url_body, data, json_number, workflow_step5)
-                json_number += 1
+            # data = get_latest_api_response(url_body)
+            #
+            # # Discover Rackhd Node Inventory
+            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step5:
+            #     check_the_workflow_task(url_body, data, json_number, workflow_step5)
+            #     json_number += 1
 
             data = get_latest_api_response(url_body)
 
@@ -405,12 +459,12 @@ def test_preprocess_GET_workflow_status():
                 assert check_step9_biosChange(), 'Check on ' + workflow_step9 + ' failed'
                 json_number += 1
 
-                #data = get_latest_api_response(url_body)
+                # data = get_latest_api_response(url_body)
 
                 # Find ScaleIO
-                #if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
+                # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
                 #   check_the_workflow_task(url_body, data, json_number, workflow_step10)
-                #assert check_step9_FindScaleIO(data), 'Check on ' + workflow_step10 + ' failed'
+                # assert check_step9_FindScaleIO(data), 'Check on ' + workflow_step10 + ' failed'
                 #  json_number += 1
 
             data = get_latest_api_response(url_body)
@@ -424,6 +478,7 @@ def test_preprocess_GET_workflow_status():
             # Find Protection Domain
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step12:
                 check_the_workflow_task(url_body, data, json_number, workflow_step12)
+                assert check_step12_findProtectionDomain(data), 'Check on ' + workflow_step12 + ' failed'
                 json_number += 1
 
             ######################### Done
@@ -471,6 +526,9 @@ def update_preprocess_params_json():
 
     with open(filePath) as json_file:
         data = json.load(json_file)
+
+    data['symphonyUuid'] = symphonyUuid
+
     data['idracIpAddress'] = New_Node['Node_IP']
     data['idracSubnetMask'] = New_Node['Node_Mask']
     data['idracGatewayIpAddress'] = New_Node['Node_GW']
@@ -478,8 +536,20 @@ def update_preprocess_params_json():
     data['esxiManagementIpAddress'] = esxiManagementIpAddress
     data['esxiManagementSubnetMask'] = esxiManagementSubnetMask
     data['esxiManagementGatewayIpAddress'] = esxiManagementGatewayIpAddress
-    data['symphonyUuid'] = symphonyUuid
 
+    data['vMotionManagementIpAddress'] = vMotionManagementIpAddress
+    data['vMotionManagementIpAddress'] = vMotionManagementSubnetMask
+
+    data['scaleIoSvmManagementIpAddress'] = scaleIoSvmManagementIpAddress
+    data['scaleIoSvmManagementSubnetMask'] = scaleIoSvmManagementSubnetMask
+    data['scaleIoSvmManagementGatewayAddress'] = scaleIoSvmManagementGatewayAddress
+
+    data['scaleIoData1KernelIpAddress'] = scaleIoData1KernelIpAddress
+    data['scaleIoData1SvmIpAddress'] = scaleIoData1SvmIpAddress
+    data['scaleIoData1KernelAndSvmSubnetMask'] = scaleIoData1KernelAndSvmSubnetMask
+    data['scaleIoData2KernelIpAddress'] = scaleIoData2KernelIpAddress
+    data['scaleIoData2SvmIpAddress'] = scaleIoData2SvmIpAddress
+    data['scaleIoData2KernelAndSvmSubnetMask'] = scaleIoData2KernelAndSvmSubnetMask
 
     with open(filePath, 'w') as outfile:
         json.dump(data, outfile)
@@ -629,6 +699,26 @@ def check_step11_findVcluster(data):
         return 0
 
 
+def check_step12_findProtectionDomain(data):
+    # actualProtectionDomainList = getProtectionDomainInfo()
+
+    error_list = []
+    for step in data['workflowTasksResponseList']:
+        if step['workFlowTaskName'] == 'Protection Domain':
+            if not step['results']['protectionDomain']:
+                error_list.append('Error : No Protection Domains detected')
+            protectionDomain = step['results']['protectionDomain']
+
+            if protectionDomain != 'FR1-ProtectionDomain1':
+                error_list.append('Error : Protection Domain Names do not match')
+
+    if error_list == []:
+        print('Valid Protection Domain detected')
+        return 1
+    else:
+        return 0
+
+
 ######## Supporting Function to get the symphonyUuid of the discovered node ############
 
 def get_SymphonyUuid_of_discovered_node():
@@ -639,7 +729,7 @@ def get_SymphonyUuid_of_discovered_node():
     assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
     data = response.json()
 
-    #global symphonyUuid
+    # global symphonyUuid
     symphonyUuid = data[0]['symphonyUuid']
 
     return symphonyUuid
@@ -675,7 +765,6 @@ def get_BIOS_settings(Node):
 
 
 def get_exported_bios_setting(attribute):
-
     grepCommand = 'cat /opt/dell/public/write/tempExport.xml | grep ' + attribute
 
     returnedAttributeValue = af_support_tools.send_ssh_command(
