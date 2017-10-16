@@ -83,7 +83,7 @@ def load_test_data():
     global vcenter_IP
     vcenter_IP = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                            heading=setup_config_header,
-                                                           property='vcenter_dne_ipaddress_scaleio')
+                                                           property='vcenter_dne_ipaddress_customer')
 
     global vcenter_port
     vcenter_port = '443'
@@ -95,7 +95,7 @@ def load_test_data():
     global vcenter_password
     vcenter_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                                  heading=setup_config_header,
-                                                                 property='vcenter_password_rtp')
+                                                                 property='vcenter_password_fra')
 
     global scaleIO_IP
     scaleIO_IP = af_support_tools.get_config_file_property(config_file=setup_config_file,
@@ -149,8 +149,8 @@ def test_dne_RegisterVcenter():
     assert registerVcenter(), 'Error: unable to register the vCenter endpoint'
 
 
-#@pytest.mark.dne_paqx_parent_mvp
-#@pytest.mark.dne_paqx_parent_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
 def test_dne_RegisterScaleIO():
     assert registerScaleIO(), 'Error: unable to register the ScaleIO endpoint'
 
@@ -363,7 +363,7 @@ def registerScaleIO():
                                      ssl_enabled=cpsd.props.rmq_ssl_enabled,
                                      queue='test.endpoint.registration.event')
 
-    the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"scaleio-full-abcd-abcdabcdabcd"},"registrationInfo":{"address":"https://' + scaleIO_IP + ':443","username":"' + scaleIO_username + '","password":"' + scaleIO_password + '"}}'
+    the_payload = '{"messageProperties":{"timestamp":"2010-01-01T12:00:00Z","correlationId":"scaleio-full-abcd-abcdabcdabcd"},"registrationInfo":{"address":"https://' + scaleIO_IP + '","username":"' + scaleIO_username + '","password":"' + scaleIO_password + '"}}'
     print(the_payload)
 
     af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
