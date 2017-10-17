@@ -1,15 +1,26 @@
 #!/usr/bin/python
+# Author:
+# Revision: 1.0
+# Code Reviewed by:
+# Description: This test should only be run once a day.
 #
 # Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
 # Dell EMC Confidential/Proprietary Information
 #
+
+import time
+import sys
 import af_support_tools
+import pytest
+import string
+import requests
 import json
 import os
-import pytest
-import requests
-import time
-import paramiko
+from pyVmomi import vim
+from pyVim.connect import SmartConnect, Disconnect
+import atexit
+import argparse
+import ssl
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -46,20 +57,72 @@ def load_test_data():
     my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/setup_config.properties'
     af_support_tools.set_config_file_property_by_data_file(my_data_file)
 
-    # IDrac Server IP & Creds details
+    # RackHD VM IP & Creds details
     global setup_config_file
     setup_config_file = 'continuous-integration-deploy-suite/setup_config.ini'
 
     global setup_config_header
     setup_config_header = 'config_details'
 
-    global idrac_hostname
-    idrac_hostname = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                               heading=setup_config_header, property='idrac_ipaddress')
+    # ~~~~~~~~RackHD Details
+    global rackHD_IP
+    rackHD_IP = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                          heading=setup_config_header,
+                                                          property='rackhd_dne_ipaddress')
+
+    global rackHD_username
+    rackHD_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                heading=setup_config_header,
+                                                                property='rackhd_username')
+
+    global rackHD_password
+    rackHD_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                heading=setup_config_header,
+                                                                property='rackhd_password')
+
+    global rackHD_cli_username
+    rackHD_cli_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                    heading=setup_config_header,
+                                                                    property='rackhd_cli_username')
+
+    global rackHD_cli_password
+    rackHD_cli_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                    heading=setup_config_header,
+                                                                    property='rackhd_cli_password')
+
+    global RHDtoken
+    RHDtoken = retrieveRHDToken()
+
+    # ~~~~~~~~Test Node IP & Creds Details
+    global testNodeMAC
+    testNodeMAC = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                            heading=setup_config_header,
+                                                            property='dne_test_node_mac')
+
+    global idrac_ip_address
+    idrac_ip_address = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                 heading=setup_config_header,
+                                                                 property='idrac_ipaddress')
+
+    global idrac_ip_address_alternative
+    idrac_ip_address_alternative = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                             heading=setup_config_header,
+                                                                             property='idrac_ipaddress_alternative')
+
+    global idrac_ip_subnetmask
+    idrac_ip_subnetmask = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                    heading=setup_config_header,
+                                                                    property='idrac_ip_subnetmask')
+
+    global idrac_ip_gateway
+    idrac_ip_gateway = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                 heading=setup_config_header,
+                                                                 property='idrac_ip_gateway')
 
     global idrac_username
     idrac_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                               heading=setup_config_header, property='idrac_username')
+                                                               heading=setup_config_header,
+                                                               property='idrac_username')
 
     global idrac_common_password
     idrac_common_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
@@ -71,80 +134,100 @@ def load_test_data():
                                                                        heading=setup_config_header,
                                                                        property='idrac_factory_password')
 
-    global jsonfilepath
-    jsonfilepath = 'IDRAC.json'
+    global vcenter_IP
+    vcenter_IP = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                           heading=setup_config_header,
+                                                           property='vcenter_dne_ipaddress_scaleio')
 
-#####################################################################
-# These are the main tests.
-#####################################################################
+    global vcenter_port
+    vcenter_port = '443'
 
-@pytest.mark.dne_paqx_parent_mvp_extended
+    global vcenter_username
+    vcenter_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                 heading=setup_config_header,
+                                                                 property='vcenter_username')
+    global vcenter_password
+    vcenter_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                 heading=setup_config_header,
+                                                                 property='vcenter_password_rtp')
+
+
+    global esxiManagementGatewayIpAddress
+    esxiManagementGatewayIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                       heading=setup_config_header,
+                                                                       property='esxi_management_gateway_ipaddress')
+
+    global esxiManagementHostname
+    esxiManagementHostname = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                       heading=setup_config_header,
+                                                                       property='esxi_management_hostname')
+
+    global esxiManagementIpAddress
+    esxiManagementIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                       heading=setup_config_header,
+                                                                       property='esxi_management_ipaddress')
+
+    global esxiManagementSubnetMask
+    esxiManagementSubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                       heading=setup_config_header,
+                                                                       property='esxi_management_subnet_mask')
+
+    global clusterName
+    clusterName = "rvx2-scaleio"
+
+    ####################
+
+    global Alpha_Node
+    Alpha_Node = {'Node_IP': '' + idrac_ip_address + '',
+                  'Node_User': '' + idrac_username + '',
+                  'Node_Pass': '' + idrac_factory_password + '',
+                  'Node_GW': '' + idrac_ip_gateway + '',
+                  'Node_Mask': '' + idrac_ip_subnetmask + ''}
+
+    global Beta_Node
+    Beta_Node = {'Node_IP': '' + idrac_ip_address_alternative + '',
+                 'Node_User': '' + idrac_username + '',
+                 'Node_Pass': '' + idrac_factory_password + '',
+                 'Node_GW': '' + idrac_ip_gateway + '',
+                 'Node_Mask': '' + idrac_ip_subnetmask + ''}
+
+
+# ######################################################################################
+#@pytest.mark.dne_paqx_parent_mvp_extended
 def test_pre_test_verification():
     """
-    Description     :       This is a pre test check list. It checks:
-                                1) Factory Creds are valid
-                                2) Default Creds are invalid
-                                3) Any other checks...
-
+    Description     :       This is a pre-test check list. It checks:
+                                1) which of the 2 allocated IP addres for this node are active currently
+                                2) whether this node already has an obm setting for the ipmi-service.
+                                   If it does, it deletes the setting
     Parameters      :       none
     Returns         :       None
     """
-    # Test ssh connection to idrac before starting the workflow with Factory configured password
-    assert check_ssh(idrac_hostname, idrac_username, idrac_factory_password), 'ERROR: unable to log-in to iDrac with Factory Creds'
-    time.sleep(3)
+    ####################
+    # There are 2 IP Addresses (alpha and beta) associated with the Test node.
+    # Either of these may be the current IP Address of the node
+    # Is alpha_node alive ? if so, set it to be the current_node
+    global Current_Node
+    global New_Node
 
-    # Test ssh connection to idrac before starting the workflow with Common configured password - should not allow connection
-    assert not check_ssh(idrac_hostname, idrac_username, idrac_common_password), 'ERROR: able to log-in to iDrac with Common creds'
-    time.sleep(3)
+    response = os.system("ping -c 1 -w2 " + Alpha_Node['Node_IP'] + " > /dev/null 2>&1")
+    if response == 0:  # node is alive
+        Current_Node = Alpha_Node
+        New_Node = Beta_Node
+    else:
+        Current_Node = Beta_Node
+        New_Node = Alpha_Node
 
+    print (New_Node)
 
-@pytest.mark.dne_paqx_parent_mvp_extended
-def test_nodes_GET_workflows():
-    """
-    Title           :       Verify the GET function on /dne/nodes API
-    Description     :       Send a GET to /dne/nodes details body.
-                            We are not asserting on the content of the response as this is variable.
-                            It will fail if :
-                                The expected json response is not correct
-    Parameters      :       none
-    Returns         :       None
-    """
+    # verify that an OBM for the ipmi service is not currently configured for this node.
+    # If it is configured, delete it as it will be recreated during this addNode flow
+    preCheckOBM()
 
-    print('\n=======================Add Node Work Flow Test Begin=======================\n')
+############################################################################################
 
-    # Step 1: Invoke /dne/nodes REST API call to gather the info that will be needed for add node.
-    print('Send GET /dne/nodes REST API call to verify the discovered node\n')
-
-    try:
-        endpoint = '/dne/nodes'
-        url_body = protocol + ipaddress + dne_port + endpoint
-        response = requests.get(url_body)
-        # verify the status_code
-        assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
-        data = response.json()
-
-        global symphonyUuid
-        symphonyUuid = data[0]['symphonyUuid']
-
-        global node_id
-        node_id = data[0]['nodeId']
-
-        assert data[0]['nodeStatus'] == 'DISCOVERED', 'Error: Node not in a discovered state'
-
-        print ('Node Discoverd ID: ',node_id)
-        print('Valid /dne/nodes Response received')
-        time.sleep(1)
-
-    # Error check the response
-    except Exception as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        raise Exception(err)
-
-
-@pytest.mark.dne_paqx_parent_mvp_extended
-def test_nodes_request_workflows():
+#@pytest.mark.dne_paqx_parent_mvp_extended
+def test_addNode_POST_workflow():
     """
     Title           :       Verify the POST function on /dne/nodes API
     Description     :       Send a POST to /dne/nodes where the body of the request is the typical DNE config
@@ -153,34 +236,34 @@ def test_nodes_request_workflows():
                                 The expected json response is not correct
     Parameters      :       none
     Returns         :       None
+    Pre-requisites  :       The DNE-PAQX has already run thepreprocess workflow
     """
 
-    #########################
-    #Prepare the request message body with valid details, SymphonyUUID & nodeID
-
-    assert update_addnode_params_json(), 'Error: Unable to update the POST message body'
 
     #########################
-    # Step 3: Invoke POST /dne/nodes REST API to provission the node
+    # Prepare the Request message body with valid details: IP, Gateway, Mask
+    assert update_addNode_params_json(), 'Error: Unable to update the POST message body'
+
+    #########################
+
     print('\nSend POST /dne/nodes REST API call to provision an unallocated node...\n')
+    global addNode_workflow_id  # set this value as global as it will be used in the next test.
 
-    global nodes_workflow_id  # set this value as global as it will be used in the next test.
+    endpoint = '/dne/nodes'
+    url_body = protocol + ipaddress + dne_port + endpoint
 
     filePath = os.environ[
-                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode_dr.json'
     with open(filePath) as fixture:
         request_body = json.loads(fixture.read())
 
     try:
-        endpoint = '/dne/nodes'
-        url_body = protocol + ipaddress + dne_port + endpoint
         response = requests.post(url_body, json=request_body, headers=headers)
-        # verify the status_code
         assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
         data = response.json()
 
-        nodes_workflow_id = data['workflowId']
-        print ('WorkflowID: ',nodes_workflow_id)
+        addNode_workflow_id = data['workflowId']
+        print ('WorkflowID: ', addNode_workflow_id)
 
         error_list = []
 
@@ -198,199 +281,170 @@ def test_nodes_request_workflows():
         print('Valid /dne/nodes request has been sent')
         time.sleep(2)
 
-    # Error check the response
     except Exception as err:
         # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
+        print(err, '\n')
         raise Exception(err)
 
 
-@pytest.mark.dne_paqx_parent_mvp_extended
-def test_nodes_status_workflow():
+#@pytest.mark.skip(reason="Test not ready")
+#@pytest.mark.dne_paqx_parent_mvp_extended
+def test_preprocess_GET_workflow_status():
     """
-    Title           :       Verify the GET function on /dne/nodes/<jobId> API
-    Description     :       Send a GET to /dne/nodes/<jobId>. The <jobId> value is the workFlowID obtained in the
-                            previous test_nodes_request_workflows() test.
+    Title           :       Verify the GET function on /dne/preprocess/<jobId> API
+    Description     :       Send a GET to /dne/preprocess/<jobId>. The <jobId> value is the workFlowID obtained in the
+                            previous test_addNode_POST_workflow() test.
                             Each expected step in the workflow process will be checked.
-                                1. Finding discovered Nodes
-                                2. Change Out of Band Management Credentials
-                                n-1. Update System Definition
-                                n. Notify Node Discovery To Update Status
-                            This tes will be updated as new steps are added to the workflow
+
+                            This test will be updated as new steps are added to the workflow
                             It will fail if :
                                 Any of the steps along the wat fail
     Parameters      :       none
     Returns         :       None
     """
 
-
-    # Step 4: Invoke /dne/nodes/{jobId} REST API call to get the status
-    print('\n\n*******************************************************\n')
-    print("\nSend GET /dne/nodes/<jobId> REST API call to get the addnodes job status...\n")
-
+    print("\n\nGET /dne/nodes/<jobId> REST API call to get the nodes job status...\n")
     workflow_status = ''
+    # addNode_workflow_id =''
+    json_number = 0
+
+    workflow_step1 = 'retrieveEsxiDefaultCredentialDetails'
+    # workflow_step2 = 'changeIdracCredentials'
+    workflow_step3 = 'installEsxi'
+    workflow_step4 = 'addHostToVcenter'
+    workflow_step5 = 'applyEsxiLicense'
+    workflow_step6 = 'datastoreRename'
+    # workflow_step7 = 'exitHostMaintenanceMode'
+    # workflow_step8 = 'installScaleIoVib'
+    # workflow_step9 = 'enterHostMaintenanceMode'
+    # workflow_step10 = 'rebootHost'
+    # workflow_step11 = 'exitHostMaintenanceMode'
+    # workflow_step12 = 'configureScaleIoVib'
+    workflow_step13 = 'configurePxeBoot'
+    workflow_step14 = 'updateSystemDefinition'
+    workflow_step15 = 'notifyNodeDiscoveryToUpdateStatus'
+
+    endpoint = '/dne/nodes/'
+    url_body = protocol + ipaddress + dne_port + endpoint + addNode_workflow_id
+
     while workflow_status != 'SUCCEEDED':
 
         try:
-            endpoint = '/dne/nodes/'
-            url_body = protocol + ipaddress + dne_port + endpoint + nodes_workflow_id
-            response = requests.get(url_body)
-            assert response.status_code == 200, 'Error: 200 not returned from dne\\nodes'  # verify the status_code
-            data = response.text
-            data = json.loads(data, encoding='utf-8')
+            # Get the latest state of the workflow from the API
+            data = get_latest_api_response(url_body)
 
             # If the process has failed immediately then fail the test outright
-            assert data['status'] != 'FAILED', 'ERROR: The addnode workflow overall status = Failed'
+            assert data['status'] != 'FAILED', 'ERROR: The addNode workflow overall status = Failed'
 
 
-            ######################### List ESXi Default Host Credential Details
-            if data['workflowTasksResponseList'][0]['workFlowTaskName'] == 'List ESXi Default Host Credential Details':
-                assert data['workflowTasksResponseList'][0][
-                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Update System Definition" Failed'
+            # retrieveEsxiDefaultCredentialDetails
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step1:
+                check_the_workflow_task(url_body, data, json_number, workflow_step1)
+                json_number += 1
 
-                print ('Step n-1: List ESXi Default Host Credential Details')
-                timeout = 0
-                while timeout < 300:
-                    # Get the latest state from the API
-                    response = requests.get(url_body)
-                    data = response.text
-                    data = json.loads(data, encoding='utf-8')
+            data = get_latest_api_response(url_body)
 
-                    if data['workflowTasksResponseList'][0]['workFlowTaskStatus'] == 'IN_PROGRESS':
-                        time.sleep(1)
-                        timeout += 1
-                        # If the task is still in progress wait and then refresh the API data
+            # # changeIdracCredentials
+            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step2:
+            #     check_the_workflow_task(url_body, data, json_number, workflow_step2)
+            #     json_number += 1
 
-                    # Check something
-                    if data['workflowTasksResponseList'][0]['workFlowTaskStatus'] == 'SUCCEEDED':
-                        # TODO need to figure out how to test this
-                        print ('(Note: Task took', timeout, 'seconds to complete)')
-                        print('\n*******************************************************\n')
-                        break
-                        # Validate a SUCCEEDED message by checking something??
+            # installEsxi
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step3:
+                check_the_workflow_task(url_body, data, json_number, workflow_step3)
+                json_number += 1
 
-                    if data['workflowTasksResponseList'][0]['workFlowTaskStatus'] == 'FAILED':
-                        print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][0][
-                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step n-1: List ESXi Default Host Credential Details'
-                        # If the task has failed then fail the entire test.
+            data = get_latest_api_response(url_body)
+
+            # addHostToVcenter
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step4:
+                check_the_workflow_task(url_body, data, json_number, workflow_step4)
+                assert check_step4_addHostToVcenter(), 'Check on ' + workflow_step4 + ' failed'
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
 
 
-            ######################### Change Out of Band Management Credentials
-            if data['workflowTasksResponseList'][1]['workFlowTaskName'] == 'Change Out of Band Management Credentials':
-                assert data['workflowTasksResponseList'][1][
-                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Change Out of Band Management Credentials" Failed'
+            # applyEsxiLicense
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step5:
+                check_the_workflow_task(url_body, data, json_number, workflow_step5)
+                assert check_step5_applyESXLicense(), 'Check on ' + workflow_step5 + ' failed'
+                json_number += 1
 
-                print('Step 2: Change Out of Band Management Credentials')
-                timeout = 0
-                while timeout < 610:
-                    # Get the latest state from the API
-                    response = requests.get(url_body)
-                    data = response.text
-                    data = json.loads(data, encoding='utf-8')
+            data = get_latest_api_response(url_body)
 
-                    if data['workflowTasksResponseList'][1]['workFlowTaskStatus'] == 'IN_PROGRESS':
-                        time.sleep(1)
-                        timeout += 1
-                        # If the task is still in progress wait and then refresh the API data
+            # datastoreRename
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step6:
+                check_the_workflow_task(url_body, data, json_number, workflow_step6)
+                assert check_step6_datastoreRename(), 'Check on ' + workflow_step6 + ' failed'
+                json_number += 1
 
-                    # Check that new credentials do allow user to log into server
-                    if data['workflowTasksResponseList'][1]['workFlowTaskStatus'] == 'SUCCEEDED':
-                        assert check_ssh(idrac_hostname, idrac_username,
-                                         idrac_common_password), 'ERROR: unable to log-in to iDrac'
-                        assert not check_ssh(idrac_hostname, idrac_username,
-                                             idrac_factory_password), 'ERROR: still able to log-in to iDrac with Factory Creds'
-                        print ('(Note: Task took', timeout, 'seconds to complete)')
-                        print('\n*******************************************************\n')
-                        time.sleep(5)
-                        break
-                        # Validate a SUCCEEDED message by checking ssh connection to idrac at the end of the workflow with new password
+            # # exitHostMaintenanceMode
+            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step7:
+            #     check_the_workflow_task(url_body, data, json_number, workflow_step7)
+            #     assert check_step7_exitHostMaintenanceMode(), 'Check on ' + workflow_step7 + ' failed'
+            #     json_number += 1
 
-                    if data['workflowTasksResponseList'][1]['workFlowTaskStatus'] == 'FAILED':
-                        print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][1][
-                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step 2: Failed to change iDrac credentials'
-                        # If the task has failed then fail the entire test.
+            data = get_latest_api_response(url_body)
 
+            # # installScaleIoVib
+            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step8:
+            #     check_the_workflow_task(url_body, data, json_number, workflow_step8)
+            #     json_number += 1
 
-            ######################### Update System Definition
-            if data['workflowTasksResponseList'][2]['workFlowTaskName'] == 'Update System Definition':
-                assert data['workflowTasksResponseList'][2][
-                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Update System Definition" Failed'
+            # # enterHostMaintenanceMode
+            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step9:
+            #     check_the_workflow_task(url_body, data, json_number, workflow_step9)
+            #     json_number += 1
 
-                print ('Step n-1: Update System Definition')
-                timeout = 0
-                while timeout < 300:
-                    # Get the latest state from the API
-                    response = requests.get(url_body)
-                    data = response.text
-                    data = json.loads(data, encoding='utf-8')
+            data = get_latest_api_response(url_body)
 
-                    if data['workflowTasksResponseList'][2]['workFlowTaskStatus'] == 'IN_PROGRESS':
-                        time.sleep(1)
-                        timeout += 1
-                        # If the task is still in progress wait and then refresh the API data
+            # # rebootHost
+            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
+            #     check_the_workflow_task(url_body, data, json_number, workflow_step10)
+            #     json_number += 1
 
-                    # Check something
-                    if data['workflowTasksResponseList'][2]['workFlowTaskStatus'] == 'SUCCEEDED':
-                        # TODO need to figure out how to test this
-                        print ('(Note: Task took', timeout, 'seconds to complete)')
-                        print('\n*******************************************************\n')
-                        break
-                        # Validate a SUCCEEDED message by checking something??
+            # # exitHostMaintenanceMode
+            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step11:
+            #     check_the_workflow_task(url_body, data, json_number, workflow_step11)
+            #     assert check_step11_biosChange(New_Node), 'Check on ' + workflow_step11 + ' failed'
+            #     json_number += 1
 
-                    if data['workflowTasksResponseList'][2]['workFlowTaskStatus'] == 'FAILED':
-                        print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][2][
-                                   'workFlowTaskStatus'] != 'FAILED', 'Error in Step n-1: Failed to update system defnition'
-                        # If the task has failed then fail the entire test.
+            data = get_latest_api_response(url_body)
+
+            # # configureScaleIoVib
+            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step12:
+            #     check_the_workflow_task(url_body, data, json_number, workflow_step12)
+            #     json_number += 1
+
+            # configurePxeBoot
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step13:
+                check_the_workflow_task(url_body, data, json_number, workflow_step13)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
 
 
-            ######################### Notify Node Discovery To Update Status
-            if data['workflowTasksResponseList'][3]['workFlowTaskName'] == 'Notify Node Discovery To Update Status':
-                assert data['workflowTasksResponseList'][3][
-                           'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow "Notify Node Discovery To Update Status" Failed'
+            # updateSystemDefinition
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step14:
+                check_the_workflow_task(url_body, data, json_number, workflow_step14)
+                json_number += 1
 
-                print ('Step n: Notify Node Discovery To Update Status')
-                timeout = 0
-                while timeout < 100:
-                    # Get the latest state from the API
-                    response = requests.get(url_body)
-                    data = response.text
-                    data = json.loads(data, encoding='utf-8')
 
-                    if data['workflowTasksResponseList'][3]['workFlowTaskStatus'] == 'IN_PROGRESS':
-                        time.sleep(1)
-                        timeout += 1
-                        # If the task is still in progress wait and then refresh the API data
+            data = get_latest_api_response(url_body)
 
-                    # Check the status of the node is now "ADDED" in GET /dne/nodes
-                    if data['workflowTasksResponseList'][3]['workFlowTaskStatus'] == 'SUCCEEDED':
-                        endpoint2 = '/dne/nodes'
-                        url_body2 = protocol + ipaddress + dne_port + endpoint2
-                        response = requests.get(url_body2)
-                        data2 = response.text
-                        data2 = json.loads(data2, encoding='utf-8')
 
-                        for node in data2:
-                            if node['nodeId'] == node_id:
-                                assert node['nodeStatus'] == 'ADDED', 'Error in Step n: Node status has not been updated'
-                                print ('(Note: Task took', timeout, 'seconds to complete)')
-                                print('\n*******************************************************\n')
-                                break
-                                # Validate a SUCCEEDED message by checking the node state has changed to ADDED
-                        break
+            # notifyNodeDiscoveryToUpdateStatus
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step15:
+                check_the_workflow_task(url_body, data, json_number, workflow_step15)
+                json_number += 1
 
-                    if data['workflowTasksResponseList'][3]['workFlowTaskStatus'] == 'FAILED':
-                        print ('(Note: Task took', timeout, 'seconds to fail)\n')
-                        assert data['workflowTasksResponseList'][3][
-                                   'workFlowTaskStatus'] != 'FAILED', 'Error: failed to update system defnition'
-                        # If the task has failed then fail the entire test.
+
+            ######################### Done
 
             workflow_status = data['status']
 
-            print('Test Pass: Node added successfully')
+            print('Valid /dne/nodes/{jobId} status returned')
 
         # Error check the response
         except Exception as err:
@@ -401,71 +455,16 @@ def test_nodes_status_workflow():
 
     time.sleep(5)
 
-    print('\n=======================Add Node Work Flow Test Complete=======================\n')
 
-#####################################################################
-# These are Negative Tests tests.
-#####################################################################
+########################################################################################
 
-@pytest.mark.parametrize('endpoint', [('/dne/nodes/')])
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
-def test_GETjobid_using_invalid_jobid(endpoint):
-    """
-    Title           :       Verify the dne REST API handles invalid job-id's correctly
-    Description     :       Send a GET to /dne/nodes/{job-Id} with an invalid job-id.
-                            It will fail if :
-                                The returned error exposes  java NPE details
-    Parameters      :       none
-    Returns         :       None
-    """
-
-    print("\n======================= invalid jobId  Test Start =======================\n")
-
-    # Step 1: Invoke a REST API call with invalid jobId .
-    print("GET /dne/nodes/{job-Id} REST API call with invalid jobId\n")
-
-    filePath = os.environ[
-                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
-    with open(filePath) as fixture:
-        request_body = json.loads(fixture.read())
+# Run the api query
+def get_latest_api_response(url_body):
+    # re-run an api status request
 
     try:
-        invalid_job_id = "abcd-12345"
-        url_body = protocol + ipaddress + dne_port + endpoint + invalid_job_id
-        print(url_body)
-
-        response = requests.get(url_body, json=request_body, headers=headers)
-        # verify the status_code
-        assert response.status_code == 404 or response.status_code == 400, \
-            'Error: Did not get a 400-series error on ' + endpoint + '{invalid-job-Id}'
-        data = response.json()
-        print(data)
-
-        error_list = []
-
-        if not data['error']:
-            error_list.append(data['error'])
-
-        if 'exception' in data:
-            if 'java' in data['exception']:
-                error_list.append('\"java\" text should not be displayed')
-
-        if 'message' not in data:
-            error_list.append(data['message'])
-        else:
-            if 'java' in data['message']:
-                error_list.append('\"java\" text should not be displayed')
-
-        if not data['path'] :
-            error_list.append(data['path'])
-        else:
-            if not invalid_job_id in data['path']:
-                error_list.append('the invalid job id should be listed in the path field')
-
-        assert not error_list, 'Error: Issue found with ' + endpoint + '{invalid-jobId} Response'
-
-
+        response = requests.get(url_body)
+        assert response.status_code == 200, 'Error: Did not get a 200 response'
     # Error check the response
     except Exception as err:
         # Return code error (e.g. 404, 501, ...)
@@ -473,193 +472,431 @@ def test_GETjobid_using_invalid_jobid(endpoint):
         print('\n')
         raise Exception(err)
 
-    print('\n======================= invalid jobId Test End=======================\n')
+    data = response.text
+    data = json.loads(data, encoding='utf-8')
+    return data
 
 
-@pytest.mark.parametrize('endpoint', [('/dne/nodes/')])
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
-def test_GETjobid_using_valid_but_incorrect_jobid(endpoint):
+# Update the json that will be used in the POST /dne/nodes command with valid values
+def update_addNode_params_json():
     """
-    Title           :       Verify the dne REST API handles valid, but incorrect, job-id's correctly
-    Description     :       Send a GET to /dne/nodes/{job-Id} with a preprocess job-id.
-                            It will fail if :
-                                The returned error exposes  java NPE details
-    Parameters      :       none
-    Returns         :       None
-    """
-
-    print("\n======================= valid jobId but incorrect Test Start =======================\n")
-
-    # Step 1: Invoke a REST API call with invalid jobId .
-    print("GET /dne/nodes/{job-Id} REST API call with an incorrect jobId\n")
-
-    filePath = os.environ[
-                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
-    with open(filePath) as fixture:
-        request_body = json.loads(fixture.read())
-
-    try:
-        jobId = '14cf9e3f-b651-4e14-8f35-e0c012cb0e9c'
-
-        url_body = protocol + ipaddress + dne_port + endpoint + jobId
-        print(url_body)
-
-        response = requests.get(url_body, json=request_body, headers=headers)
-        # verify the status_code
-        assert response.status_code == 400 or response.status_code == 404, \
-            'Error: Did not get a 400-series error ' + endpoint + '{incorrect-job-Id}'
-        data = response.json()
-        print(data)
-
-        error_list = []
-
-        if not data['error']:
-            error_list.append(data['error'])
-
-        if 'exception' in data:
-            if 'java' in data['exception']:
-                error_list.append('\"java\" text should not be displayed')
-
-        if 'message' not in data:
-            error_list.append(data['message'])
-        else:
-            if 'java' in data['message']:
-                error_list.append('\"java\" text should not be displayed')
-
-        if not data['path'] :
-            error_list.append(data['path'])
-        else:
-            if not jobId in data['path']:
-                error_list.append('the incorrect job id should be listed in the path field')
-
-        assert not error_list, 'Error: Issue found with ' + endpoint + '{incorrect-jobId} Response'
-
-
-    # Error check the response
-    except Exception as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        raise Exception(err)
-
-    print('\n======================= valid jobId but incorrect Test End=======================\n')
-
-
-@pytest.mark.parametrize('endpoint', [('/dne/nodes/step/')])
-@pytest.mark.dne_paqx_parent_mvp
-@pytest.mark.dne_paqx_parent_mvp_extended
-def test_POSTstepname_using_invalid_stepName(endpoint):
-    """
-    Title           :       Verify the dne REST API handles invalid step-names correctly
-    Description     :       Send a POST to /dne/nodes/step/{stepName} with an invalid stepName
-                            It will fail if :
-                                The returned error exposes  java NPE details
-    Parameters      :       none
-    Returns         :       None
-    """
-
-    print("\n======================= invalid stepname Test Start =======================\n")
-
-    # Step 1: Invoke /dne/nodes/step/{stepName} REST API call with invalid step name .
-    print("POST /dne/../step/{step-id}} REST API call with invalid step name\n")
-
-    filePath = os.environ[
-                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
-    with open(filePath) as fixture:
-        request_body = json.loads(fixture.read())
-
-    try:
-        invalid_step_name = "invalidStep"
-        url_body = protocol + ipaddress + dne_port + endpoint + invalid_step_name
-        print(url_body)
-
-        response = requests.post(url_body, json=request_body, headers=headers)
-        # verify the status_code
-        assert response.status_code == 404 or response.status_code == 400, \
-            'Error: Did not get a 400-series on ' + endpoint +  '{invalid_step_name}'
-        data = response.json()
-        print(data)
-
-        error_list = []
-
-        if not data['error']:
-            error_list.append(data['error'])
-
-        if 'exception' in data :
-            if 'java' in data['exception']:
-                error_list.append('\"java\" text should not be displayed')
-
-        if 'message' not in data:
-            error_list.append(data['message'])
-        else:
-            if 'java' in data['message']:
-                error_list.append('\"java\" text should not be displayed')
-
-        if not data['path'] :
-            error_list.append(data['path'])
-        else :
-            if not invalid_step_name in data['path']:
-                error_list.append('the invalid step name should be listed in the path field')
-
-        assert not error_list, 'Error: Issue found with  ' + endpoint +  '{invalid-step-name} Response'
-
-
-    # Error check the response
-    except Exception as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        raise Exception(err)
-
-    print('\n======================= invalid stepname Test End=======================\n')
-
-#####################################################################
-
-def check_ssh(ip, usrname, passwd):
-    """
-    Title           : Check SSH connection to the idrac server node
-    Description     : Check SSH connection to the idrac server node with the given credentials
-                      It will fail if :
-                      Unable to establish the ssh connection with the given credentials
-    Parameters      : 1. ip of the idrac server node
-    		          2. username of the idrac server
-    		          3. password of the idrac server
-    Returns         : Boolean
-    """
-    try:
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(ip, username=usrname, password=passwd)
-        print ("\nSucessfully connected to " + ip + " using password: " + passwd)
-        return True
-    except:
-        print ("Unable to connect to " + ip + " using password: " + passwd)
-        return False
-
-
-def update_addnode_params_json():
-    """
-    Description:    This method will update the json file with the symphonyUuid & nodeId values. Others wil be added as needed
+    Description:    This method will update the json file with the symphonyUuid & nodeId values.
     Parameters:     None
     Returns:        0 or 1 (Boolean)
     """
 
+    global symphonyUuid
+    symphonyUuid = get_SymphonyUuid_of_discovered_node()
+
+    global symphonyUUID
+    symphonyUUID = symphonyUuid
+
     filePath = os.environ[
-                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode_dr.json'
 
     if (os.path.isfile(filePath) == 0):
         return 0
 
     with open(filePath) as json_file:
         data = json.load(json_file)
-    data['nodeId'] = node_id
+    data['idracIpAddress'] = Current_Node['Node_IP']
+    data['idracSubnetMask'] = Current_Node['Node_Mask']
+    data['idracGatewayIpAddress'] = Current_Node['Node_GW']
+    data['esxiManagementHostname'] = esxiManagementHostname
+    data['esxiManagementIpAddress'] = esxiManagementIpAddress
+    data['esxiManagementSubnetMask'] = esxiManagementSubnetMask
+    data['esxiManagementGatewayIpAddress'] = esxiManagementGatewayIpAddress
     data['symphonyUuid'] = symphonyUuid
+    data['symphonyUuid'] = symphonyUUID
 
+    data['clusterName'] = clusterName
 
-    with open(filePath,'w') as outfile:
-        json.dump(data,outfile)
+    with open(filePath, 'w') as outfile:
+        json.dump(data, outfile)
 
     print (data)
 
     return 1
+
+
+######################
+# This is the main response workflow test
+
+def check_the_workflow_task(url_body, data, json_number, workflow_step):
+    """
+    Description     :       This function will monitor the status of a particular step in the workflow every ~3 secs.
+                            Whilst the status of the step is 'IN_PROGRESS' it will continue monitoring.
+                            If the status goes to 'SUCCEEDED', the fucntion is exited.
+                            if the status goes to 'FAILED', fail the entire flow (ie. test)
+    Parameters      :       url_body - the status request url
+                            data - the most recent response to the status request for this flow
+                            json_number - the number assigned to this step of the flow  in the json response msg
+                            workflow_step - the stepname that we are currently monitoring
+    Returns         :       None
+    """
+
+    print('\n*******************************************************\n')
+    if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step:
+        assert data['workflowTasksResponseList'][json_number][
+                   'workFlowTaskStatus'] != 'FAILED', 'ERROR: Workflow Failed: "' + workflow_step
+
+        print(workflow_step)
+        timeout = 0
+        while timeout < 601:
+
+            # Get the latest state of the workflow from the API
+            data = get_latest_api_response(url_body)
+
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskStatus'] == 'IN_PROGRESS':
+                time.sleep(1)
+                timeout += 1
+                # If the task is still in progress wait and then refresh the API data
+
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskStatus'] == 'SUCCEEDED':
+                print(workflow_step + ' successful. (Note: Task took', timeout, 'seconds to complete)')
+                time.sleep(1)
+                break
+                # If the task has succeeded, return to the calling test
+
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskStatus'] == 'FAILED':
+                print ('(Note: Task took', timeout, 'seconds to fail)\n')
+                print (data['workflowTasksResponseList'][json_number]['errors'])
+                assert data['workflowTasksResponseList'][json_number][
+                           'workFlowTaskStatus'] != 'FAILED', 'Error in Step: ' + workflow_step + ' failed'
+                # If the task has failed then fail the entire test.
+
+
+######## Supporting Functions ################################################################
+
+def get_SymphonyUuid_of_discovered_node():
+    # query the dne-paqx to return the symphonyuuid of the discovered node
+    endpoint = '/dne/nodes'
+    url_body = protocol + ipaddress + dne_port + endpoint
+
+    try:
+        response = requests.get(url_body)
+        # verify the status_code
+        assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+
+    data = response.json()
+    Uuid = data[0]['symphonyUuid']
+
+    return Uuid
+
+
+#####################################################################
+
+def preCheckOBM():
+    # check at the rackhd if the node to be added already has an OBM configured against it.
+    # if it does, remove the OBM.
+
+    nodeId = getNodeIdentifier(RHDtoken, testNodeMAC)
+    # the verify function returns either confirmation text ("no obm configured"),  or the id of the configured obm
+    obmResponse = verify_no_obm_ipmi_config_in_place(nodeId)
+    if obmResponse == "no obm configured":
+        print('ipmi - no obm present, test can proceed')
+    else :
+        print('deleting an obm currently configured for the node')
+        delete_ipmi_obm(obmResponse)
+
+#####################################################################
+
+def  delete_ipmi_obm(obmId):
+    """"
+    Description :       request the rackhd to delete the OBM with id = obmId
+    parameters :        obmId - the id of an OBM configured at rackhd
+    returns :           Nothing
+    """
+
+    apipath = 'api/2.0/obms/' + obmId
+    url = 'http://' + rackHD_IP + ':9090' + apipath
+    headerstring = {"Content-Type": "application/json", "Authorization": "JWT " + RHDtoken}
+    try:
+        response = requests.delete(url, headers=headerstring)
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+#####################################################################
+
+
+def verify_no_obm_ipmi_config_in_place(nodeId):
+    """"
+    Description :       check at the rackhd if an ipmi obm exists for node with an id = nodeId
+    parameters :        nodeId - the rackhd asssigned id of the node to be Added
+    returns :           Text string = "no obm configured" if no OBM is found
+                        The OBM Id if an OBM with service = ipmi is found
+    """
+
+    apipath = '/api/2.0/nodes/' + nodeId + '/obm'
+    url = 'http://' + rackHD_IP + ':9090' + apipath
+    headerstring = {"Content-Type": "application/json", "Authorization": "JWT " + RHDtoken}
+
+    try:
+        response = requests.get(url, headers=headerstring)
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+    data_text = response.text
+    data = json.loads(response.text, encoding='utf-8')
+
+    for entry in data :
+        if entry['service'] == 'ipmi-obm-service':
+            return entry['id']
+    return "no obm configured"
+
+#####################################################################
+
+
+def retrieveRHDToken():
+    """"
+    Description :       retrieve the rackHD token allowing api querying
+    parameters :        nodeId - the rackhd asssigned id of the node to be Added
+    returns :           Text string = "no obm configured" if no OBM is found
+                        The OBM Id if an OBM with service = ipmi is found
+    """
+    url = "http://" + rackHD_IP + ":9090/login"
+    header = {'Content-Type': 'application/json'}
+    body = '{"username": "' + rackHD_username + '", "password": "' + rackHD_password + '"}'
+
+    try:
+        resp = requests.post(url, headers=header, data=body)
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+
+    tokenJson = json.loads(resp.text, encoding='utf-8')
+    token = tokenJson["token"]
+    return token
+
+#####################################################################
+
+def getNodeIdentifier(token, testNodeMAC):
+    # Get the node Identifier value
+
+    apipath = '/api/2.0/nodes/'
+    url = 'http://' + rackHD_IP + ':9090' + apipath
+    headerstring = {"Content-Type": "application/json", "Authorization": "JWT " + RHDtoken}
+
+    try:
+     response = requests.get(url, headers=headerstring)
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+    data_text = response.text
+    data_json = json.loads(response.text, encoding='utf-8')
+    assert testNodeMAC in data_text, 'Error: Node not in Rackhd'
+    for nodes in data_json:
+        if testNodeMAC.rstrip() in nodes['identifiers']:
+            testNodeIdentifier = nodes['id']
+            return testNodeIdentifier
+
+#############################################################################
+
+def check_step4_addHostToVcenter():
+    """" Check that the new ESXi host has been added to the Scaleio VCenter """
+    try:
+        # Disabling urllib3 ssl warnings
+        requests.packages.urllib3.disable_warnings()
+
+        # Disabling SSL certificate verification
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+        context.verify_mode = ssl.CERT_NONE
+
+        # connect this thing
+        si = SmartConnect(
+            host=vcenter_IP,
+            user=vcenter_username,
+            pwd=vcenter_password,
+            port=vcenter_port,
+            sslContext=context)
+
+        # disconnect this thing
+        atexit.register(Disconnect, si)
+        content = si.RetrieveContent()
+
+        # Search the Vcenter for a host with an IP = the ESXi Manangement IP we used
+        # parameters for the search are (specific datacenter, IP Address, False => find hosts only and not vm's)
+        addedHost = content.searchIndex.FindByIp(None, esxiManagementIpAddress, False)
+
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+    domainName = "lab.vce.com"
+    expectedHostName = esxiManagementHostname + '.' +  domainName
+
+    if addedHost :
+        if addedHost.name == expectedHostName :
+            return 1
+    else :
+         return 0
+
+
+#############################################################################
+
+def check_step5_applyESXLicense():
+    """" Check that the correct license has been applied to the new ESXi host """
+    try:
+        # Disabling urllib3 ssl warnings
+        requests.packages.urllib3.disable_warnings()
+
+        # Disabling SSL certificate verification
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+        context.verify_mode = ssl.CERT_NONE
+
+        # connect this thing
+        si = SmartConnect(
+            host=vcenter_IP,
+            user=vcenter_username,
+            pwd=vcenter_password,
+            port=vcenter_port,
+            sslContext=context)
+
+        # disconnect this thing
+        atexit.register(Disconnect, si)
+        content = si.RetrieveContent()
+
+        # Search the Vcenter for a host with an IP = the ESXi Manangement IP
+        # parameters for the search are (specific datacenter, IP Address, False => find hosts only and not vm's)
+        addedHost = content.searchIndex.FindByIp(None, esxiManagementIpAddress, False)
+
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+    if addedHost:
+        if ("VMware ESX Server" in addedHost.summary.config.product.licenseProductName) \
+        and ("6.0" in addedHost.summary.config.product.licenseProductVersion):
+            return 1
+    else:
+        return 0
+
+#############################################################################
+
+def check_step6_datastoreRename():
+    """" Verify that the datastore associated with the newly added ESXi host has been
+        renamed. The new name should be of the form 'DASxx', where 'xx' are the last two digits of the
+        the new hostname.
+    """
+    try:
+        # Disabling urllib3 ssl warnings
+        requests.packages.urllib3.disable_warnings()
+
+        # Disabling SSL certificate verification
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+        context.verify_mode = ssl.CERT_NONE
+
+        # connect this thing
+        si = SmartConnect(
+            host=vcenter_IP,
+            user=vcenter_username,
+            pwd=vcenter_password,
+            port=vcenter_port,
+            sslContext=context)
+
+        # disconnect this thing
+        atexit.register(Disconnect, si)
+        content = si.RetrieveContent()
+
+        # Search the Vcenter for a host with an IP = the ESXi Manangement IP
+        # parameters for the search are (specific datacenter, IP Address, False => find hosts only and not vm's)
+        addedHost = content.searchIndex.FindByIp(None, esxiManagementIpAddress, False)
+
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+    dataStoreList = []
+
+    # iterate through the storage volumes associated with the host and record those
+    # of type VMFS to the dataStore list
+    if addedHost:
+        if addedHost.configManager.storageSystem:
+            host_file_sys_vol_mount_info = addedHost.configManager.storageSystem.fileSystemVolumeInfo.mountInfo
+            for host_mount_info in host_file_sys_vol_mount_info:
+                # Extract only VMFS volumes
+                if host_mount_info.volume.type == "VMFS":
+                    dataStoreList.append(host_mount_info.volume.name)
+
+    expectedDataStoreName = "DAS" + esxiManagementHostname[-2:]
+    print('Expected Datastore Name :', expectedDataStoreName)
+
+    # Check that a datastore with the expected name has been mounted
+    if expectedDataStoreName in dataStoreList:
+        return 1
+    else:
+        return 0
+
+#############################################################################
+
+def test_step7_exitHostMaintenanceMode():
+    """" Verify that the newly added host is no longer in maintenance mode
+    """
+    try:
+        # Disabling urllib3 ssl warnings
+        requests.packages.urllib3.disable_warnings()
+
+        # Disabling SSL certificate verification
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+        context.verify_mode = ssl.CERT_NONE
+
+        # connect this thing
+        si = SmartConnect(
+            host=vcenter_IP,
+            user=vcenter_username,
+            pwd=vcenter_password,
+            port=vcenter_port,
+            sslContext=context)
+
+        # disconnect this thing
+        atexit.register(Disconnect, si)
+        content = si.RetrieveContent()
+
+        # Search the Vcenter for a host with an IP = the ESXi Manangement IP
+        # parameters for the search are (specific datacenter, IP Address, False => find hosts only and not vm's)
+        addedHost = content.searchIndex.FindByIp(None, "10.234.122.79", False)
+
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+    if addedHost:
+        # check for maintenance status
+        if addedHost.runtime.inMaintenanceMode == False :
+            return 1
+        else:
+            return 0
+    else:
+        return 0
