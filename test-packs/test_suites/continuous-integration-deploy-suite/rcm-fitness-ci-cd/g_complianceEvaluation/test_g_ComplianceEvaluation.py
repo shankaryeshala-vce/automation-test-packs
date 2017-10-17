@@ -20,7 +20,6 @@ def load_test_data():
     global host
     host = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
 
-
 @pytest.fixture()
 def sys():
     url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/'
@@ -48,7 +47,7 @@ def sys():
     ("9.2", "9.2.1", "BIOS", "630", "BIOS", "BIOS"),
     ("9.2", "9.2.1", "NonRAID", "630", "Dell HBA330 Mini", "Non-RAID"),
     ("9.2", "9.2.1", "iDRAC", "730", "Integrated Remote Access Controller", "iDRAC"),
-    ("9.2", "9.2.1", "NIC", "730", "Intel(R) Gigabit 4P X520/I350 rNDC -", "Network"),
+    ("9.2", "9.2.1", "NIC", "730", "Intel(R) Ethernet 10G 4P X520/I350 rNDC -", "Network"),
     ("9.2", "9.2.1", "NIC", "730", "Intel(R) Ethernet 10G 2P X520 Adapter -", "Network"),
     ("9.2", "9.2.1", "BIOS", "730", "BIOS", "BIOS"),
     ("9.2", "9.2.1", "RAID", "730", "PERC H730 Mini", "RAID"),
@@ -60,12 +59,18 @@ def sys():
     ("9.2", "9.2.1.1", "BIOS", "630", "BIOS", "BIOS"),
     ("9.2", "9.2.1.1", "NonRAID", "630", "Dell HBA330 Mini", "Non-RAID"),
     ("9.2", "9.2.1.1", "iDRAC", "730", "Integrated Remote Access Controller", "iDRAC"),
-    ("9.2", "9.2.1.1", "NIC", "730", "Intel(R) Gigabit 4P X520/I350 rNDC -", "Network"),
+    ("9.2", "9.2.1.1", "NIC", "730", "Intel(R) Ethernet 10G 4P X520/I350 rNDC -", "Network"),
     ("9.2", "9.2.1.1", "NIC", "730", "Intel(R) Ethernet 10G 2P X520 Adapter -", "Network"),
     ("9.2", "9.2.1.1", "BIOS", "730", "BIOS", "BIOS"),
     ("9.2", "9.2.1.1", "RAID", "730", "PERC H730 Mini", "RAID"),
     ("9.2", "9.2.1.1", "VCENTER", "VCENTER-APPLIANCE", "VCENTER-APPLIANCE", "VMware-VCSA"),
     ("9.2", "9.2.1.1", "VCENTER", "VCENTER-WINDOWS", "VCENTER-WINDOWS", "VMware-VIMSetup"),
+    ("9.2", "9.2.2", "BIOS", "630", "BIOS", "BIOS"),
+    ("9.2", "9.2.3", "BIOS", "630", "BIOS", "BIOS"),
+    ("9.2", "9.2.2", "BIOS", "730", "BIOS", "BIOS"),
+    ("9.2", "9.2.3", "BIOS", "730", "BIOS", "BIOS"),
+    ("9.2", "9.2.2", "RAID", "730", "PERC H730 Mini", "RAID"),
+    ("9.2", "9.2.3", "RAID", "730", "PERC H730 Mini", "RAID"),
     ("9.2", "9.2.2", "BIOS", "630", "BIOS", "VxRack_1000_FLEX/Component/BIOS/2.2.5/BIOS"),
     ("9.2", "9.2.2", "BIOS", "730", "BIOS", "VxRack_1000_FLEX/Component/BIOS/2.2.5/BIOS"),
     ("9.2", "9.2.2", "RAID", "730", "PERC H730 Mini", "VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware"),
