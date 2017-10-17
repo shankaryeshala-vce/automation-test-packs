@@ -379,7 +379,6 @@ def getComplianceDataSystem_INVALID(sysUUID):
 
     print("\nReturned data has completed all defined checks successfully......")
 
-
 def getComplianceDataSystem_NULL():
     print("Verifying 404 returned if no component UUID provided.")
 

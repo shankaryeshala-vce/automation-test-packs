@@ -442,20 +442,17 @@ def test_getComplianceDataDevice1():
     getComplianceData("VXRACK", "FLEX", "R730XD", "POWEREDGE", "SERVER", path + "complianceDataDevicePOWEREDGE.json",
                       systemUUID, 5, 5)
 
-
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice2():
     getComplianceDataDeviceSubComps("NIC", "Ethernet 10G 2P", "R730XD", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
-
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice3():
     getComplianceDataDeviceSubComps("NIC", "Ethernet 10G 4P", "R730XD", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
-
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended

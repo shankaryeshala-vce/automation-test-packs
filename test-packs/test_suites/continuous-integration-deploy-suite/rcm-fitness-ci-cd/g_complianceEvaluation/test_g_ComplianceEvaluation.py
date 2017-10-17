@@ -20,7 +20,6 @@ def load_test_data():
     global host
     host = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
 
-
 @pytest.fixture()
 def sys():
     url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/system/definition/'
