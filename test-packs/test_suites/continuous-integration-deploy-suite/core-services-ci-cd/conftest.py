@@ -75,13 +75,13 @@ class RabbitMq:
 @pytest.fixture(scope="session")
 def hostIpAddress():
     import cpsd
-    global cpsd
+    #global cpsd
     return cpsd.props.base_hostname
 
 @pytest.fixture(scope="session")
 def hostConnection(hostIpAddress):
     import cpsd
-    global cpsd
+    #global cpsd
     username = cpsd.props.base_username
     password = cpsd.props.base_password
 
