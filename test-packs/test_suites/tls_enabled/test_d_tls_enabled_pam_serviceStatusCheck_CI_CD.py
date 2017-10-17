@@ -8,7 +8,7 @@ import pytest
 
 
 
-@pytest.mark.tls_enabled
+#@pytest.mark.tls_enabled
 def test_pam_uninstall(setup):
     """
     Title: Verify the persistence asset manager service can be uninstalled
@@ -31,7 +31,7 @@ def test_pam_uninstall(setup):
 
     assert my_return_status == 0, "pam is not uninstalled"
 
-@pytest.mark.tls_enabled
+#@pytest.mark.tls_enabled
 def test_pam_install(setup):
     #this test is working (TW)
     """

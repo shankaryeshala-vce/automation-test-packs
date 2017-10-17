@@ -8,7 +8,7 @@ import pytest
 
 
 
-@pytest.mark.tls_enabled
+#@pytest.mark.tls_enabled
 def test_endpoint_uninstall(setup):
     """
     Title: Verify the endpoint service can be uninstalled
@@ -31,7 +31,7 @@ def test_endpoint_uninstall(setup):
 
     assert my_return_status == 0, "endpoint is not uninstalled"
 
-@pytest.mark.tls_enabled
+#@pytest.mark.tls_enabled
 def test_endpoint_install(setup):
     #this test is working (TW)
     """
