@@ -79,7 +79,7 @@ def test_coreamqptls(core_services, setup):
     assert not err
 
 
-#@pytest.mark.tls_enabled
+@pytest.mark.tls_enabled_stop_start
 @pytest.mark.core_services_mvp_extended
 def test_core_stop(core_container, setup):
     """
@@ -112,7 +112,7 @@ def test_core_stop(core_container, setup):
     assert "Exited" in response2, "%s did not stop or container has been removed" % core_container
 
 
-#@pytest.mark.tls_enabled
+@pytest.mark.tls_enabled_stop_start
 @pytest.mark.core_services_mvp_extended
 def test_core_start(core_container, setup):
     """
