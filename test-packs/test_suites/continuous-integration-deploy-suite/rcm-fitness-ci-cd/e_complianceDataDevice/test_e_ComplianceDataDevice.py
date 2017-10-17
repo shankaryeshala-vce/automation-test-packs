@@ -453,7 +453,7 @@ def test_getComplianceDataDevice2():
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice3():
-    getComplianceDataDeviceSubComps("NIC", "Gigabit 4P X520", "R730XD", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataDeviceSubComps("NIC", "Ethernet 10G 4P", "R730XD", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDevicePOWEREDGE.json", systemUUID)
 
 
