@@ -48,7 +48,7 @@ def test_thirdparty_containerup(setup, thirdparty_container):
 
 
 
-@pytest.mark.tls_enabled
+#@pytest.mark.tls_enabled
 @pytest.mark.core_services_mvp_extended
 def test_core_stop(thirdparty_container, setup):
     """
@@ -85,7 +85,7 @@ def test_core_stop(thirdparty_container, setup):
     assert "Exited" in response2, "%s did not stop or container has been removed" % thirdparty_container
 
 
-@pytest.mark.tls_enabled
+#@pytest.mark.tls_enabled
 @pytest.mark.core_services_mvp_extended
 def test_thirdparty_start(thirdparty_container, setup):
     """
