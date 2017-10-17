@@ -361,7 +361,6 @@ def test_preprocess_GET_workflow_status():
     # preprocess_workflow_id =''    # This is used for test purposes
     json_number = 0
 
-    # workflow_step1 = 'Finding discovered Nodes'
     workflow_step1 = 'List ScaleIO Components'
     workflow_step2 = 'List VCenter Components'
     workflow_step3 = 'Discover ScaleIO'
@@ -387,11 +386,6 @@ def test_preprocess_GET_workflow_status():
             # If the process has failed immediately then fail the test outright
             assert data['status'] != 'FAILED', 'ERROR: The preprocess workflow overall status = Failed'
 
-            # # Finding discovered Nodes
-            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step1:
-            #     check_the_workflow_task(url_body, data, json_number, workflow_step1)
-            #     assert check_step1_findNode(data, json_number), 'Check on ' + workflow_step1 + ' failed'
-            #     json_number += 1
 
             data = get_latest_api_response(url_body)
 
@@ -433,7 +427,7 @@ def test_preprocess_GET_workflow_status():
             # Configuring Out of Band Management
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step6:
                 check_the_workflow_task(url_body, data, json_number, workflow_step6)
-                assert check_step6_ConfigIP(data, json_number, url_body), 'Check on ' + workflow_step6 + ' failed'
+                assert check_configIdrac(data, json_number, url_body), 'Check on ' + workflow_step6 + ' failed'
                 json_number += 1
 
             data = get_latest_api_response(url_body)
@@ -441,7 +435,7 @@ def test_preprocess_GET_workflow_status():
             # Ping iDRAC IP Address
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step7:
                 check_the_workflow_task(url_body, data, json_number, workflow_step7)
-                assert check_step7_PingIP(), 'Check on ' + workflow_step7 + ' failed'
+                assert check_pingIdrac(), 'Check on ' + workflow_step7 + ' failed'
                 json_number += 1
 
             data = get_latest_api_response(url_body)
@@ -456,10 +450,10 @@ def test_preprocess_GET_workflow_status():
             # Configure Boot Device Idrac
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step9:
                 check_the_workflow_task(url_body, data, json_number, workflow_step9)
-                assert check_step9_biosChange(), 'Check on ' + workflow_step9 + ' failed'
+                #assert check_configureBootDeviceIdrac(), 'Check on ' + workflow_step9 + ' failed'
                 json_number += 1
 
-                # data = get_latest_api_response(url_body)
+            # data = get_latest_api_response(url_body)
 
                 # Find ScaleIO
                 # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
@@ -472,13 +466,15 @@ def test_preprocess_GET_workflow_status():
             # Find vcluster
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step11:
                 check_the_workflow_task(url_body, data, json_number, workflow_step11)
-                assert check_step11_findVcluster(data), 'Check on ' + workflow_step11 + ' failed'
+                assert check_findVCluster(data), 'Check on ' + workflow_step11 + ' failed'
                 json_number += 1
+
+            data = get_latest_api_response(url_body)
 
             # Find Protection Domain
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step12:
                 check_the_workflow_task(url_body, data, json_number, workflow_step12)
-                assert check_step12_findProtectionDomain(data), 'Check on ' + workflow_step12 + ' failed'
+                assert check_findProtectionDomain(data), 'Check on ' + workflow_step12 + ' failed'
                 json_number += 1
 
             ######################### Done
@@ -495,6 +491,8 @@ def test_preprocess_GET_workflow_status():
             raise Exception(err)
 
     time.sleep(5)
+    createAddNodeMsgJson()
+
 
 
 ########################################################################################
@@ -559,6 +557,60 @@ def update_preprocess_params_json():
 
     return 1
 
+# Create the json file that will be used in the addnode test
+def createAddNodeMsgJson():
+    """
+    Description:    This method will update the json file with the symphonyUuid & nodeId values. Others wil be added as needed
+    Parameters:     None
+    Returns:        0 or 1 (Boolean)
+    """
+
+    symphonyUuid = get_SymphonyUuid_of_discovered_node()
+
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
+
+    if (os.path.isfile(filePath) == 0):
+        return 0
+
+    with open(filePath) as json_file:
+        data = json.load(json_file)
+
+    data['symphonyUuid'] = symphonyUuid
+
+    data['idracIpAddress'] = New_Node['Node_IP']
+    data['idracSubnetMask'] = New_Node['Node_Mask']
+    data['idracGatewayIpAddress'] = New_Node['Node_GW']
+    data['esxiManagementHostname'] = esxiManagementHostname
+    data['esxiManagementIpAddress'] = esxiManagementIpAddress
+    data['esxiManagementSubnetMask'] = esxiManagementSubnetMask
+    data['esxiManagementGatewayIpAddress'] = esxiManagementGatewayIpAddress
+
+    data['vMotionManagementIpAddress'] = vMotionManagementIpAddress
+    data['vMotionManagementIpAddress'] = vMotionManagementSubnetMask
+
+    data['scaleIoSvmManagementIpAddress'] = scaleIoSvmManagementIpAddress
+    data['scaleIoSvmManagementSubnetMask'] = scaleIoSvmManagementSubnetMask
+    data['scaleIoSvmManagementGatewayAddress'] = scaleIoSvmManagementGatewayAddress
+
+    data['scaleIoData1KernelIpAddress'] = scaleIoData1KernelIpAddress
+    data['scaleIoData1SvmIpAddress'] = scaleIoData1SvmIpAddress
+    data['scaleIoData1KernelAndSvmSubnetMask'] = scaleIoData1KernelAndSvmSubnetMask
+    data['scaleIoData2KernelIpAddress'] = scaleIoData2KernelIpAddress
+    data['scaleIoData2SvmIpAddress'] = scaleIoData2SvmIpAddress
+    data['scaleIoData2KernelAndSvmSubnetMask'] = scaleIoData2KernelAndSvmSubnetMask
+
+    data['clusterName'] = clustername
+    data['protectionDomain'] = protectionDomain
+
+    with open(filePath, 'w') as outfile:
+        json.dump(data, outfile)
+
+    print('\nAddNode POST message body:')
+    print(data)
+
+    return 1
+
 
 ######################
 # This is the main response workflow test
@@ -593,11 +645,11 @@ def check_the_workflow_task(url_body, data, json_number, workflow_step):
                            'workFlowTaskStatus'] != 'FAILED', 'Error in Step 1: ' + workflow_step + ' failed'
                 # If the task has failed then fail the entire test.
 
-
+######################
 # Functions to check the steps of the workflow actually did something ###########
 
 # Check the new IP address is returned in the results
-def check_step6_ConfigIP(data, json_num, url_body):
+def check_configIdrac(data, json_num, url_body):
     time.sleep(3)
     data = get_latest_api_response(url_body)
     error_list = []
@@ -619,7 +671,7 @@ def check_step6_ConfigIP(data, json_num, url_body):
 
 
 # Check we can ping the new IP address
-def check_step7_PingIP():
+def check_pingIdrac():
     # Contact the new IP address and check the network settings
     error_list = []
 
@@ -656,7 +708,7 @@ def check_step9_FindScaleIO(data):
 
 
 # Check the bios setting has changed.
-def check_step9_biosChange():
+def check_configureBootDeviceIdrac():
     # export the bios configuration again and check the DNE relevant attributes have been updated
     response = get_BIOS_settings(New_Node)
     assert response.status_code == 200, 'Error, '
@@ -679,9 +731,10 @@ def check_step9_biosChange():
 
 
 # Check the cluster retunred is retunred from source also
-def check_step11_findVcluster(data):
+def check_findVCluster(data):
     actualvCenterClusterList = getRealVcenterInfo()
 
+    global clustername
     error_list = []
     for step in data['workflowTasksResponseList']:
         if step['workFlowTaskName'] == 'Find VCluster':
@@ -699,9 +752,9 @@ def check_step11_findVcluster(data):
         return 0
 
 
-def check_step12_findProtectionDomain(data):
+def check_findProtectionDomain(data):
     # actualProtectionDomainList = getProtectionDomainInfo()
-
+    global protectionDomain
     error_list = []
     for step in data['workflowTasksResponseList']:
         if step['workFlowTaskName'] == 'Protection Domain':
