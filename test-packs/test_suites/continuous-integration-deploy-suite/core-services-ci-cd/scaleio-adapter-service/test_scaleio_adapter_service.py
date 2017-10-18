@@ -107,7 +107,7 @@ def test_scaleio_adapter_servicerunning():
     print('\nDocker Container is:', my_return_status, '\n')
     assert my_return_status == 'Up', (service_name + " not running")
 
-@pytest.mark.skip(reason="Defect ESTS-133293")
+
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_registerscaleio():
@@ -204,7 +204,7 @@ def test_scaleio_RMQ_bindings_core(exchange, queue):
     assert queue in queues, 'The queue "' + queue + '" is not bound to the exchange "' + exchange + '"'
     print(exchange, '\nis bound to\n', queue, '\n')
 
-@pytest.mark.skip(reason="Defect ESTS-133293")
+
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_scaleio_adapter_full_ListCapabilities():
@@ -256,6 +256,8 @@ def test_scaleio_adapter_full_ListCapabilities():
     capabilities3 = 'scaleio-sds-remove'
     capabilities4 = 'scaleio-sdc-remove'
     capabilities5 = 'scaleio-list-components'
+    capabilities6 = 'scaleio-add-host-to-protection-domain'
+    capabilities7 = 'scaleio-update-sdc-performance-profile'
 
 
     error_list = []
@@ -272,6 +274,10 @@ def test_scaleio_adapter_full_ListCapabilities():
         error_list.append(capabilities4)
     if (capabilities5 not in return_message):
         error_list.append(capabilities5)
+    if (capabilities6 not in return_message):
+        error_list.append(capabilities6)
+    if (capabilities7 not in return_message):
+        error_list.append(capabilities7)
 
     assert not error_list, ('Missing some scaleio capabilities')
 
@@ -279,7 +285,7 @@ def test_scaleio_adapter_full_ListCapabilities():
 
     cleanup('test.capability.registry.response')
 
-@pytest.mark.skip(reason="Defect ESTS-133293")
+
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_consul_verify_scaleio_registered():
@@ -322,7 +328,7 @@ def test_consul_verify_scaleio_registered():
         print('\n')
         raise Exception(err)
 
-@pytest.mark.skip(reason="Defect ESTS-133293")
+
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
 def test_consul_verify_scaleio_passing_status():

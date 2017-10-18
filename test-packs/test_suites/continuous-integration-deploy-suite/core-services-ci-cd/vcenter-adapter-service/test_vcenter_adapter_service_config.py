@@ -289,7 +289,15 @@ def test_vcenter_adapter_full_ListCapabilities():
     capabilities14 = 'vcenter-enablePCIpassthroughHost'
     capabilities15 = 'vcenter-addhostdvswitch'
     capabilities16 = 'vcenter-rename-datastore'
-    capabilities17= 'vcenter-list-components'
+    capabilities17 = 'vcenter-list-components'
+    capabilities18 = 'esxi-credential-details'
+    capabilities19 = 'vcenter-migrate-host-networking'
+    capabilities20 = 'vcenter-add-host-virtual-nic-dvportgroup'
+    capabilities21 = 'vcenter-update-software-acceptance'
+    capabilities22 = 'vcenter-vm-powercommand'
+    capabilities23 = 'vcenter-configure-vm-network'
+    capabilities24 = 'vcenter-execute-remote-ssh-commands'
+
 
     error_list = []
 
@@ -329,6 +337,21 @@ def test_vcenter_adapter_full_ListCapabilities():
         error_list.append(capabilities16)
     if (capabilities17 not in return_message):
         error_list.append(capabilities17)
+    if (capabilities18 not in return_message):
+        error_list.append(capabilities18)
+    if (capabilities19 not in return_message):
+        error_list.append(capabilities19)
+    if (capabilities20 not in return_message):
+        error_list.append(capabilities20)
+    if (capabilities21 not in return_message):
+        error_list.append(capabilities21)
+    if (capabilities22 not in return_message):
+        error_list.append(capabilities22)
+    if (capabilities23 not in return_message):
+        error_list.append(capabilities23)
+    if (capabilities24 not in return_message):
+        error_list.append(capabilities24)
+
 
     assert not error_list, ('Missing some vcenter-adapter capabilities')
 
