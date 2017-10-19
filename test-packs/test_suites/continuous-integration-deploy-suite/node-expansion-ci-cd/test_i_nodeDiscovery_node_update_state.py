@@ -240,7 +240,7 @@ def test_getListOfNodes():
 
     assert listingsMsg['discoveredNodes'], "Error - No discovered nodes were returned in Listing"
     for node in listingsMsg['discoveredNodes']:
-        if node['nodeId'] == testNodeId :
+        if node['convergedUuid'] == symphonyNodeId :
             assert "DISCOVERED" == node["allocationStatus"], "Error, wrong Node Status returned in listing"
             assert symphonyNodeId == node['convergedUuid'], "Error, wrong converged UUID returned in listing"
 
