@@ -40,50 +40,50 @@ def sys():
 
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.parametrize(("train", "version", "type", "model", "identifier", "fileName"), [
-    ("9.2", "9.2.1", "iDRAC", "630", "Integrated Remote Access Controller", "iDRAC"),
-    ("9.2", "9.2.1", "NIC", "630", "Intel(R) Gigabit 4P X520/I350 rNDC -", "Network"),
-    ("9.2", "9.2.1", "NIC", "630", "Intel(R) Ethernet 10G 2P X520 Adapter -", "Network"),
-    ("9.2", "9.2.1", "BIOS", "630", "BIOS", "BIOS"),
-    ("9.2", "9.2.1", "NonRAID", "630", "Dell HBA330 Mini", "Non-RAID"),
-    ("9.2", "9.2.1", "iDRAC", "730", "Integrated Remote Access Controller", "iDRAC"),
-    ("9.2", "9.2.1", "NIC", "730", "Intel(R) Ethernet 10G 4P X520/I350 rNDC -", "Network"),
-    ("9.2", "9.2.1", "NIC", "730", "Intel(R) Ethernet 10G 2P X520 Adapter -", "Network"),
-    ("9.2", "9.2.1", "BIOS", "730", "BIOS", "BIOS"),
-    ("9.2", "9.2.1", "RAID", "730", "PERC H730 Mini", "RAID"),
-    ("9.2", "9.2.1", "VCENTER", "VCENTER-APPLIANCE", "VCENTER-APPLIANCE", "VMware-VCSA"),
-    ("9.2", "9.2.1", "VCENTER", "VCENTER-WINDOWS", "VCENTER-WINDOWS", "VMware-VIMSetup"),
-    ("9.2", "9.2.1.1", "iDRAC", "630", "Integrated Remote Access Controller", "iDRAC"),
-    ("9.2", "9.2.1.1", "NIC", "630", "Intel(R) Gigabit 4P X520/I350 rNDC -", "Network"),
-    ("9.2", "9.2.1.1", "NIC", "630", "Intel(R) Ethernet 10G 2P X520 Adapter -", "Network"),
-    ("9.2", "9.2.1.1", "BIOS", "630", "BIOS", "BIOS"),
-    ("9.2", "9.2.1.1", "NonRAID", "630", "Dell HBA330 Mini", "Non-RAID"),
-    ("9.2", "9.2.1.1", "iDRAC", "730", "Integrated Remote Access Controller", "iDRAC"),
-    ("9.2", "9.2.1.1", "NIC", "730", "Intel(R) Ethernet 10G 4P X520/I350 rNDC -", "Network"),
-    ("9.2", "9.2.1.1", "NIC", "730", "Intel(R) Ethernet 10G 2P X520 Adapter -", "Network"),
-    ("9.2", "9.2.1.1", "BIOS", "730", "BIOS", "BIOS"),
-    ("9.2", "9.2.1.1", "RAID", "730", "PERC H730 Mini", "RAID"),
-    ("9.2", "9.2.1.1", "VCENTER", "VCENTER-APPLIANCE", "VCENTER-APPLIANCE", "VMware-VCSA"),
-    ("9.2", "9.2.1.1", "VCENTER", "VCENTER-WINDOWS", "VCENTER-WINDOWS", "VMware-VIMSetup"),
-    ("9.2", "9.2.2", "BIOS", "630", "BIOS", "BIOS"),
-    ("9.2", "9.2.3", "BIOS", "630", "BIOS", "BIOS"),
-    ("9.2", "9.2.2", "BIOS", "730", "BIOS", "BIOS"),
-    ("9.2", "9.2.3", "BIOS", "730", "BIOS", "BIOS"),
-    ("9.2", "9.2.2", "RAID", "730", "PERC H730 Mini", "RAID"),
-    ("9.2", "9.2.3", "RAID", "730", "PERC H730 Mini", "RAID"),
-    ("9.2", "9.2.2", "BIOS", "630", "BIOS", "VxRack_1000_FLEX/Component/BIOS/2.2.5/BIOS"),
-    ("9.2", "9.2.2", "BIOS", "730", "BIOS", "VxRack_1000_FLEX/Component/BIOS/2.2.5/BIOS"),
-    ("9.2", "9.2.2", "RAID", "730", "PERC H730 Mini", "VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware"),
-    ("9.2", "9.2.3", "BIOS", "630", "BIOS", "VxRack_1000_FLEX/Component/BIOS/2.4.3/BIOS"),
-    ("9.2", "9.2.3", "BIOS", "730", "BIOS", "VxRack_1000_FLEX/Component/BIOS/2.4.3/BIOS"),
-    ("9.2", "9.2.3", "RAID", "730", "PERC H730 Mini", "VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware"),
-    ("3.2", "3.2.2", "BIOS", "630", "BIOS", "VxRack_1000_FLEX/Component/BIOS/2.2.5/BIOS"),
-    ("3.2", "3.2.2", "BIOS", "730", "BIOS", "VxRack_1000_FLEX/Component/BIOS/2.2.5/BIOS"),
-    ("3.2", "3.2.2", "RAID", "730", "PERC H730 Mini", "VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware"),
-    ("3.2", "3.2.3", "BIOS", "630", "BIOS", "VxRack_1000_FLEX/Component/BIOS/2.4.3/BIOS"),
-    ("3.2", "3.2.3", "BIOS", "730", "BIOS", "VxRack_1000_FLEX/Component/BIOS/2.4.3/BIOS"),
-    ("3.2", "3.2.3", "RAID", "730", "PERC H730 Mini", "VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware")])
-def test_post_eval(sys, train, version, type, model, identifier, fileName):
+@pytest.mark.parametrize(("train", "version", "type", "model", "identifier"), [
+    ("9.2", "9.2.1", "iDRAC", "630", "Integrated Remote Access Controller"),
+    ("9.2", "9.2.1", "NIC", "630", "Intel(R) Gigabit 4P X520/I350 rNDC -"),
+    ("9.2", "9.2.1", "NIC", "630", "Intel(R) Ethernet 10G 2P X520 Adapter -"),
+    ("9.2", "9.2.1", "BIOS", "630", "BIOS"),
+    ("9.2", "9.2.1", "NonRAID", "630", "Dell HBA330 Mini"),
+    ("9.2", "9.2.1", "iDRAC", "730", "Integrated Remote Access Controller"),
+    ("9.2", "9.2.1", "NIC", "730", "Intel(R) Ethernet 10G 4P X520/I350 rNDC -"),
+    ("9.2", "9.2.1", "NIC", "730", "Intel(R) Ethernet 10G 2P X520 Adapter -"),
+    ("9.2", "9.2.1", "BIOS", "730", "BIOS"),
+    ("9.2", "9.2.1", "ESXI", "VCENTER", "lab.vce.com"),
+    ("9.2", "9.2.1", "RAID", "730", "PERC H730 Mini"),
+    ("9.2", "9.2.1", "VCENTER", "VCENTER-APPLIANCE", "VCENTER-APPLIANCE"),
+    ("9.2", "9.2.1", "VCENTER", "VCENTER-WINDOWS", "VCENTER-WINDOWS"),
+    ("9.2", "9.2.1.1", "iDRAC", "630", "Integrated Remote Access Controller"),
+    ("9.2", "9.2.1.1", "NIC", "630", "Intel(R) Gigabit 4P X520/I350 rNDC -"),
+    ("9.2", "9.2.1.1", "NIC", "630", "Intel(R) Ethernet 10G 2P X520 Adapter -"),
+    ("9.2", "9.2.1.1", "BIOS", "630", "BIOS"),
+    ("9.2", "9.2.1.1", "NonRAID", "630", "Dell HBA330 Mini"),
+    ("9.2", "9.2.1.1", "iDRAC", "730", "Integrated Remote Access Controller"),
+    ("9.2", "9.2.1.1", "NIC", "730", "Intel(R) Ethernet 10G 4P X520/I350 rNDC -"),
+    ("9.2", "9.2.1.1", "NIC", "730", "Intel(R) Ethernet 10G 2P X520 Adapter -"),
+    ("9.2", "9.2.1.1", "BIOS", "730", "BIOS"),
+    ("9.2", "9.2.1.1", "ESXI", "VCENTER", "lab.vce.com"),
+    ("9.2", "9.2.1.1", "RAID", "730", "PERC H730 Mini"),
+    ("9.2", "9.2.1.1", "VCENTER", "VCENTER-APPLIANCE", "VCENTER-APPLIANCE"),
+    ("9.2", "9.2.1.1", "VCENTER", "VCENTER-WINDOWS", "VCENTER-WINDOWS"),
+    ("9.2", "9.2.2", "BIOS", "630", "BIOS"),
+    ("9.2", "9.2.3", "BIOS", "630", "BIOS"),
+    ("9.2", "9.2.2", "BIOS", "730", "BIOS"),
+    ("9.2", "9.2.3", "BIOS", "730", "BIOS"),
+    ("9.2", "9.2.2", "RAID", "730", "PERC H730 Mini"),
+    ("9.2", "9.2.3", "RAID", "730", "PERC H730 Mini"),
+    ("9.2", "9.2.2", "ESXI", "VCENTER", "lab.vce.com"),
+    ("9.2", "9.2.3", "ESXI", "VCENTER", "lab.vce.com"),
+    ("3.2", "3.2.2", "BIOS", "630", "BIOS"),
+    ("3.2", "3.2.2", "BIOS", "730", "BIOS"),
+    ("3.2", "3.2.2", "ESXI", "VCENTER", "lab.vce.com"),
+    ("3.2", "3.2.2", "RAID", "730", "PERC H730 Mini"),
+    ("3.2", "3.2.3", "BIOS", "630", "BIOS"),
+    ("3.2", "3.2.3", "BIOS", "730", "BIOS"),
+    ("3.2", "3.2.3", "ESXI", "VCENTER", "lab.vce.com"),
+    ("3.2", "3.2.3", "RAID", "730", "PERC H730 Mini")])
+def test_post_eval(sys, train, version, type, model, identifier):
     url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/VxRack/1000 FLEX/' + train + '/' + version + '/'
     response = requests.get(url)
     assert response.status_code == 200, "Request has not been acknowledged as expected."
@@ -108,12 +108,16 @@ def test_post_eval(sys, train, version, type, model, identifier, fileName):
     print("Version: %s" % version)
 
     while results < evals:
+        print(1)
         if model in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition']['model'] and identifier in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity']['identifier']:
+            print(2)
             assert model in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition'][
                 'model'], "Model"
             assert identifier in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity'][
                 'identifier'], "Identifier"
-            if data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity']['elementType'] == type:
+            print(3)
+            if type in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity']['elementType']:
+                print(4)
                 assert data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity'][
                            'elementType'] == type, "Type"
                 assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']['rcmUuid'] == rcmid
@@ -122,6 +126,7 @@ def test_post_eval(sys, train, version, type, model, identifier, fileName):
                 assert data['rcmEvaluationResults'][results]['elementUuid'] == \
                        data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['componentUuid']
                 if 'serialNumber' in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity']:
+                    print(5)
                     assert type in data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['identity']['serialNumber']
                 assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']['productFamily'] == \
                        data['rcmEvaluationResults'][results]['evaluatedVersionDatum']['definition']['productFamily']
@@ -143,9 +148,11 @@ def test_post_eval(sys, train, version, type, model, identifier, fileName):
                 print('Expected value:', data['rcmEvaluationResults'][results]['expectedValues'][0])
                 print('Message:', data['rcmEvaluationResults'][results]['evaluationMessage'])
                 if actual == expected:
+                    print(6)
                     assert (data['rcmEvaluationResults'][results]['evaluationResult']) == "match", "Expect a match"
                     print("Returned result: %s" % data['rcmEvaluationResults'][results]['evaluationResult'])
                 else:
+                    print(6)
                     assert (
                            data['rcmEvaluationResults'][results]['evaluationResult']) == "mismatch", "Expect a mismatch"
                     print("Returned result: %s" % data['rcmEvaluationResults'][results]['evaluationResult'])
@@ -154,27 +161,33 @@ def test_post_eval(sys, train, version, type, model, identifier, fileName):
                 stripActual = actual.strip("0")
                 stripExpected = expected.strip("0")
                 if stripActual == stripExpected:
+                    print(7)
                     print("Returned result: %s" % data['rcmEvaluationResults'][results]['evaluationResult'])
                     print('Actual stripped:', stripActual)
                     print('Expected stripped:', stripExpected)
                     assert (data['rcmEvaluationResults'][results]['evaluationResult']) == "match", "Expect a match"
                 else:
+                    print(7)
                     print("Returned result: %s" % data['rcmEvaluationResults'][results]['evaluationResult'])
                     print('Actual stripped:', stripActual)
                     print('Expected stripped:', stripExpected)
                     assert (
                            data['rcmEvaluationResults'][results]['evaluationResult']) == "mismatch", "Expect a mismatch"
 
-                if "versionFileName" in data['rcmEvaluationResults'][results]['evaluatedRcmDatum']:
-                    assert fileName in data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileName"], "Unexpected fileName returned."
-                    assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"] != "", "Unexpected fileHash returned."
-                if "versionFileHash" in data['rcmEvaluationResults'][results]['evaluatedRcmDatum']:
-                    if data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"] != "unknown":
-                        assert len(data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"]) >  24, "Unexpected fileHash rturned."
+                # if "versionFileName" in data['rcmEvaluationResults'][results]['evaluatedRcmDatum']:
+                #     assert fileName in data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileName"], "Unexpected fileName returned."
+                #     assert data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"] != "", "Unexpected fileHash returned."
+                # if "versionFileHash" in data['rcmEvaluationResults'][results]['evaluatedRcmDatum']:
+                #     if data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"] != "unknown":
+                #         assert len(data['rcmEvaluationResults'][results]['evaluatedRcmDatum']["versionFileHash"]) >  24, "Unexpected fileHash rturned."
                 print("Here....")
                 return
             instances += 1
-        results += 1
+            results += 1
+        else:
+            results += 1
+            continue
+
 
     assert False, "No Evaluation for this component"
     print('Specified type not found:', type)
