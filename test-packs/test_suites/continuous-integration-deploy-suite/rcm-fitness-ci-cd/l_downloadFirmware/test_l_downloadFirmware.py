@@ -1287,18 +1287,18 @@ def test_verifyConsumedNoneAttributes8():
     verifyConsumedAttributesNone(path + 'noAllFWRequest.json', path + 'noAllFWResponse.json', "SHA-256", "VCEVision")
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_downloadFWFileRequest9():
     downloadFWFileRequest(message, 'downloadFWRequest.json', 'downloadFWCredentials.json',
                           'downloadFWResponse.json', "RCM/3.2.2/VxRack_1000_FLEX/Component/BIOS/2.2.5/BIOS_PFWCY_WN64_2.2.5.EXE", 24992920)
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_verifyPublishedAttributes9():
     verifyPublishedAttributes(path + 'downloadFWRequest.json')
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_verifyConsumedAttributes9():
     verifyConsumedAttributes("RCM/3.2.2/VxRack_1000_FLEX/Component/BIOS/2.2.5/BIOS_PFWCY_WN64_2.2.5.EXE", path + 'downloadFWRequest.json', path + 'downloadFWCredentials.json',
                              path + 'downloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
@@ -1321,21 +1321,17 @@ def test_verifyProgressMessage10():
                           path + 'repeatDownloadFWResponse.json')
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+# @pytest.mark.rcm_fitness_mvp
 def test_downloadFWFileRequest11():
     downloadFWFileRequest(messageSas2, 'sasDownloadFWRequest.json', 'sasDownloadFWCredentials.json',
                           'sasDownloadFWResponse.json', "RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE", 16505448)
 
-
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+# @pytest.mark.rcm_fitness_mvp
 def test_verifyConsumedAttributes11():
     verifyConsumedAttributes("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE", path + 'sasDownloadFWRequest.json', path + 'sasDownloadFWCredentials.json',
                              path + 'sasDownloadFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
 #
-# # # # # #
-# # # # # # RCM/3.2.3/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE
-# # # # # #
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileMulti12():
     downloadFWFileMulti(message, messageSec, messageSas2, 'multiDownloadFWRequest.json',
@@ -1375,7 +1371,6 @@ def test_verifyMultiConsumedAttributes14():
     verifyMultiConsumedAttributes(path + 'downloadAllBiosFWRequest.json', path + 'downloadAllBiosFWCredentials.json',
                                   path + 'downloadAllBiosFWResponse.json', "SHA-256", "BETA2ENG218", "https://10.234.100.5:9443/")
 
-# # #
 @pytest.mark.rcm_fitness_mvp_extended
 def test_downloadFWFileRequest15():
     downloadFWFileMulti(messageSas1, messageSas3, messageSas2, 'downloadAllSasFWRequest.json', 'downloadAllSasFWCredentials.json',
