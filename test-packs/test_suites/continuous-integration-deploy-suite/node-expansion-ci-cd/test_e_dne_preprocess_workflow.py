@@ -370,7 +370,7 @@ def test_preprocess_GET_workflow_status():
     workflow_step7 = 'Ping Out of Band Management IP Address'
     workflow_step8 = 'Configuring Obm Settings'
     workflow_step9 = 'Configure Boot Device Idrac'
-    # workflow_step10 = 'Find ScaleIO'
+    workflow_step10 = 'Find ScaleIO'
     workflow_step11 = 'Find VCluster'
     workflow_step12 = 'Protection Domain'
 
@@ -453,13 +453,13 @@ def test_preprocess_GET_workflow_status():
                 #assert check_configureBootDeviceIdrac(), 'Check on ' + workflow_step9 + ' failed'
                 json_number += 1
 
-            # data = get_latest_api_response(url_body)
+            data = get_latest_api_response(url_body)
 
-                # Find ScaleIO
-                # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
-                #   check_the_workflow_task(url_body, data, json_number, workflow_step10)
-                # assert check_step9_FindScaleIO(data), 'Check on ' + workflow_step10 + ' failed'
-                #  json_number += 1
+            # Find ScaleIO
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
+                check_the_workflow_task(url_body, data, json_number, workflow_step10)
+                #assert check__findScaleIO(data), 'Check on ' + workflow_step10 + ' failed'
+                json_number += 1
 
             data = get_latest_api_response(url_body)
 
@@ -536,7 +536,7 @@ def update_preprocess_params_json():
     data['esxiManagementGatewayIpAddress'] = esxiManagementGatewayIpAddress
 
     data['vMotionManagementIpAddress'] = vMotionManagementIpAddress
-    data['vMotionManagementIpAddress'] = vMotionManagementSubnetMask
+    data['vMotionManagementSubnetMask'] = vMotionManagementSubnetMask
 
     data['scaleIoSvmManagementIpAddress'] = scaleIoSvmManagementIpAddress
     data['scaleIoSvmManagementSubnetMask'] = scaleIoSvmManagementSubnetMask
@@ -587,7 +587,7 @@ def createAddNodeMsgJson():
     data['esxiManagementGatewayIpAddress'] = esxiManagementGatewayIpAddress
 
     data['vMotionManagementIpAddress'] = vMotionManagementIpAddress
-    data['vMotionManagementIpAddress'] = vMotionManagementSubnetMask
+    data['vMotionManagementSubnetMask'] = vMotionManagementSubnetMask
 
     data['scaleIoSvmManagementIpAddress'] = scaleIoSvmManagementIpAddress
     data['scaleIoSvmManagementSubnetMask'] = scaleIoSvmManagementSubnetMask
@@ -692,21 +692,6 @@ def check_pingIdrac():
         return 1
 
 
-# Check that ScaleIO data (volumes ...) is returned
-def check_step9_FindScaleIO(data):
-    # TODO this needs to be expanded to valiadte at source.
-    error_list = []
-    for step in data['workflowTasksResponseList']:
-        if step['workFlowTaskName'] == 'Find ScaleIO':
-            if not ['results']['storagePool']:
-                error_list.append('Error : No storage pool detected')
-    if error_list == []:
-        print('storage Pool detected')
-        return 1
-    else:
-        return 0
-
-
 # Check the bios setting has changed.
 def check_configureBootDeviceIdrac():
     # export the bios configuration again and check the DNE relevant attributes have been updated
@@ -725,6 +710,21 @@ def check_configureBootDeviceIdrac():
 
     if error_list == []:
         print('Bios Settings are verified')
+        return 1
+    else:
+        return 0
+
+
+# Check that ScaleIO data (volumes ...) is returned
+def check__findScaleIO(data):
+    # TODO this needs to be expanded to valiadte at source.
+    error_list = []
+    for step in data['workflowTasksResponseList']:
+        if step['workFlowTaskName'] == 'Find ScaleIO':
+            if not ['results']['storagePool']:
+                error_list.append('Error : No storage pool detected')
+    if error_list == []:
+        print('storage Pool detected')
         return 1
     else:
         return 0
