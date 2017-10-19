@@ -77,10 +77,24 @@ def load_test_data():
                                                                 heading=setup_config_header,
                                                                 property='rackhd_password')
 
-
 #####################################################################
 # These are the main tests.
 #####################################################################
+@pytest.mark.network_services_mvp
+def test_enable_rabbitmq_management():
+    """
+    Title           : Enable rabbitMQ management to bring up port 15762
+    Description     : Since symphony ova turns off rabbitmq management by default, need enable it
+                      to run following test
+    Parameters      : none
+    Returns         : none
+    """
+    sendCommand = "docker exec -d amqp rabbitmq-plugins enable rabbitmq_management"
+    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+                                                         command=sendCommand, return_output=True)
+    my_return_status = my_return_status.strip()
+    print('\namqp rabbitmq-plugins enable rabbitmq_management :', my_return_status, '\n')
+
 
 @pytest.mark.network_services_mvp
 def test_rackHD_adapter_servicerunning():
@@ -176,6 +190,7 @@ def test_registerRackHD():
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.change.idrac.credentials.request'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.hardware.idrac.configure.request'),
     ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.rackhd.register'),
+    ('exchange.dell.cpsd.controlplane.rackhd.request', 'queue.dell.cpsd.controlplane.hardware.update.switch.firmware'),
     ('exchange.dell.cpsd.hdp.capability.registry.control',
      'queue.dell.cpsd.hdp.capability.registry.control.rackhd-adapter'),
     (
@@ -310,6 +325,7 @@ def test_rackHD_adapter_full_ListCapabilities():
     capabilities11 = 'rackhd-set-node-obm-setting'
     capabilities12 = 'rackhd-configure-bmc-settings'
     capabilities13 = 'rackhd-set-idrac-credentials'
+    capabilities14 = 'update-switch-firmware'
 
     error_list = []
 
@@ -341,6 +357,8 @@ def test_rackHD_adapter_full_ListCapabilities():
         error_list.append(capabilities12)
     if (capabilities13 not in return_message):
         error_list.append(capabilities13)
+    if (capabilities14 not in return_message):
+        error_list.append(capabilities14)
 
     assert not error_list, ('Missing some rackHD capabilities')
 
