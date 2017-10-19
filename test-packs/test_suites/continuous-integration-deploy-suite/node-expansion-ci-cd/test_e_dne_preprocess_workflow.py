@@ -477,11 +477,11 @@ def test_preprocess_GET_workflow_status():
                 assert check_findProtectionDomain(data), 'Check on ' + workflow_step12 + ' failed'
                 json_number += 1
 
+                print('\nPreprocess Workflow Completed Successfully')
             ######################### Done
 
             workflow_status = data['status']
 
-            print('\nPreprocess Workflow Completed Successfully')
 
         # Error check the response
         except Exception as err:

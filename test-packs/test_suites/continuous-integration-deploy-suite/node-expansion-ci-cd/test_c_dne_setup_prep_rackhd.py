@@ -117,7 +117,7 @@ def test_0_prep():
     testNodeIdentifier = getNodeIdentifier(token, testNodeMAC)  # Get the "id" value for the Node
 
     global idrac_hostname
-    idrac_hostname = getNewNodeIP()
+    idrac_hostname = getCurrentNodeIP()
 
     print ('\nActive IP = ' + idrac_hostname)
 
@@ -253,7 +253,7 @@ def test_5_discover_node_in_symphony():
 
 #####################################################################
 #There are used by 0_prep
-def getNewNodeIP():
+def getCurrentNodeIP():
     ####################
     # There are 2 IP Addresses associated with the Test node.
     # Either of these may be the current IP Address of the node
@@ -267,6 +267,7 @@ def getNewNodeIP():
     else:
         idrac_hostname = idrac_hostname_2
 
+    print((idrac_hostname))
     return idrac_hostname
 
 
@@ -345,13 +346,22 @@ def createPxeRebootWorkflow(token):
 
 def enablePxeBoot():
     msgbody = '{"componentNames":[""],"fileName":"fne-pre-os-config.xml","serverIP":"'+idrac_hostname+'","serverPassword":"'+idrac_factory_password+'","serverUsername":"'+idrac_username+'","shareAddress":"'+rackHD_IP+'","shareName":"/opt/dell/public","sharePassword":"'+cli_password+'","shareType":0,"shareUsername":"'+cli_username+'","shutdownType":1}'
+
+    print(idrac_hostname)
+    print(msgbody)
+
     apipath = '/api/1.0/server/configuration/import/'
     url = 'http://' + rackHD_IP + rackhd_smi_port + apipath
     response = requests.post(url, data=msgbody, headers=headers)
     status = response.status_code
 
     print (response.text)
-    time.sleep(200) # need to wait till system has fully rebooted
+
+    response_json = json.loads(response.text, encoding='utf-8')
+    if response_json['xmlConfig']['message'] != 'No configuration changes requiring a system restart need to be applied.':
+
+        time.sleep(200) # need to wait till system has fully rebooted
+
     if (status != 200):
         print ("test failed")
         return 0
