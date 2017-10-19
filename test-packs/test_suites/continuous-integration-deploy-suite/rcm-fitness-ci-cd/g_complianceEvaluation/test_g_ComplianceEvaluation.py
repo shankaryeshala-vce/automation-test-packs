@@ -75,13 +75,23 @@ def sys():
     ("9.2", "9.2.3", "RAID", "730", "PERC H730 Mini"),
     ("9.2", "9.2.2", "ESXI", "VCENTER", "lab.vce.com"),
     ("9.2", "9.2.3", "ESXI", "VCENTER", "lab.vce.com"),
+    ("3.2", "3.2.1", "BIOS", "630", "BIOS"),
+    ("3.2", "3.2.1", "BIOS", "730", "BIOS"),
+    ("3.2", "3.2.1", "ESXI", "VCENTER", "lab.vce.com"),
+    ("3.2", "3.2.1", "VCENTER", "VCENTER-APPLIANCE", "VCENTER-APPLIANCE"),
+    ("3.2", "3.2.1", "VCENTER", "VCENTER-WINDOWS", "VCENTER-WINDOWS"),
+    ("3.2", "3.2.1", "RAID", "730", "PERC H730 Mini"),
     ("3.2", "3.2.2", "BIOS", "630", "BIOS"),
     ("3.2", "3.2.2", "BIOS", "730", "BIOS"),
     ("3.2", "3.2.2", "ESXI", "VCENTER", "lab.vce.com"),
+#    ("3.2", "3.2.2", "VCENTER", "VCENTER-APPLIANCE", "lab.vce.com"),
+#    ("3.2", "3.2.2", "VCENTER", "VCENTER-WINDOWS", "lab.vce.com"),
     ("3.2", "3.2.2", "RAID", "730", "PERC H730 Mini"),
     ("3.2", "3.2.3", "BIOS", "630", "BIOS"),
     ("3.2", "3.2.3", "BIOS", "730", "BIOS"),
     ("3.2", "3.2.3", "ESXI", "VCENTER", "lab.vce.com"),
+#    ("3.2", "3.2.3", "VCENTER", "VCENTER-APPLIANCE", "lab.vce.com"),
+#    ("3.2", "3.2.3", "VCENTER", "VCENTER-WINDOWS", "lab.vce.com"),
     ("3.2", "3.2.3", "RAID", "730", "PERC H730 Mini")])
 def test_post_eval(sys, train, version, type, model, identifier):
     url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/rcm/inventory/VxRack/1000 FLEX/' + train + '/' + version + '/'
