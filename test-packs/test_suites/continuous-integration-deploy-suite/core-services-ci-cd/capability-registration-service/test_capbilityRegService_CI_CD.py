@@ -170,7 +170,6 @@ def test_capability_registry_RMQ_bindings_fru(exchange, queue):
     print(exchange, '\nis bound to\n', queue, '\n')
 
 
-@pytest.mark.skip(reason="Test will be enabled when CI pipeline will install the rpms from master. Tha fix is already pushed into the master")
 @pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
@@ -206,7 +205,7 @@ def test_capabilityRegistry_log_files_exist():
 
     print('Valid log files exist')
 
-@pytest.mark.skip(reason="Test will be enabled when CI pipeline will install the rpms from master. Tha fix is already pushed into the master")
+
 @pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
