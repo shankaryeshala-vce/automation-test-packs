@@ -11,9 +11,9 @@ import pytest
 @pytest.mark.tls_enabled_stop_start
 def test_sysdef_uninstall(setup):
     """
-    Title: Verify the endpoint service can be uninstalled
-    Description: This test verifies that the endpoint service can be uninstalled successfully
-    Params: dell-cpsd-core-endpoint-registration-service
+    Title: Verify the sds service can be uninstalled
+    Description: This test verifies that the sds service can be uninstalled successfully
+    Params: dell-cpsd-core-system-definition-service
     Returns: None
 
     """
@@ -34,9 +34,9 @@ def test_sysdef_uninstall(setup):
 def test_sysdef_install(setup):
     #this test is working (TW)
     """
-    Title: Verify the endpoint service can be installed
-    Description: This test verifies that the endpoint service can be installed successfully
-    Params: dell-cpsd-core-endpoint-registration-service
+    Title: Verify the sds service can be installed
+    Description: This test verifies that the sds service can be installed successfully
+    Params: dell-cpsd-core-system-definition-service
     Returns: None
 
     """
@@ -66,9 +66,9 @@ def test_sysdef_install(setup):
 @pytest.mark.tls_enabled
 def test_sysdef_serviceup(setup):
     """
-    Title: Verify the endpoint services containers are UP
-    Description: This test verifies that the endpoint container is up
-    Params: dell-cpsd-core-endpoint-registration-service
+    Title: Verify the sds services containers are UP
+    Description: This test verifies that the sd container is up
+    Params: dell-cpsd-core-system-definition-service
     Returns: None
 
     """
