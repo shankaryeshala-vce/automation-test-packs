@@ -14,6 +14,7 @@ import af_support_tools
 import pytest
 import string
 import requests
+from requests.auth import HTTPBasicAuth
 import json
 import os
 from pyVmomi import vim
@@ -93,6 +94,24 @@ def load_test_data():
     global RHDtoken
     RHDtoken = retrieveRHDToken()
 
+
+    # ~~~~~~~~ScaleIO Details
+    global scaleio_IP
+    scaleio_IP = af_support_tools.get_config_file_property(config_file=setup_config_file, heading=setup_config_header,
+                                                           property='scaleio_integration_ipaddress')
+
+    global scaleio_username
+    scaleio_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                 heading=setup_config_header,
+                                                                 property='scaleio_username')
+
+    global scaleio_password
+    scaleio_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                 heading=setup_config_header,
+                                                                 property='scaleio_password')
+
+
+
     # ~~~~~~~~Test Node IP & Creds Details
     global testNodeMAC
     testNodeMAC = af_support_tools.get_config_file_property(config_file=setup_config_file,
@@ -149,7 +168,7 @@ def load_test_data():
     global vcenter_password
     vcenter_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                                  heading=setup_config_header,
-                                                                 property='vcenter_password_rtp')
+                                                                 property='vcenter_password_fra')
 
 
     global esxiManagementGatewayIpAddress
@@ -173,7 +192,7 @@ def load_test_data():
                                                                        property='esxi_management_subnet_mask')
 
     global clusterName
-    clusterName = "rvx2-scaleio"
+    clusterName = 'fpr1-cvcsa'
 
     ####################
 
@@ -220,14 +239,21 @@ def test_pre_test_verification():
 
     print (New_Node)
 
+    global scaleIoToken
+    scaleIoToken = retrieveScaleIoToken()
+    print(scaleIoToken)
+
+    data = retrieveScaleIOProtectionDomain(scaleIoToken)
+    data2 = retrieveScaleIOStoragePool(scaleIoToken)
+
     # verify that an OBM for the ipmi service is not currently configured for this node.
     # If it is configured, delete it as it will be recreated during this addNode flow
-    preCheckOBM()
+    #preCheckOBM()
 
 ############################################################################################
 
 #@pytest.mark.dne_paqx_parent_mvp_extended
-def test_addNode_POST_workflow():
+def xtest_addNode_POST_workflow():
     """
     Title           :       Verify the POST function on /dne/nodes API
     Description     :       Send a POST to /dne/nodes where the body of the request is the typical DNE config
@@ -253,7 +279,7 @@ def test_addNode_POST_workflow():
     url_body = protocol + ipaddress + dne_port + endpoint
 
     filePath = os.environ[
-                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode_dr.json'
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode.json'
     with open(filePath) as fixture:
         request_body = json.loads(fixture.read())
 
@@ -289,7 +315,7 @@ def test_addNode_POST_workflow():
 
 #@pytest.mark.skip(reason="Test not ready")
 #@pytest.mark.dne_paqx_parent_mvp_extended
-def test_preprocess_GET_workflow_status():
+def xtest_preprocess_GET_workflow_status():
     """
     Title           :       Verify the GET function on /dne/preprocess/<jobId> API
     Description     :       Send a GET to /dne/preprocess/<jobId>. The <jobId> value is the workFlowID obtained in the
@@ -305,24 +331,35 @@ def test_preprocess_GET_workflow_status():
 
     print("\n\nGET /dne/nodes/<jobId> REST API call to get the nodes job status...\n")
     workflow_status = ''
-    # addNode_workflow_id =''
+    addNode_workflow_id ='009c9c70-4172-4af5-b977-19b14716d5fb'
     json_number = 0
 
-    workflow_step1 = 'retrieveEsxiDefaultCredentialDetails'
-    # workflow_step2 = 'changeIdracCredentials'
-    workflow_step3 = 'installEsxi'
-    workflow_step4 = 'addHostToVcenter'
-    workflow_step5 = 'applyEsxiLicense'
-    workflow_step6 = 'datastoreRename'
-    # workflow_step7 = 'exitHostMaintenanceMode'
-    # workflow_step8 = 'installScaleIoVib'
-    # workflow_step9 = 'enterHostMaintenanceMode'
-    # workflow_step10 = 'rebootHost'
-    # workflow_step11 = 'exitHostMaintenanceMode'
-    # workflow_step12 = 'configureScaleIoVib'
-    workflow_step13 = 'configurePxeBoot'
-    workflow_step14 = 'updateSystemDefinition'
-    workflow_step15 = 'notifyNodeDiscoveryToUpdateStatus'
+    workflow_step1 = 'Retrieve default ESXi host credential details'
+    workflow_step2 = 'Install ESXi'
+    workflow_step3 = 'Add Host to VCenter'
+    workflow_step4 = 'Apply ESXi License'
+    workflow_step5 = 'Datastore rename'
+    workflow_step6 = 'Exit Host Maintenance Mode'
+    workflow_step7 = 'Enable PCI pass through'
+    workflow_step8 = 'Install ScaleIO VIB'
+    workflow_step9 = 'Enter Host Maintenance Mode'
+    workflow_step10 = 'Reboot Host'
+    workflow_step11 = 'Exit Host Maintenance Mode'
+    workflow_step12 = 'Configure ScaleIO VIB'
+    workflow_step13 = 'Update ScaleIO SDC Performance Profile'
+    workflow_step14 = 'Add Host to DV Switch'
+    workflow_step15 = 'Deploy ScaleIO VM'
+    workflow_step16 = 'Set PCI Pass through ScaleIO VM'
+    workflow_step17 = 'Configure VM Network Settings'
+    workflow_step18 = 'Power on the ScaleIO VM'
+    workflow_step19 = 'Change ScaleIO VM Credentials'
+    workflow_step20 = 'Install ScaleIO VM Packages'
+    workflow_step21 = 'Performance Tune the ScaleIO VM'
+    workflow_step22 = 'Add Host To Protection Domain'
+    workflow_step23 = 'Configure Pxe boot'
+    workflow_step24 = 'Update System Definition'
+    workflow_step25 = 'Notify Node Discovery To Update Status'
+
 
     endpoint = '/dne/nodes/'
     url_body = protocol + ipaddress + dne_port + endpoint + addNode_workflow_id
@@ -336,7 +373,6 @@ def test_preprocess_GET_workflow_status():
             # If the process has failed immediately then fail the test outright
             assert data['status'] != 'FAILED', 'ERROR: The addNode workflow overall status = Failed'
 
-
             # retrieveEsxiDefaultCredentialDetails
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step1:
                 check_the_workflow_task(url_body, data, json_number, workflow_step1)
@@ -344,100 +380,178 @@ def test_preprocess_GET_workflow_status():
 
             data = get_latest_api_response(url_body)
 
-            # # changeIdracCredentials
-            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step2:
-            #     check_the_workflow_task(url_body, data, json_number, workflow_step2)
-            #     json_number += 1
-
             # installEsxi
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step2:
+                check_the_workflow_task(url_body, data, json_number, workflow_step2)
+                #assert check_installEsxi(), 'Check on ' + workflow_step2 + ' failed'
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # addHostToVcenter
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step3:
                 check_the_workflow_task(url_body, data, json_number, workflow_step3)
                 json_number += 1
 
             data = get_latest_api_response(url_body)
 
-            # addHostToVcenter
+            # applyEsxiLicense
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step4:
                 check_the_workflow_task(url_body, data, json_number, workflow_step4)
-                assert check_step4_addHostToVcenter(), 'Check on ' + workflow_step4 + ' failed'
-                json_number += 1
-
-            data = get_latest_api_response(url_body)
-
-
-            # applyEsxiLicense
-            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step5:
-                check_the_workflow_task(url_body, data, json_number, workflow_step5)
-                assert check_step5_applyESXLicense(), 'Check on ' + workflow_step5 + ' failed'
+                #assert check_applyEsxiLicense(), 'Check on ' + workflow_step4 + ' failed'
                 json_number += 1
 
             data = get_latest_api_response(url_body)
 
             # datastoreRename
-            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step6:
-                check_the_workflow_task(url_body, data, json_number, workflow_step6)
-                assert check_step6_datastoreRename(), 'Check on ' + workflow_step6 + ' failed'
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step5:
+                check_the_workflow_task(url_body, data, json_number, workflow_step5)
+                #assert check_datastoreRename(), 'Check on ' + workflow_step5 + ' failed'
                 json_number += 1
 
-            # # exitHostMaintenanceMode
-            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step7:
-            #     check_the_workflow_task(url_body, data, json_number, workflow_step7)
-            #     assert check_step7_exitHostMaintenanceMode(), 'Check on ' + workflow_step7 + ' failed'
-            #     json_number += 1
+            data = get_latest_api_response(url_body)
+
+            # exitHostMaintenanceMode1
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step6:
+                check_the_workflow_task(url_body, data, json_number, workflow_step6)
+                #assert check_exitHostMaintenanceMode(), 'Check on ' + workflow_step6 + ' failed'
+                json_number += 1
 
             data = get_latest_api_response(url_body)
 
-            # # installScaleIoVib
-            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step8:
-            #     check_the_workflow_task(url_body, data, json_number, workflow_step8)
-            #     json_number += 1
-
-            # # enterHostMaintenanceMode
-            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step9:
-            #     check_the_workflow_task(url_body, data, json_number, workflow_step9)
-            #     json_number += 1
+            # enablePciPassthroughHost
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step7:
+                check_the_workflow_task(url_body, data, json_number, workflow_step7)
+                json_number += 1
 
             data = get_latest_api_response(url_body)
 
-            # # rebootHost
-            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
-            #     check_the_workflow_task(url_body, data, json_number, workflow_step10)
-            #     json_number += 1
-
-            # # exitHostMaintenanceMode
-            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step11:
-            #     check_the_workflow_task(url_body, data, json_number, workflow_step11)
-            #     assert check_step11_biosChange(New_Node), 'Check on ' + workflow_step11 + ' failed'
-            #     json_number += 1
+            # installScaleIoVib
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step8:
+                check_the_workflow_task(url_body, data, json_number, workflow_step8)
+                json_number += 1
 
             data = get_latest_api_response(url_body)
 
-            # # configureScaleIoVib
-            # if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step12:
-            #     check_the_workflow_task(url_body, data, json_number, workflow_step12)
-            #     json_number += 1
+            # enterHostMaintenanceMode
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step9:
+                check_the_workflow_task(url_body, data, json_number, workflow_step9)
+                json_number += 1
 
-            # configurePxeBoot
+            data = get_latest_api_response(url_body)
+
+            # rebootHost
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
+                check_the_workflow_task(url_body, data, json_number, workflow_step10)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # exitHostMaintenanceMode2
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step11:
+                check_the_workflow_task(url_body, data, json_number, workflow_step11)
+                #assert check_exitHostMaintenanceMode(), 'Check on ' + workflow_step11 + ' failed'
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # configureScaleIoVib
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step12:
+                check_the_workflow_task(url_body, data, json_number, workflow_step12)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # updateSdcPerformanceProfile
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step13:
                 check_the_workflow_task(url_body, data, json_number, workflow_step13)
                 json_number += 1
 
             data = get_latest_api_response(url_body)
 
-
-            # updateSystemDefinition
+            # addHostToDvSwitch
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step14:
                 check_the_workflow_task(url_body, data, json_number, workflow_step14)
                 json_number += 1
 
-
             data = get_latest_api_response(url_body)
 
-
-            # notifyNodeDiscoveryToUpdateStatus
+            # deploySVM
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step15:
                 check_the_workflow_task(url_body, data, json_number, workflow_step15)
                 json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # setPciPassthroughSioVm
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step16:
+                check_the_workflow_task(url_body, data, json_number, workflow_step16)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # configureVmNetworkSettings
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step17:
+                check_the_workflow_task(url_body, data, json_number, workflow_step17)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # powerOnSVM
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step18:
+                check_the_workflow_task(url_body, data, json_number, workflow_step18)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # changeSvmCredentials
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step19:
+                check_the_workflow_task(url_body, data, json_number, workflow_step19)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # installSvmPackages
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step20:
+                check_the_workflow_task(url_body, data, json_number, workflow_step20)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # performanceTuneSvm
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step21:
+                check_the_workflow_task(url_body, data, json_number, workflow_step21)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # addHostToProtectionDomain
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step22:
+                check_the_workflow_task(url_body, data, json_number, workflow_step22)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # configurePxeBoot
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step23:
+                check_the_workflow_task(url_body, data, json_number, workflow_step23)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # updateSystemDefinition
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step24:
+                check_the_workflow_task(url_body, data, json_number, workflow_step24)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # notifyNodeDiscoveryToUpdateStatus
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step25:
+                check_the_workflow_task(url_body, data, json_number, workflow_step25)
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
 
 
             ######################### Done
@@ -519,6 +633,30 @@ def update_addNode_params_json():
     return 1
 
 
+def get_SymphonyUuid_of_discovered_node():
+    # query the dne-paqx to return the symphonyuuid of the discovered node
+    endpoint = '/dne/nodes'
+    url_body = protocol + ipaddress + dne_port + endpoint
+
+    try:
+        response = requests.get(url_body)
+        # verify the status_code
+        assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
+
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+
+    data = response.json()
+    Uuid = data[0]['symphonyUuid']
+
+    return Uuid
+
+
 ######################
 # This is the main response workflow test
 
@@ -566,157 +704,8 @@ def check_the_workflow_task(url_body, data, json_number, workflow_step):
                 # If the task has failed then fail the entire test.
 
 
-######## Supporting Functions ################################################################
-
-def get_SymphonyUuid_of_discovered_node():
-    # query the dne-paqx to return the symphonyuuid of the discovered node
-    endpoint = '/dne/nodes'
-    url_body = protocol + ipaddress + dne_port + endpoint
-
-    try:
-        response = requests.get(url_body)
-        # verify the status_code
-        assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
-
-    # Error check the response
-    except Exception as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        raise Exception(err)
-
-
-    data = response.json()
-    Uuid = data[0]['symphonyUuid']
-
-    return Uuid
-
-
-#####################################################################
-
-def preCheckOBM():
-    # check at the rackhd if the node to be added already has an OBM configured against it.
-    # if it does, remove the OBM.
-
-    nodeId = getNodeIdentifier(RHDtoken, testNodeMAC)
-    # the verify function returns either confirmation text ("no obm configured"),  or the id of the configured obm
-    obmResponse = verify_no_obm_ipmi_config_in_place(nodeId)
-    if obmResponse == "no obm configured":
-        print('ipmi - no obm present, test can proceed')
-    else :
-        print('deleting an obm currently configured for the node')
-        delete_ipmi_obm(obmResponse)
-
-#####################################################################
-
-def  delete_ipmi_obm(obmId):
-    """"
-    Description :       request the rackhd to delete the OBM with id = obmId
-    parameters :        obmId - the id of an OBM configured at rackhd
-    returns :           Nothing
-    """
-
-    apipath = 'api/2.0/obms/' + obmId
-    url = 'http://' + rackHD_IP + ':9090' + apipath
-    headerstring = {"Content-Type": "application/json", "Authorization": "JWT " + RHDtoken}
-    try:
-        response = requests.delete(url, headers=headerstring)
-    # Error check the response
-    except Exception as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        raise Exception(err)
-
-#####################################################################
-
-
-def verify_no_obm_ipmi_config_in_place(nodeId):
-    """"
-    Description :       check at the rackhd if an ipmi obm exists for node with an id = nodeId
-    parameters :        nodeId - the rackhd asssigned id of the node to be Added
-    returns :           Text string = "no obm configured" if no OBM is found
-                        The OBM Id if an OBM with service = ipmi is found
-    """
-
-    apipath = '/api/2.0/nodes/' + nodeId + '/obm'
-    url = 'http://' + rackHD_IP + ':9090' + apipath
-    headerstring = {"Content-Type": "application/json", "Authorization": "JWT " + RHDtoken}
-
-    try:
-        response = requests.get(url, headers=headerstring)
-    # Error check the response
-    except Exception as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        raise Exception(err)
-
-    data_text = response.text
-    data = json.loads(response.text, encoding='utf-8')
-
-    for entry in data :
-        if entry['service'] == 'ipmi-obm-service':
-            return entry['id']
-    return "no obm configured"
-
-#####################################################################
-
-
-def retrieveRHDToken():
-    """"
-    Description :       retrieve the rackHD token allowing api querying
-    parameters :        nodeId - the rackhd asssigned id of the node to be Added
-    returns :           Text string = "no obm configured" if no OBM is found
-                        The OBM Id if an OBM with service = ipmi is found
-    """
-    url = "http://" + rackHD_IP + ":9090/login"
-    header = {'Content-Type': 'application/json'}
-    body = '{"username": "' + rackHD_username + '", "password": "' + rackHD_password + '"}'
-
-    try:
-        resp = requests.post(url, headers=header, data=body)
-    # Error check the response
-    except Exception as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        raise Exception(err)
-
-
-    tokenJson = json.loads(resp.text, encoding='utf-8')
-    token = tokenJson["token"]
-    return token
-
-#####################################################################
-
-def getNodeIdentifier(token, testNodeMAC):
-    # Get the node Identifier value
-
-    apipath = '/api/2.0/nodes/'
-    url = 'http://' + rackHD_IP + ':9090' + apipath
-    headerstring = {"Content-Type": "application/json", "Authorization": "JWT " + RHDtoken}
-
-    try:
-     response = requests.get(url, headers=headerstring)
-    # Error check the response
-    except Exception as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        raise Exception(err)
-
-    data_text = response.text
-    data_json = json.loads(response.text, encoding='utf-8')
-    assert testNodeMAC in data_text, 'Error: Node not in Rackhd'
-    for nodes in data_json:
-        if testNodeMAC.rstrip() in nodes['identifiers']:
-            testNodeIdentifier = nodes['id']
-            return testNodeIdentifier
-
-#############################################################################
-
-def check_step4_addHostToVcenter():
+######## Check Functions
+def check_installEsxi():
     """" Check that the new ESXi host has been added to the Scaleio VCenter """
     try:
         # Disabling urllib3 ssl warnings
@@ -755,12 +744,10 @@ def check_step4_addHostToVcenter():
         if addedHost.name == expectedHostName :
             return 1
     else :
-         return 0
+        return 0
 
 
-#############################################################################
-
-def check_step5_applyESXLicense():
+def check_applyEsxiLicense():
     """" Check that the correct license has been applied to the new ESXi host """
     try:
         # Disabling urllib3 ssl warnings
@@ -794,14 +781,13 @@ def check_step5_applyESXLicense():
 
     if addedHost:
         if ("VMware ESX Server" in addedHost.summary.config.product.licenseProductName) \
-        and ("6.0" in addedHost.summary.config.product.licenseProductVersion):
+                and ("6.0" in addedHost.summary.config.product.licenseProductVersion):
             return 1
     else:
         return 0
 
-#############################################################################
 
-def check_step6_datastoreRename():
+def check_datastoreRename():
     """" Verify that the datastore associated with the newly added ESXi host has been
         renamed. The new name should be of the form 'DASxx', where 'xx' are the last two digits of the
         the new hostname.
@@ -857,9 +843,8 @@ def check_step6_datastoreRename():
     else:
         return 0
 
-#############################################################################
 
-def test_step7_exitHostMaintenanceMode():
+def check_exitHostMaintenanceMode():
     """" Verify that the newly added host is no longer in maintenance mode
     """
     try:
@@ -900,3 +885,155 @@ def test_step7_exitHostMaintenanceMode():
             return 0
     else:
         return 0
+
+
+
+#####################################################################
+
+def preCheckOBM():
+    # check at the rackhd if the node to be added already has an OBM configured against it.
+    # if it does, remove the OBM.
+
+    nodeId = getNodeIdentifier(RHDtoken, testNodeMAC)
+    # the verify function returns either confirmation text ("no obm configured"),  or the id of the configured obm
+    obmResponse = verify_no_obm_ipmi_config_in_place(nodeId)
+    if obmResponse == "no obm configured":
+        print('ipmi - no obm present, test can proceed')
+    else :
+        print('deleting an obm currently configured for the node')
+        delete_ipmi_obm(obmResponse)
+
+#####################################################################
+
+def  delete_ipmi_obm(obmId):
+    """"
+    Description :       request the rackhd to delete the OBM with id = obmId
+    parameters :        obmId - the id of an OBM configured at rackhd
+    returns :           Nothing
+    """
+
+    apipath = 'api/2.0/obms/' + obmId
+    url = 'http://' + rackHD_IP + ':32080' + apipath
+    headerstring = {"Content-Type": "application/json", "Authorization": "JWT " + RHDtoken}
+    try:
+        response = requests.delete(url, headers=headerstring)
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+#####################################################################
+
+
+def verify_no_obm_ipmi_config_in_place(nodeId):
+    """"
+    Description :       check at the rackhd if an ipmi obm exists for node with an id = nodeId
+    parameters :        nodeId - the rackhd asssigned id of the node to be Added
+    returns :           Text string = "no obm configured" if no OBM is found
+                        The OBM Id if an OBM with service = ipmi is found
+    """
+
+    apipath = '/api/2.0/nodes/' + nodeId + '/obm'
+    url = 'http://' + rackHD_IP + ':32080' + apipath
+    headerstring = {"Content-Type": "application/json", "Authorization": "JWT " + RHDtoken}
+
+    try:
+        response = requests.get(url, headers=headerstring)
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+    data_text = response.text
+    data = json.loads(response.text, encoding='utf-8')
+
+    for entry in data :
+        if entry['service'] == 'ipmi-obm-service':
+            return entry['id']
+    return "no obm configured"
+
+#####################################################################
+
+
+def retrieveRHDToken():
+    """"
+    Description :       retrieve the rackHD token allowing api querying
+    parameters :        nodeId - the rackhd asssigned id of the node to be Added
+    returns :           Text string = "no obm configured" if no OBM is found
+                        The OBM Id if an OBM with service = ipmi is found
+    """
+    url = "http://" + rackHD_IP + ":32080/login"
+    header = {'Content-Type': 'application/json'}
+    body = '{"username": "' + rackHD_username + '", "password": "' + rackHD_password + '"}'
+
+    try:
+        resp = requests.post(url, headers=header, data=body)
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+
+    tokenJson = json.loads(resp.text, encoding='utf-8')
+    token = tokenJson["token"]
+    return token
+
+
+#####################################################################
+
+def getNodeIdentifier(token, testNodeMAC):
+    # Get the node Identifier value
+
+    apipath = '/api/2.0/nodes/'
+    url = 'http://' + rackHD_IP + ':32080' + apipath
+    headerstring = {"Content-Type": "application/json", "Authorization": "JWT " + RHDtoken}
+
+    try:
+     response = requests.get(url, headers=headerstring)
+    # Error check the response
+    except Exception as err:
+        # Return code error (e.g. 404, 501, ...)
+        print(err)
+        print('\n')
+        raise Exception(err)
+
+    data_text = response.text
+    data_json = json.loads(response.text, encoding='utf-8')
+    assert testNodeMAC in data_text, 'Error: Node not in Rackhd'
+    for nodes in data_json:
+        if testNodeMAC.rstrip() in nodes['identifiers']:
+            testNodeIdentifier = nodes['id']
+            return testNodeIdentifier
+
+
+#####################################################################
+# ScaleIO Functions
+def retrieveScaleIoToken():
+    # grab a token
+    url = 'https://' + scaleio_IP +'/api/login'
+    header = {'Content-Type': 'application/json'}
+    resp = requests.get(url, auth=(scaleio_username, scaleio_password), verify=False)
+    scaleIoToken = resp.text
+    scaleIoToken = scaleIoToken.strip('"')
+    print(scaleIoToken)
+    return scaleIoToken
+
+def retrieveScaleIOProtectionDomain(scaleIoToken):
+    url = 'https://' + scaleio_IP +'/api/types/ProtectionDomain/instances'
+    header = {'Content-Type': 'application/json'}
+    resp = requests.get(url, auth=(scaleio_username, scaleIoToken), verify=False)
+    respJson = json.loads(resp.text, encoding='utf-8')
+    print(respJson)
+
+def retrieveScaleIOStoragePool(scaleIoToken):
+    url = 'https://' + scaleio_IP +'/api/types/StoragePool/instances'
+    header = {'Content-Type': 'application/json'}
+    resp = requests.get(url, auth=(scaleio_username, scaleIoToken), verify=False)
+    respJson = json.loads(resp.text, encoding='utf-8')
+    print(respJson)

@@ -110,6 +110,21 @@ def load_test_data():
     global vcenter_port
     vcenter_port = '443'
 
+    # ~~~~~~~~ScaleIO Details
+    global scaleio_IP
+    scaleio_IP = af_support_tools.get_config_file_property(config_file=setup_config_file, heading=setup_config_header,
+                                                           property='scaleio_integration_ipaddress')
+
+    global scaleio_username
+    scaleio_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                 heading=setup_config_header,
+                                                                 property='scaleio_username')
+
+    global scaleio_password
+    scaleio_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                 heading=setup_config_header,
+                                                                 property='scaleio_password')
+
     # ~~~~~~~~Test Node IP & Creds Details
     global testNodeMAC
     testNodeMAC = af_support_tools.get_config_file_property(config_file=setup_config_file,
@@ -196,10 +211,10 @@ def load_test_data():
                                                                                    heading=setup_config_header,
                                                                                    property='scaleio_vm_gateway')
 
-    global scaleIoData1KernelIpAddress
-    scaleIoData1KernelIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                            heading=setup_config_header,
-                                                                            property='data1_kernal_ip')
+    # global scaleIoData1KernelIpAddress
+    # scaleIoData1KernelIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+    #                                                                         heading=setup_config_header,
+    #                                                                         property='data1_kernal_ip')
 
     global scaleIoData1SvmIpAddress
     scaleIoData1SvmIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
@@ -211,10 +226,10 @@ def load_test_data():
                                                                                    heading=setup_config_header,
                                                                                    property='data1_svm_kernal_mask')
 
-    global scaleIoData2KernelIpAddress
-    scaleIoData2KernelIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                            heading=setup_config_header,
-                                                                            property='data2_kernal_ip')
+    # global scaleIoData2KernelIpAddress
+    # scaleIoData2KernelIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
+    #                                                                         heading=setup_config_header,
+    #                                                                         property='data2_kernal_ip')
 
     global scaleIoData2SvmIpAddress
     scaleIoData2SvmIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
@@ -278,6 +293,10 @@ def test_pre_test_verification():
 
     print('\nNode Idrac IP details:')
     print(New_Node)
+
+    #Get the ScaleIO Auth Token
+    global scaleIoToken
+    scaleIoToken = retrieveScaleIoToken()
 
 
 @pytest.mark.dne_paqx_parent_mvp_extended
@@ -542,10 +561,8 @@ def update_preprocess_params_json():
     data['scaleIoSvmManagementSubnetMask'] = scaleIoSvmManagementSubnetMask
     data['scaleIoSvmManagementGatewayAddress'] = scaleIoSvmManagementGatewayAddress
 
-    data['scaleIoData1KernelIpAddress'] = scaleIoData1KernelIpAddress
     data['scaleIoData1SvmIpAddress'] = scaleIoData1SvmIpAddress
     data['scaleIoData1KernelAndSvmSubnetMask'] = scaleIoData1KernelAndSvmSubnetMask
-    data['scaleIoData2KernelIpAddress'] = scaleIoData2KernelIpAddress
     data['scaleIoData2SvmIpAddress'] = scaleIoData2SvmIpAddress
     data['scaleIoData2KernelAndSvmSubnetMask'] = scaleIoData2KernelAndSvmSubnetMask
 
@@ -593,15 +610,14 @@ def createAddNodeMsgJson():
     data['scaleIoSvmManagementSubnetMask'] = scaleIoSvmManagementSubnetMask
     data['scaleIoSvmManagementGatewayAddress'] = scaleIoSvmManagementGatewayAddress
 
-    data['scaleIoData1KernelIpAddress'] = scaleIoData1KernelIpAddress
     data['scaleIoData1SvmIpAddress'] = scaleIoData1SvmIpAddress
     data['scaleIoData1KernelAndSvmSubnetMask'] = scaleIoData1KernelAndSvmSubnetMask
-    data['scaleIoData2KernelIpAddress'] = scaleIoData2KernelIpAddress
     data['scaleIoData2SvmIpAddress'] = scaleIoData2SvmIpAddress
     data['scaleIoData2KernelAndSvmSubnetMask'] = scaleIoData2KernelAndSvmSubnetMask
 
     data['clusterName'] = clustername
     data['protectionDomain'] = protectionDomain
+    data['deviceToDeviceStoragePool'] = deviceToDeviceStoragePool
 
     with open(filePath, 'w') as outfile:
         json.dump(data, outfile)
@@ -715,14 +731,24 @@ def check_configureBootDeviceIdrac():
         return 0
 
 
-# Check that ScaleIO data (volumes ...) is returned
+# Check that ScaleIO data  is returned
 def check__findScaleIO(data):
-    # TODO this needs to be expanded to valiadte at source.
+
+    actualStoragePool = retrieveScaleIOStoragePool(scaleIoToken)
+    global deviceToDeviceStoragePool
+
     error_list = []
     for step in data['workflowTasksResponseList']:
         if step['workFlowTaskName'] == 'Find ScaleIO':
-            if not ['results']['storagePool']:
+            if not ['deviceToStoragePoolMap']:
                 error_list.append('Error : No storage pool detected')
+
+            #storagePoolName = data['deviceToStoragePoolMap']['1']['storagePoolName']
+            deviceToDeviceStoragePool = step['deviceToDeviceStoragePool']
+
+            #if storagePoolName not in actualStoragePool:
+                #error_list.append('Error : Protection Domain Names do not match')
+
     if error_list == []:
         print('storage Pool detected')
         return 1
@@ -752,8 +778,12 @@ def check_findVCluster(data):
         return 0
 
 
+# Check that the Protection Domain is returned
 def check_findProtectionDomain(data):
     # actualProtectionDomainList = getProtectionDomainInfo()
+
+    actualProtectionDomain = retrieveScaleIOProtectionDomain(scaleIoToken)
+
     global protectionDomain
     error_list = []
     for step in data['workflowTasksResponseList']:
@@ -762,7 +792,7 @@ def check_findProtectionDomain(data):
                 error_list.append('Error : No Protection Domains detected')
             protectionDomain = step['results']['protectionDomain']
 
-            if protectionDomain != 'FR1-ProtectionDomain1':
+            if protectionDomain not in actualProtectionDomain:
                 error_list.append('Error : Protection Domain Names do not match')
 
     if error_list == []:
@@ -868,6 +898,32 @@ def getRealVcenterInfo():
 
     return clusterList
 
+
+######## Supporting Functions for ScaleIO ##########
+
+def retrieveScaleIoToken():
+    # grab a token
+    url = 'https://' + scaleio_IP +'/api/login'
+    header = {'Content-Type': 'application/json'}
+    resp = requests.get(url, auth=(scaleio_username, scaleio_password), verify=False)
+    scaleIoToken = resp.text
+    scaleIoToken = scaleIoToken.strip('"')
+    print(scaleIoToken)
+    return scaleIoToken
+
+def retrieveScaleIOProtectionDomain(scaleIoToken):
+    url = 'https://' + scaleio_IP +'/api/types/ProtectionDomain/instances'
+    header = {'Content-Type': 'application/json'}
+    resp = requests.get(url, auth=(scaleio_username, scaleIoToken), verify=False)
+    respJson = json.loads(resp.text, encoding='utf-8')
+    print(respJson)
+
+def retrieveScaleIOStoragePool(scaleIoToken):
+    url = 'https://' + scaleio_IP +'/api/types/StoragePool/instances'
+    header = {'Content-Type': 'application/json'}
+    resp = requests.get(url, auth=(scaleio_username, scaleIoToken), verify=False)
+    respJson = json.loads(resp.text, encoding='utf-8')
+    print(respJson)
 
 #####################################################################
 # These are Negative Tests tests.
