@@ -91,8 +91,7 @@ def load_test_data():
                                                                     heading=setup_config_header,
                                                                     property='rackhd_cli_password')
 
-    global RHDtoken
-    RHDtoken = retrieveRHDToken()
+
 
 
     # ~~~~~~~~ScaleIO Details
@@ -171,11 +170,6 @@ def load_test_data():
                                                                  property='vcenter_password_fra')
 
 
-    global esxiManagementGatewayIpAddress
-    esxiManagementGatewayIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                       heading=setup_config_header,
-                                                                       property='esxi_management_gateway_ipaddress')
-
     global esxiManagementHostname
     esxiManagementHostname = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                                        heading=setup_config_header,
@@ -186,13 +180,7 @@ def load_test_data():
                                                                        heading=setup_config_header,
                                                                        property='esxi_management_ipaddress')
 
-    global esxiManagementSubnetMask
-    esxiManagementSubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                       heading=setup_config_header,
-                                                                       property='esxi_management_subnet_mask')
 
-    global clusterName
-    clusterName = 'fpr1-cvcsa'
 
     ####################
 
@@ -212,7 +200,7 @@ def load_test_data():
 
 
 # ######################################################################################
-#@pytest.mark.dne_paqx_parent_mvp_extended
+@pytest.mark.dne_paqx_parent_mvp_extended
 def test_pre_test_verification():
     """
     Description     :       This is a pre-test check list. It checks:
@@ -232,28 +220,22 @@ def test_pre_test_verification():
     response = os.system("ping -c 1 -w2 " + Alpha_Node['Node_IP'] + " > /dev/null 2>&1")
     if response == 0:  # node is alive
         Current_Node = Alpha_Node
-        New_Node = Beta_Node
+        New_Node = Alpha_Node
     else:
         Current_Node = Beta_Node
-        New_Node = Alpha_Node
+        New_Node = Beta_Node
 
     print (New_Node)
 
     global scaleIoToken
     scaleIoToken = retrieveScaleIoToken()
-    print(scaleIoToken)
 
-    data = retrieveScaleIOProtectionDomain(scaleIoToken)
-    data2 = retrieveScaleIOStoragePool(scaleIoToken)
+    global RHDtoken
+    RHDtoken = retrieveRHDToken()
 
-    # verify that an OBM for the ipmi service is not currently configured for this node.
-    # If it is configured, delete it as it will be recreated during this addNode flow
-    #preCheckOBM()
 
-############################################################################################
-
-#@pytest.mark.dne_paqx_parent_mvp_extended
-def xtest_addNode_POST_workflow():
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_addNode_POST_workflow():
     """
     Title           :       Verify the POST function on /dne/nodes API
     Description     :       Send a POST to /dne/nodes where the body of the request is the typical DNE config
@@ -268,7 +250,7 @@ def xtest_addNode_POST_workflow():
 
     #########################
     # Prepare the Request message body with valid details: IP, Gateway, Mask
-    assert update_addNode_params_json(), 'Error: Unable to update the POST message body'
+    #assert update_addNode_params_json(), 'Error: Unable to update the POST message body'
 
     #########################
 
@@ -313,12 +295,11 @@ def xtest_addNode_POST_workflow():
         raise Exception(err)
 
 
-#@pytest.mark.skip(reason="Test not ready")
-#@pytest.mark.dne_paqx_parent_mvp_extended
-def xtest_preprocess_GET_workflow_status():
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_addnode_GET_workflow_status():
     """
-    Title           :       Verify the GET function on /dne/preprocess/<jobId> API
-    Description     :       Send a GET to /dne/preprocess/<jobId>. The <jobId> value is the workFlowID obtained in the
+    Title           :       Verify the GET function on /dne/addnode<jobId> API
+    Description     :       Send a GET to /dne/addnode/<jobId>. The <jobId> value is the workFlowID obtained in the
                             previous test_addNode_POST_workflow() test.
                             Each expected step in the workflow process will be checked.
 
@@ -331,7 +312,7 @@ def xtest_preprocess_GET_workflow_status():
 
     print("\n\nGET /dne/nodes/<jobId> REST API call to get the nodes job status...\n")
     workflow_status = ''
-    addNode_workflow_id ='009c9c70-4172-4af5-b977-19b14716d5fb'
+    #addNode_workflow_id ='153b8292-b4e1-49bc-a84a-c6005621056c'
     json_number = 0
 
     workflow_step1 = 'Retrieve default ESXi host credential details'
@@ -340,20 +321,20 @@ def xtest_preprocess_GET_workflow_status():
     workflow_step4 = 'Apply ESXi License'
     workflow_step5 = 'Datastore rename'
     workflow_step6 = 'Exit Host Maintenance Mode'
-    workflow_step7 = 'Enable PCI pass through'
-    workflow_step8 = 'Install ScaleIO VIB'
+    workflow_step7 = 'Enable PCI Passthrough ESXi host'
+    workflow_step8 = 'Install SDC VIB'
     workflow_step9 = 'Enter Host Maintenance Mode'
     workflow_step10 = 'Reboot Host'
     workflow_step11 = 'Exit Host Maintenance Mode'
-    workflow_step12 = 'Configure ScaleIO VIB'
-    workflow_step13 = 'Update ScaleIO SDC Performance Profile'
-    workflow_step14 = 'Add Host to DV Switch'
-    workflow_step15 = 'Deploy ScaleIO VM'
-    workflow_step16 = 'Set PCI Pass through ScaleIO VM'
-    workflow_step17 = 'Configure VM Network Settings'
+    workflow_step12 = 'Configure SDC VIB'
+    workflow_step13 = 'Configure SDC profile for High Performance'
+    workflow_step14 = 'ESXi Host DVSwitch Configuration'
+    workflow_step15 = 'Clone and Deploy ScaleIO VM'
+    workflow_step16 = 'Configure PCI Passthrough ScaleIO VM'
+    workflow_step17 = 'Configure ScaleIO VM Network Settings'
     workflow_step18 = 'Power on the ScaleIO VM'
     workflow_step19 = 'Change ScaleIO VM Credentials'
-    workflow_step20 = 'Install ScaleIO VM Packages'
+    workflow_step20 = 'Install SDS and LIA Packages'
     workflow_step21 = 'Performance Tune the ScaleIO VM'
     workflow_step22 = 'Add Host To Protection Domain'
     workflow_step23 = 'Configure Pxe boot'
@@ -590,73 +571,6 @@ def get_latest_api_response(url_body):
     data = json.loads(data, encoding='utf-8')
     return data
 
-
-# Update the json that will be used in the POST /dne/nodes command with valid values
-def update_addNode_params_json():
-    """
-    Description:    This method will update the json file with the symphonyUuid & nodeId values.
-    Parameters:     None
-    Returns:        0 or 1 (Boolean)
-    """
-
-    global symphonyUuid
-    symphonyUuid = get_SymphonyUuid_of_discovered_node()
-
-    global symphonyUUID
-    symphonyUUID = symphonyUuid
-
-    filePath = os.environ[
-                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/payload_addnode_dr.json'
-
-    if (os.path.isfile(filePath) == 0):
-        return 0
-
-    with open(filePath) as json_file:
-        data = json.load(json_file)
-    data['idracIpAddress'] = Current_Node['Node_IP']
-    data['idracSubnetMask'] = Current_Node['Node_Mask']
-    data['idracGatewayIpAddress'] = Current_Node['Node_GW']
-    data['esxiManagementHostname'] = esxiManagementHostname
-    data['esxiManagementIpAddress'] = esxiManagementIpAddress
-    data['esxiManagementSubnetMask'] = esxiManagementSubnetMask
-    data['esxiManagementGatewayIpAddress'] = esxiManagementGatewayIpAddress
-    data['symphonyUuid'] = symphonyUuid
-    data['symphonyUuid'] = symphonyUUID
-
-    data['clusterName'] = clusterName
-
-    with open(filePath, 'w') as outfile:
-        json.dump(data, outfile)
-
-    print (data)
-
-    return 1
-
-
-def get_SymphonyUuid_of_discovered_node():
-    # query the dne-paqx to return the symphonyuuid of the discovered node
-    endpoint = '/dne/nodes'
-    url_body = protocol + ipaddress + dne_port + endpoint
-
-    try:
-        response = requests.get(url_body)
-        # verify the status_code
-        assert response.status_code == 200, 'Error: Did not get a 200 on dne/nodes'
-
-    # Error check the response
-    except Exception as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        raise Exception(err)
-
-
-    data = response.json()
-    Uuid = data[0]['symphonyUuid']
-
-    return Uuid
-
-
 ######################
 # This is the main response workflow test
 
@@ -680,7 +594,7 @@ def check_the_workflow_task(url_body, data, json_number, workflow_step):
 
         print(workflow_step)
         timeout = 0
-        while timeout < 601:
+        while timeout < 2701:
 
             # Get the latest state of the workflow from the API
             data = get_latest_api_response(url_body)
@@ -887,78 +801,8 @@ def check_exitHostMaintenanceMode():
         return 0
 
 
-
 #####################################################################
-
-def preCheckOBM():
-    # check at the rackhd if the node to be added already has an OBM configured against it.
-    # if it does, remove the OBM.
-
-    nodeId = getNodeIdentifier(RHDtoken, testNodeMAC)
-    # the verify function returns either confirmation text ("no obm configured"),  or the id of the configured obm
-    obmResponse = verify_no_obm_ipmi_config_in_place(nodeId)
-    if obmResponse == "no obm configured":
-        print('ipmi - no obm present, test can proceed')
-    else :
-        print('deleting an obm currently configured for the node')
-        delete_ipmi_obm(obmResponse)
-
-#####################################################################
-
-def  delete_ipmi_obm(obmId):
-    """"
-    Description :       request the rackhd to delete the OBM with id = obmId
-    parameters :        obmId - the id of an OBM configured at rackhd
-    returns :           Nothing
-    """
-
-    apipath = 'api/2.0/obms/' + obmId
-    url = 'http://' + rackHD_IP + ':32080' + apipath
-    headerstring = {"Content-Type": "application/json", "Authorization": "JWT " + RHDtoken}
-    try:
-        response = requests.delete(url, headers=headerstring)
-    # Error check the response
-    except Exception as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        raise Exception(err)
-
-#####################################################################
-
-
-def verify_no_obm_ipmi_config_in_place(nodeId):
-    """"
-    Description :       check at the rackhd if an ipmi obm exists for node with an id = nodeId
-    parameters :        nodeId - the rackhd asssigned id of the node to be Added
-    returns :           Text string = "no obm configured" if no OBM is found
-                        The OBM Id if an OBM with service = ipmi is found
-    """
-
-    apipath = '/api/2.0/nodes/' + nodeId + '/obm'
-    url = 'http://' + rackHD_IP + ':32080' + apipath
-    headerstring = {"Content-Type": "application/json", "Authorization": "JWT " + RHDtoken}
-
-    try:
-        response = requests.get(url, headers=headerstring)
-    # Error check the response
-    except Exception as err:
-        # Return code error (e.g. 404, 501, ...)
-        print(err)
-        print('\n')
-        raise Exception(err)
-
-    data_text = response.text
-    data = json.loads(response.text, encoding='utf-8')
-
-    for entry in data :
-        if entry['service'] == 'ipmi-obm-service':
-            return entry['id']
-    return "no obm configured"
-
-#####################################################################
-
-
+# RackHD Functions
 def retrieveRHDToken():
     """"
     Description :       retrieve the rackHD token allowing api querying
@@ -966,6 +810,8 @@ def retrieveRHDToken():
     returns :           Text string = "no obm configured" if no OBM is found
                         The OBM Id if an OBM with service = ipmi is found
     """
+
+
     url = "http://" + rackHD_IP + ":32080/login"
     header = {'Content-Type': 'application/json'}
     body = '{"username": "' + rackHD_username + '", "password": "' + rackHD_password + '"}'
@@ -985,8 +831,6 @@ def retrieveRHDToken():
     return token
 
 
-#####################################################################
-
 def getNodeIdentifier(token, testNodeMAC):
     # Get the node Identifier value
 
@@ -995,7 +839,7 @@ def getNodeIdentifier(token, testNodeMAC):
     headerstring = {"Content-Type": "application/json", "Authorization": "JWT " + RHDtoken}
 
     try:
-     response = requests.get(url, headers=headerstring)
+        response = requests.get(url, headers=headerstring)
     # Error check the response
     except Exception as err:
         # Return code error (e.g. 404, 501, ...)
@@ -1012,6 +856,7 @@ def getNodeIdentifier(token, testNodeMAC):
             return testNodeIdentifier
 
 
+
 #####################################################################
 # ScaleIO Functions
 def retrieveScaleIoToken():
@@ -1024,6 +869,7 @@ def retrieveScaleIoToken():
     print(scaleIoToken)
     return scaleIoToken
 
+
 def retrieveScaleIOProtectionDomain(scaleIoToken):
     url = 'https://' + scaleio_IP +'/api/types/ProtectionDomain/instances'
     header = {'Content-Type': 'application/json'}
@@ -1031,9 +877,12 @@ def retrieveScaleIOProtectionDomain(scaleIoToken):
     respJson = json.loads(resp.text, encoding='utf-8')
     print(respJson)
 
+
 def retrieveScaleIOStoragePool(scaleIoToken):
     url = 'https://' + scaleio_IP +'/api/types/StoragePool/instances'
     header = {'Content-Type': 'application/json'}
     resp = requests.get(url, auth=(scaleio_username, scaleIoToken), verify=False)
     respJson = json.loads(resp.text, encoding='utf-8')
     print(respJson)
+
+#####################################################################

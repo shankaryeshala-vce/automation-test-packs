@@ -616,7 +616,7 @@ def createAddNodeMsgJson():
     data['scaleIoData2KernelAndSvmSubnetMask'] = scaleIoData2KernelAndSvmSubnetMask
 
     data['clusterName'] = clustername
-    data['protectionDomain'] = protectionDomain
+    data['protectionDomainId'] = protectionDomain
     data['deviceToDeviceStoragePool'] = deviceToDeviceStoragePool
 
     with open(filePath, 'w') as outfile:
