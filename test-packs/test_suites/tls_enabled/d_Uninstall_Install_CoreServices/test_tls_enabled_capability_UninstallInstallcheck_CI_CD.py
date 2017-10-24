@@ -63,7 +63,7 @@ def test_cap_reg_install(setup):
     assert my_return_status == 0, "capability Reg did not install"
 
 
-@pytest.mark.tls_enabled
+@pytest.mark.tls_enabled_stop_start
 def test_cap_reg_serviceup(setup):
     """
     Title: Verify the Capability Reg service containers are UP
