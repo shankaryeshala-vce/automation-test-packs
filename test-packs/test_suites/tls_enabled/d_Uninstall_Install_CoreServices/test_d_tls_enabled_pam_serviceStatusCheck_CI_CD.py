@@ -66,7 +66,7 @@ def test_pam_install(setup):
     assert my_return_status == 0, "pam did not install"
 
 
-@pytest.mark.tls_enabled
+@pytest.mark.tls_enabled_stop_start
 def test_pam_serviceup(setup):
     """
     Title: Verify the PAM services containers are UP
