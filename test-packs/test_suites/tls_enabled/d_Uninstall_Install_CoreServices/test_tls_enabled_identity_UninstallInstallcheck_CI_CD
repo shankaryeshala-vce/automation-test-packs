@@ -63,7 +63,7 @@ def test_identity_service_install(setup):
     assert my_return_status == 0, "Identity did not install"
 
 
-@pytest.mark.tls_enabled
+@pytest.mark.tls_enabled_stop_start
 def test_cap_reg_serviceup(setup):
     """
     Title: Verify the Identity service containers are UP
