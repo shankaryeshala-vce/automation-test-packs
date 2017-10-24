@@ -13,11 +13,11 @@ def test_cap_reg_uninstall(setup):
     """
     Title: Verify the capability Registry service can be uninstalled
     Description: This test verifies that the capability service can be uninstalled successfully
-    Params: cpsd-capability-registry-service
+    Params: dell-cpsd-capability-registry-service
     Returns: None
 
     """
-    service = "cpsd-capability-registry-service"
+    service = "dell-cpsd-capability-registry-service"
 
     print(test_cap_reg_uninstall.__doc__)
 
@@ -36,11 +36,11 @@ def test_cap_reg_install(setup):
     """
     Title: Verify the sds service can be installed
     Description: This test verifies that the sds service can be installed successfully
-    Params: cpsd-capability-registry-service
+    Params: dell-cpsd-capability-registry-service
     Returns: None
 
     """
-    service = "cpsd-capability-registry-service"
+    service = "dell-cpsd-capability-registry-service"
 
     print(test_cap_reg_install.__doc__)
 
@@ -68,11 +68,11 @@ def test_cap_reg_serviceup(setup):
     """
     Title: Verify the Capability Reg service containers are UP
     Description: This test verifies that the capReg container is up
-    Params: cpsd-capability-registry-service
+    Params: dell-cpsd-capability-registry-service
     Returns: None
 
     """
-    service = "cpsd-capability-registry-service"
+    service = "dell-cpsd-capability-registry-service"
 
     print(test_cap_reg_serviceup.__doc__)
 
