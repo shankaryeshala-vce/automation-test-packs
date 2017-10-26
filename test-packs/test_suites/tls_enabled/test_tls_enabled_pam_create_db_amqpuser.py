@@ -1,3 +1,9 @@
+#!/usr/bin/python
+# Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+# Dell EMC Confidential/Proprietary Information
+# Author - Toqeer Akhtar
+
+
 import af_support_tools
 import pytest
 import json
