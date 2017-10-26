@@ -56,10 +56,9 @@ def get_rmq_credentials():
 
     assert r.status_code == 200, "Error---Rabbitmq credentials not returned"
     data = json.loads(r.text)
-
     rmq_user =data['response']['amqp']['username']    
 
-return {'rmq_user': rmq_user}
+    return {'rmq_user': rmq_user}
 
 
 def cs_encrypt_credential_elements(my_json):
