@@ -35,6 +35,7 @@ class props(object):
     #     rmq_port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='port')
     #     rmq_cert_path = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ', property='cert_path')
 
+'''	
 def get_rmq_credentials():
     api_url = "https://credential-service.cpsd.dell:9090/v1/accesscontrol/credentials?name=amqp&type=rabbitmq&raw=true"
     r = requests.get(api_url, verify=False)
@@ -45,6 +46,20 @@ def get_rmq_credentials():
     rmq_password = resp['response']['password']
 
     return {'rmq_user': rmq_user, 'rmq_password': rmq_password}
+'''
+def get_rmq_credentials():
+
+    r = requests.put("https://pam-service.cpsd.dell:7002/pam-service/v1/amqp/users",
+                     cert=('/usr/local/share/ca-certificates/taf.cpsd.dell.crt',
+                           '/usr/local/share/ca-certificates/taf.cpsd.dell.key'),
+                     verify='/usr/local/share/ca-certificates/cpsd.dell.ca.crt')
+
+    assert r.status_code == 200, "Error---Rabbitmq credentials not returned"
+    data = json.loads(r.text)
+
+    rmq_user =data['response']['amqp']['username']    
+
+return {'rmq_user': rmq_user}
 
 
 def cs_encrypt_credential_elements(my_json):
