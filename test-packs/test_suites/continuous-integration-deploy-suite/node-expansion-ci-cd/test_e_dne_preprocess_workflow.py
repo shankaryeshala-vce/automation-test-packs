@@ -110,6 +110,21 @@ def load_test_data():
     global vcenter_port
     vcenter_port = '443'
 
+    # ~~~~~~~~ScaleIO Details
+    global scaleio_IP
+    scaleio_IP = af_support_tools.get_config_file_property(config_file=setup_config_file, heading=setup_config_header,
+                                                           property='scaleio_integration_ipaddress')
+
+    global scaleio_username
+    scaleio_username = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                 heading=setup_config_header,
+                                                                 property='scaleio_username')
+
+    global scaleio_password
+    scaleio_password = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                 heading=setup_config_header,
+                                                                 property='scaleio_password')
+
     # ~~~~~~~~Test Node IP & Creds Details
     global testNodeMAC
     testNodeMAC = af_support_tools.get_config_file_property(config_file=setup_config_file,
@@ -196,37 +211,30 @@ def load_test_data():
                                                                                    heading=setup_config_header,
                                                                                    property='scaleio_vm_gateway')
 
-    global scaleIoData1KernelIpAddress
-    scaleIoData1KernelIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                            heading=setup_config_header,
-                                                                            property='data1_kernal_ip')
-
     global scaleIoData1SvmIpAddress
     scaleIoData1SvmIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                                          heading=setup_config_header,
                                                                          property='data1_svm_ip')
 
-    global scaleIoData1KernelAndSvmSubnetMask
-    scaleIoData1KernelAndSvmSubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                                   heading=setup_config_header,
-                                                                                   property='data1_svm_kernal_mask')
-
-    global scaleIoData2KernelIpAddress
-    scaleIoData2KernelIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                            heading=setup_config_header,
-                                                                            property='data2_kernal_ip')
+    global scaleIoSvmData1SubnetMask
+    scaleIoSvmData1SubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                          heading=setup_config_header,
+                                                                          property='data1_svm_kernal_mask')
 
     global scaleIoData2SvmIpAddress
     scaleIoData2SvmIpAddress = af_support_tools.get_config_file_property(config_file=setup_config_file,
                                                                          heading=setup_config_header,
                                                                          property='data2_svm_ip')
 
-    global scaleIoData2KernelAndSvmSubnetMask
-    scaleIoData2KernelAndSvmSubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
-                                                                                   heading=setup_config_header,
-                                                                                   property='data2_svm_kernal_mask')
+    global scaleIoSvmData2SubnetMask
+    scaleIoSvmData2SubnetMask = af_support_tools.get_config_file_property(config_file=setup_config_file,
+                                                                          heading=setup_config_header,
+                                                                          property='data2_svm_kernal_mask')
 
     global symphonyUuid
+    global clustername
+    global protectionDomain
+    global deviceToDeviceStoragePool
 
     global serviceName
     serviceName = 'dell-wsman-obm-service'
@@ -248,7 +256,7 @@ def load_test_data():
                  'Node_Mask': '' + idrac_ip_subnetmask + ''}
 
 
-# ######################################################################################
+#######################################################################################
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_pre_test_verification():
     """
@@ -279,6 +287,15 @@ def test_pre_test_verification():
     print('\nNode Idrac IP details:')
     print(New_Node)
 
+    # Get the ScaleIO Auth Token
+    global scaleIoToken
+    scaleIoToken = retrieveScaleIoToken()
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Prepare the Request message body with valid details: IP, Gateway, Mask
+    assert update_preprocess_params_json(), 'Error: Unable to update the POST message body'
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_preporcess_POST_workflow():
@@ -292,11 +309,6 @@ def test_preporcess_POST_workflow():
     Returns         :       None
     Pre-requisites  :       The DNE-PAQX has already discovered a node and that it is booted into the micro-kernel
     """
-
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # Prepare the Request message body with valid details: IP, Gateway, Mask
-    assert update_preprocess_params_json(), 'Error: Unable to update the POST message body'
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     print('\nSend POST /dne/nodes REST API call to provision an unallocated node...\n')
@@ -358,21 +370,21 @@ def test_preprocess_GET_workflow_status():
 
     print("\n\nGET /dne/preprocess/<jobId> REST API call to get the nodes job status...\n")
     workflow_status = ''
-    # preprocess_workflow_id =''    # This is used for test purposes
+    # preprocess_workflow_id = ''  # This is used for test purposes
     json_number = 0
 
-    workflow_step1 = 'List ScaleIO Components'
-    workflow_step2 = 'List VCenter Components'
+    workflow_step1 = 'List ScaleIO components'
+    workflow_step2 = 'List vCenter components'
     workflow_step3 = 'Discover ScaleIO'
-    workflow_step4 = 'Discover VCenter'
+    workflow_step4 = 'Discover vCenter'
     # workflow_step5 = 'Discover Rackhd Node Inventory'
-    workflow_step6 = 'Configuring Out of Band Management'
-    workflow_step7 = 'Ping Out of Band Management IP Address'
-    workflow_step8 = 'Configuring Obm Settings'
-    workflow_step9 = 'Configure Boot Device Idrac'
-    workflow_step10 = 'Find ScaleIO'
-    workflow_step11 = 'Find VCluster'
-    workflow_step12 = 'Protection Domain'
+    workflow_step6 = 'Configure server out of band IP address'
+    workflow_step7 = 'Ping server out of band IP address'
+    workflow_step8 = 'Configure out of band management settings'
+    workflow_step9 = 'Configure server boot device and boot sequence'
+    workflow_step10 = 'Find vCenter cluster'
+    workflow_step11 = 'Find or create protection domain'
+    workflow_step12 = 'Find or create valid storage pool'
 
     endpoint = '/dne/preprocess/'
     url_body = protocol + ipaddress + dne_port + endpoint + preprocess_workflow_id
@@ -385,7 +397,6 @@ def test_preprocess_GET_workflow_status():
 
             # If the process has failed immediately then fail the test outright
             assert data['status'] != 'FAILED', 'ERROR: The preprocess workflow overall status = Failed'
-
 
             data = get_latest_api_response(url_body)
 
@@ -450,31 +461,31 @@ def test_preprocess_GET_workflow_status():
             # Configure Boot Device Idrac
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step9:
                 check_the_workflow_task(url_body, data, json_number, workflow_step9)
-                #assert check_configureBootDeviceIdrac(), 'Check on ' + workflow_step9 + ' failed'
-                json_number += 1
-
-            data = get_latest_api_response(url_body)
-
-            # Find ScaleIO
-            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
-                check_the_workflow_task(url_body, data, json_number, workflow_step10)
-                #assert check__findScaleIO(data), 'Check on ' + workflow_step10 + ' failed'
+                assert check_configureBootDeviceIdrac(), 'Check on ' + workflow_step9 + ' failed'
                 json_number += 1
 
             data = get_latest_api_response(url_body)
 
             # Find vcluster
-            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step11:
-                check_the_workflow_task(url_body, data, json_number, workflow_step11)
-                assert check_findVCluster(data), 'Check on ' + workflow_step11 + ' failed'
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step10:
+                check_the_workflow_task(url_body, data, json_number, workflow_step10)
+                assert check_findVCluster(data), 'Check on ' + workflow_step10 + ' failed'
                 json_number += 1
 
             data = get_latest_api_response(url_body)
 
             # Find Protection Domain
+            if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step11:
+                check_the_workflow_task(url_body, data, json_number, workflow_step11)
+                assert check_findProtectionDomain(data), 'Check on ' + workflow_step11 + ' failed'
+                json_number += 1
+
+            data = get_latest_api_response(url_body)
+
+            # Find ScaleIO
             if data['workflowTasksResponseList'][json_number]['workFlowTaskName'] == workflow_step12:
                 check_the_workflow_task(url_body, data, json_number, workflow_step12)
-                assert check_findProtectionDomain(data), 'Check on ' + workflow_step12 + ' failed'
+                assert check__findScaleIO(data), 'Check on ' + workflow_step12 + ' failed'
                 json_number += 1
 
                 print('\nPreprocess Workflow Completed Successfully')
@@ -492,7 +503,6 @@ def test_preprocess_GET_workflow_status():
 
     time.sleep(5)
     createAddNodeMsgJson()
-
 
 
 ########################################################################################
@@ -542,12 +552,10 @@ def update_preprocess_params_json():
     data['scaleIoSvmManagementSubnetMask'] = scaleIoSvmManagementSubnetMask
     data['scaleIoSvmManagementGatewayAddress'] = scaleIoSvmManagementGatewayAddress
 
-    data['scaleIoData1KernelIpAddress'] = scaleIoData1KernelIpAddress
     data['scaleIoData1SvmIpAddress'] = scaleIoData1SvmIpAddress
-    data['scaleIoData1KernelAndSvmSubnetMask'] = scaleIoData1KernelAndSvmSubnetMask
-    data['scaleIoData2KernelIpAddress'] = scaleIoData2KernelIpAddress
+    data['scaleIoSvmData1SubnetMask'] = scaleIoSvmData1SubnetMask
     data['scaleIoData2SvmIpAddress'] = scaleIoData2SvmIpAddress
-    data['scaleIoData2KernelAndSvmSubnetMask'] = scaleIoData2KernelAndSvmSubnetMask
+    data['scaleIoSvmData2SubnetMask'] = scaleIoSvmData2SubnetMask
 
     with open(filePath, 'w') as outfile:
         json.dump(data, outfile)
@@ -556,6 +564,7 @@ def update_preprocess_params_json():
     print(data)
 
     return 1
+
 
 # Create the json file that will be used in the addnode test
 def createAddNodeMsgJson():
@@ -593,15 +602,14 @@ def createAddNodeMsgJson():
     data['scaleIoSvmManagementSubnetMask'] = scaleIoSvmManagementSubnetMask
     data['scaleIoSvmManagementGatewayAddress'] = scaleIoSvmManagementGatewayAddress
 
-    data['scaleIoData1KernelIpAddress'] = scaleIoData1KernelIpAddress
     data['scaleIoData1SvmIpAddress'] = scaleIoData1SvmIpAddress
-    data['scaleIoData1KernelAndSvmSubnetMask'] = scaleIoData1KernelAndSvmSubnetMask
-    data['scaleIoData2KernelIpAddress'] = scaleIoData2KernelIpAddress
+    data['scaleIoSvmData1SubnetMask'] = scaleIoSvmData1SubnetMask
     data['scaleIoData2SvmIpAddress'] = scaleIoData2SvmIpAddress
-    data['scaleIoData2KernelAndSvmSubnetMask'] = scaleIoData2KernelAndSvmSubnetMask
+    data['scaleIoSvmData2SubnetMask'] = scaleIoSvmData2SubnetMask
 
     data['clusterName'] = clustername
-    data['protectionDomain'] = protectionDomain
+    data['protectionDomainId'] = protectionDomain
+    data['deviceToDeviceStoragePool'] = deviceToDeviceStoragePool
 
     with open(filePath, 'w') as outfile:
         json.dump(data, outfile)
@@ -645,6 +653,7 @@ def check_the_workflow_task(url_body, data, json_number, workflow_step):
                            'workFlowTaskStatus'] != 'FAILED', 'Error in Step 1: ' + workflow_step + ' failed'
                 # If the task has failed then fail the entire test.
 
+
 ######################
 # Functions to check the steps of the workflow actually did something ###########
 
@@ -653,7 +662,7 @@ def check_configIdrac(data, json_num, url_body):
     time.sleep(3)
     data = get_latest_api_response(url_body)
     error_list = []
-    if data['workflowTasksResponseList'][json_num]['workFlowTaskName'] == 'Configuring Out of Band Management':
+    if data['workflowTasksResponseList'][json_num]['workFlowTaskName'] == 'Configure server out of band IP address':
         if data['workflowTasksResponseList'][json_num]['results']['idracIpAddress'] != New_Node['Node_IP']:
             error_list.append('Error : The new IP has not been set correctly')
 
@@ -715,29 +724,15 @@ def check_configureBootDeviceIdrac():
         return 0
 
 
-# Check that ScaleIO data (volumes ...) is returned
-def check__findScaleIO(data):
-    # TODO this needs to be expanded to valiadte at source.
-    error_list = []
-    for step in data['workflowTasksResponseList']:
-        if step['workFlowTaskName'] == 'Find ScaleIO':
-            if not ['results']['storagePool']:
-                error_list.append('Error : No storage pool detected')
-    if error_list == []:
-        print('storage Pool detected')
-        return 1
-    else:
-        return 0
-
-
 # Check the cluster retunred is retunred from source also
 def check_findVCluster(data):
+    global clustername
+
     actualvCenterClusterList = getRealVcenterInfo()
 
-    global clustername
     error_list = []
     for step in data['workflowTasksResponseList']:
-        if step['workFlowTaskName'] == 'Find VCluster':
+        if step['workFlowTaskName'] == 'Find vCenter cluster':
             if not step['results']['clusterName']:
                 error_list.append('Error : No clusters detected')
             clustername = step['results']['clusterName']
@@ -746,27 +741,53 @@ def check_findVCluster(data):
                 error_list.append('Error : Cluster Names do not match')
 
     if error_list == []:
-        print('Valid vcenter Clusters detected')
+        print('Valid Center Cluster detected: ' + clustername)
         return 1
     else:
         return 0
 
 
+# Check that the Protection Domain is returned
 def check_findProtectionDomain(data):
-    # actualProtectionDomainList = getProtectionDomainInfo()
     global protectionDomain
+    actualProtectionDomain = retrieveScaleIOProtectionDomain(scaleIoToken)
+
     error_list = []
     for step in data['workflowTasksResponseList']:
-        if step['workFlowTaskName'] == 'Protection Domain':
-            if not step['results']['protectionDomain']:
+        if step['workFlowTaskName'] == 'Find or create protection domain':
+            if not step['results']['protectionDomainName']:
                 error_list.append('Error : No Protection Domains detected')
-            protectionDomain = step['results']['protectionDomain']
-
-            if protectionDomain != 'FR1-ProtectionDomain1':
+            protectionDomain = step['results']['protectionDomainName']
+            print(protectionDomain)
+            if protectionDomain not in actualProtectionDomain:
                 error_list.append('Error : Protection Domain Names do not match')
 
     if error_list == []:
-        print('Valid Protection Domain detected')
+        print('Valid Protection Domain detected: ' + protectionDomain)
+        return 1
+    else:
+        return 0
+
+
+# Check that ScaleIO data  is returned
+def check__findScaleIO(data):
+    global deviceToDeviceStoragePool
+
+    actualStoragePool = retrieveScaleIOStoragePool(scaleIoToken)
+
+    error_list = []
+    for step in data['workflowTasksResponseList']:
+        if step['workFlowTaskName'] == 'Find or create valid storage pool':
+            if not ['deviceToStoragePoolMap']:
+                error_list.append('Error : No storage pool detected')
+
+            # This will be used to create the json later
+            deviceToDeviceStoragePool = step['deviceToStoragePoolMap']
+
+            # if storagePoolName not in actualStoragePool:
+
+    if error_list == []:
+        print('Valid Storage Pool detected')
         return 1
     else:
         return 0
@@ -867,6 +888,32 @@ def getRealVcenterInfo():
         clusterList.append(cluster)
 
     return clusterList
+
+
+######## Supporting Functions for ScaleIO ##########
+
+def retrieveScaleIoToken():
+    # grab a token
+    url = 'https://' + scaleio_IP + '/api/login'
+    header = {'Content-Type': 'application/json'}
+    resp = requests.get(url, auth=(scaleio_username, scaleio_password), verify=False)
+    scaleIoToken = resp.text
+    scaleIoToken = scaleIoToken.strip('"')
+    return scaleIoToken
+
+
+def retrieveScaleIOProtectionDomain(scaleIoToken):
+    url = 'https://' + scaleio_IP + '/api/types/ProtectionDomain/instances'
+    header = {'Content-Type': 'application/json'}
+    resp = requests.get(url, auth=(scaleio_username, scaleIoToken), verify=False)
+    return resp.text
+
+
+def retrieveScaleIOStoragePool(scaleIoToken):
+    url = 'https://' + scaleio_IP + '/api/types/StoragePool/instances'
+    header = {'Content-Type': 'application/json'}
+    resp = requests.get(url, auth=(scaleio_username, scaleIoToken), verify=False)
+    return resp.text
 
 
 #####################################################################
