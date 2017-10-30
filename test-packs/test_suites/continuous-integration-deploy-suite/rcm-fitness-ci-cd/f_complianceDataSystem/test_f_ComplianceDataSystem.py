@@ -379,7 +379,6 @@ def getComplianceDataSystem_INVALID(sysUUID):
 
     print("\nReturned data has completed all defined checks successfully......")
 
-
 def getComplianceDataSystem_NULL():
     print("Verifying 404 returned if no component UUID provided.")
 
@@ -411,7 +410,7 @@ def test_getComplianceDataSystem2():
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem3():
-    getComplianceDataSystemSubComps("R730XD", "NIC", "Gigabit 4P", path + "rcmSystemDefinition-VxRack.json",
+    getComplianceDataSystemSubComps("R730XD", "NIC", "Ethernet 10G 4P", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemPOWEREDGE.json", systemUUID)
 
 

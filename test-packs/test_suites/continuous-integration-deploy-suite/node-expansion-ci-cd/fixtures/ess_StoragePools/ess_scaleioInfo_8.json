@@ -15,25 +15,33 @@
           "id": "0011",
           "name": "Device-11",
           "deviceState": "",
-          "type": "SSD"
+          "type": "SSD",
+          "serialNumber": "SN-11",
+          "capacity": "480103981056"
         },
         {
           "id": "0012",
           "name": "Device-12",
           "deviceState": "",
-          "type": "SSD"
+          "type": "SSD",
+          "serialNumber": "SN-12",
+          "capacity": "480103981056"
         },
         {
           "id": "0013",
           "name": "Device-13",
           "deviceState": "",
-          "type": "SSD"
+          "type": "SSD",
+          "serialNumber": "SN-13",
+          "capacity": "480103981056"
         },
         {
           "id": "0014",
           "name": "Device-14",
           "deviceState": "",
-          "type": "SSD"
+          "type": "SSD",
+          "serialNumber": "SN-14",
+          "capacity": "480103981056"
         }
       ]
     },
@@ -47,7 +55,9 @@
           "id": "002",
           "name": "Device-2",
           "deviceState": "",
-          "type": "HDD"
+          "type": "HDD",
+          "serialNumber": "SN-2",
+          "capacity": "480103981056"
         }
       ]
     },
@@ -61,7 +71,9 @@
           "id": "003",
           "name": "Device-3",
           "deviceState": "",
-          "type": "SSD"
+          "type": "SSD",
+          "serialNumber": "SN-3",
+          "capacity": "480103981056"
         }
       ]
     }
@@ -71,73 +83,97 @@
       "id": "004",
       "name": "Device-4",
       "deviceState": "",
-      "type": "SSD"
+      "type": "SSD",
+      "serialNumber": "SN-4",
+      "capacity": "480103981056"
     },
     {
       "id": "005",
       "name": "Device-5",
       "deviceState": "",
-      "type": "SSD"
+      "type": "SSD",
+      "serialNumber": "SN-5",
+      "capacity": "480103981056"
     },
     {
       "id": "006",
       "name": "Device-6",
       "deviceState": "",
-      "type": "SSD"
+      "type": "SSD",
+      "serialNumber": "SN-6",
+      "capacity": "480103981056"
     },
     {
       "id": "007",
       "name": "Device-7",
       "deviceState": "",
-      "type": "SSD"
+      "type": "SSD",
+      "serialNumber": "SN-7",
+      "capacity": "480103981056"
     },
     {
       "id": "008",
       "name": "Device-8",
       "deviceState": "",
-      "type": "SSD"
+      "type": "SSD",
+      "serialNumber": "SN-8",
+      "capacity": "480103981056"
     },
     {
       "id": "009",
       "name": "Device-9",
       "deviceState": "",
-      "type": "SSD"
+      "type": "SSD",
+      "serialNumber": "SN-9",
+      "capacity": "480103981056"
     },
     {
       "id": "0010",
       "name": "Device-10",
       "deviceState": "",
-      "type": "SSD"
+      "type": "SSD",
+      "serialNumber": "SN-10",
+      "capacity": "480103981056"
     },
     {
       "id": "0015",
       "name": "Device-15",
       "deviceState": "",
-      "type": "SSD"
+      "type": "SSD",
+      "serialNumber": "SN-15",
+      "capacity": "480103981056"
     },
     {
       "id": "0016",
       "name": "Device-16",
       "deviceState": "",
-      "type": "SSD"
+      "type": "SSD",
+      "serialNumber": "SN-16",
+      "capacity": "480103981056"
     },
     {
       "id": "0017",
       "name": "Device-17",
       "deviceState": "",
-      "type": "SSD"
+      "type": "SSD",
+      "serialNumber": "SN-17",
+      "capacity": "480103981056"
     },
     {
       "id": "0018",
       "name": "Device-18",
       "deviceState": "",
-      "type": "SSD"
+      "type": "SSD",
+      "serialNumber": "SN-18",
+      "capacity": "480103981056"
     },
     {
       "id": "0019",
       "name": "Device-19",
       "deviceState": "",
-      "type": "SSD"
+      "type": "SSD",
+      "serialNumber": "SN-19",
+      "capacity": "480103981056"
     }
   ]
 }

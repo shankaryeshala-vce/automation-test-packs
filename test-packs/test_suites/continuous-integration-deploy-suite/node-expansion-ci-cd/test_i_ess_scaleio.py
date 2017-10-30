@@ -56,6 +56,7 @@ def load_test_data():
     global my_routing_key
     my_routing_key = 'ess.service.request.' + str(uuid.uuid4())
 
+
 #####################################################################
 # These are the exepected rules
 # Warnings:
@@ -83,7 +84,8 @@ def test_validateScaleIO_StoragePool_ESS_msg_1():
     cleanupQ('test.ess.service.response')
     bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_1.json'
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_1.json'
 
     with open(filePath) as fixture:
         my_payload = fixture.read()
@@ -96,17 +98,42 @@ def test_validateScaleIO_StoragePool_ESS_msg_1():
     print(responseMsg)
 
     error_list = []
-    if responseMsg['deviceToStoragePoolMap']['003'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['003']['storagePoolId'] != '74ff6005valid':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['004'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['003']['storagePoolName'] != 'Pool-2-Valid':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['005'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['003']['deviceId'] != '003':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['006'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['storagePoolId'] != '74ff6005valid':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['007'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['storagePoolName'] != 'Pool-2-Valid':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['warnings'][0]['message'] != 'REQUIRED: The size of Pool-1-Invalid storage pool must be between 1 and 299 devices. -- StoragePool : Pool-1-Invalid with 300 devices failed rule checking.':
+    if responseMsg['deviceToStoragePoolMap']['004']['deviceId'] != '004':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['004']['deviceName'] != 'Device-4':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['storagePoolName'] != 'Pool-2-Valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['deviceId'] != '005':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['storagePoolName'] != 'Pool-2-Valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['deviceName'] != 'Device-5':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['deviceId'] != '006':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['007']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['007']['storagePoolName'] != 'Pool-2-Valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['007']['deviceId'] != '007':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['warnings'][0][
+        'message'] != 'REQUIRED: The size of Pool-1-Invalid storage pool must be between 0 and 299 devices. -- StoragePool : Pool-1-Invalid with 300 devices failed rule checking.':
         error_list.append('Error :Warning returned')
 
     assert not error_list
@@ -131,7 +158,8 @@ def test_validateScaleIO_StoragePool_ESS_msg_2():
     cleanupQ('test.ess.service.response')
     bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_2.json'
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_2.json'
 
     with open(filePath) as fixture:
         my_payload = fixture.read()
@@ -172,7 +200,8 @@ def test_validateScaleIO_StoragePool_ESS_msg_3():
     cleanupQ('test.ess.service.response')
     bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_3.json'
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_3.json'
 
     with open(filePath) as fixture:
         my_payload = fixture.read()
@@ -185,20 +214,41 @@ def test_validateScaleIO_StoragePool_ESS_msg_3():
     print(responseMsg)
 
     error_list = []
-    if responseMsg['deviceToStoragePoolMap']['004'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['storagePoolId'] != '74ff6005valid':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['005'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['storagePoolName'] != 'Pool-1':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['006'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['deviceId'] != '004':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['007'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['deviceName'] != 'Device-4':
         error_list.append('Error :wrong storage pool identified')
-
+    if responseMsg['deviceToStoragePoolMap']['005']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['deviceId'] != '005':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['deviceName'] != 'Device-5':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['deviceId'] != '006':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['007']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['007']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['007']['deviceId'] != '007':
+        error_list.append('Error :wrong storage pool identified')
 
     if responseMsg['errors']:
         error_list.append('Error :Unexpected Warning returned')
 
-    if responseMsg['warnings'][0]['message'] != 'The storage device Device-1 is already present in storage pool Pool-1.':
+    if responseMsg['warnings'][0][
+        'message'] != 'The storage device Device-1 is already present in storage pool Pool-1.':
         error_list.append('Error :Unexpected Error returned')
 
     assert not error_list
@@ -221,7 +271,8 @@ def test_validateScaleIO_StoragePool_ESS_msg_4():
     cleanupQ('test.ess.service.response')
     bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_4.json'
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_4.json'
 
     with open(filePath) as fixture:
         my_payload = fixture.read()
@@ -260,7 +311,8 @@ def test_validateScaleIO_StoragePool_ESS_msg_5():
     cleanupQ('test.ess.service.response')
     bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_5.json'
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_5.json'
 
     with open(filePath) as fixture:
         my_payload = fixture.read()
@@ -273,18 +325,26 @@ def test_validateScaleIO_StoragePool_ESS_msg_5():
     print(responseMsg)
 
     error_list = []
-    if responseMsg['deviceToStoragePoolMap']['003'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['003']['storagePoolId'] != '74ff6005valid':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['004'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['003']['storagePoolName'] != 'Pool-1':
         error_list.append('Error :wrong storage pool identified')
-
+    if responseMsg['deviceToStoragePoolMap']['003']['deviceId'] != '003':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['004']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['004']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['004']['deviceId'] != '004':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['004']['deviceName'] != 'Device-4':
+        error_list.append('Error :wrong storage pool identified')
     if responseMsg['errors'][0]['message'] != 'No storage pool assigned to device: Device-5':
         error_list.append('Error :Unexpected Error returned')
     if responseMsg['errors'][1]['message'] != 'No storage pool assigned to device: Device-6':
         error_list.append('Error :Unexpected Error returned')
     if responseMsg['errors'][2]['message'] != 'No storage pool assigned to device: Device-7':
         error_list.append('Error :Unexpected Error returned')
-
 
     assert not error_list
 
@@ -306,7 +366,8 @@ def test_validateScaleIO_StoragePool_ESS_msg_6():
     cleanupQ('test.ess.service.response')
     bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_6.json'
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_6.json'
 
     with open(filePath) as fixture:
         my_payload = fixture.read()
@@ -319,21 +380,25 @@ def test_validateScaleIO_StoragePool_ESS_msg_6():
     print(responseMsg)
 
     error_list = []
-    if responseMsg['deviceToStoragePoolMap']['004'] != '74ff6007valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['storagePoolId'] != '74ff6007valid':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['005'] != '74ff6007valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['deviceName'] != 'Device-4':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['006'] != '74ff6007valid':
+    if responseMsg['deviceToStoragePoolMap']['005']['storagePoolId'] != '74ff6007valid':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['007'] != '74ff6007valid':
+    if responseMsg['deviceToStoragePoolMap']['005']['deviceName'] != 'Device-5':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['storagePoolId'] != '74ff6007valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['007']['storagePoolId'] != '74ff6007valid':
         error_list.append('Error :wrong storage pool identified')
 
     if responseMsg['errors']:
         error_list.append('Error :Unexpected Warning returned')
 
-    if responseMsg['warnings'][0]['message'] != 'REQUIRED: The size of Pool-1 storage pool must be between 1 and 299 devices. -- StoragePool : Pool-1 with 301 devices failed rule checking.':
+    if responseMsg['warnings'][0][
+        'message'] != 'REQUIRED: The size of Pool-1 storage pool must be between 0 and 299 devices. -- StoragePool : Pool-1 with 301 devices failed rule checking.':
         error_list.append('Error :Warning returned')
-
 
     assert not error_list
 
@@ -355,7 +420,8 @@ def test_validateScaleIO_StoragePool_ESS_msg_7():
     cleanupQ('test.ess.service.response')
     bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_7.json'
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_7.json'
 
     with open(filePath) as fixture:
         my_payload = fixture.read()
@@ -368,20 +434,22 @@ def test_validateScaleIO_StoragePool_ESS_msg_7():
     print(responseMsg)
 
     error_list = []
-    if responseMsg['deviceToStoragePoolMap']['004'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['storagePoolId'] != '74ff6005valid':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['005'] != '74ff6006valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['deviceName'] != 'Device-4':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['006'] != '74ff6007valid':
+    if responseMsg['deviceToStoragePoolMap']['005']['storagePoolId'] != '74ff6006valid':
         error_list.append('Error :wrong storage pool identified')
-
+    if responseMsg['deviceToStoragePoolMap']['005']['deviceName'] != 'Device-5':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['storagePoolId'] != '74ff6007valid':
+        error_list.append('Error :wrong storage pool identified')
 
     if responseMsg['errors']:
         error_list.append('Error :Unexpected Warning returned')
 
     if responseMsg['warnings']:
         error_list.append('Error :Warning returned')
-
 
     assert not error_list
 
@@ -403,7 +471,8 @@ def test_validateScaleIO_StoragePool_ESS_msg_8():
     cleanupQ('test.ess.service.response')
     bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_8.json'
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_8.json'
 
     with open(filePath) as fixture:
         my_payload = fixture.read()
@@ -416,38 +485,89 @@ def test_validateScaleIO_StoragePool_ESS_msg_8():
     print(responseMsg)
 
     error_list = []
-    if responseMsg['deviceToStoragePoolMap']['004'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['storagePoolId'] != '74ff6005valid':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['005'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['storagePoolName'] != 'Pool-1':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['006'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['deviceId'] != '004':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['007'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['004']['deviceName'] != 'Device-4':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['008'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['005']['storagePoolId'] != '74ff6005valid':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['009'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['005']['storagePoolName'] != 'Pool-1':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['0010'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['005']['deviceId'] != '005':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['0015'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['005']['deviceName'] != 'Device-5':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['0016'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['006']['storagePoolId'] != '74ff6005valid':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['0017'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['006']['storagePoolName'] != 'Pool-1':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['0018'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['006']['deviceId'] != '006':
         error_list.append('Error :wrong storage pool identified')
-    if responseMsg['deviceToStoragePoolMap']['0019'] != '74ff6005valid':
+    if responseMsg['deviceToStoragePoolMap']['007']['storagePoolId'] != '74ff6005valid':
         error_list.append('Error :wrong storage pool identified')
-
+    if responseMsg['deviceToStoragePoolMap']['007']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['007']['deviceId'] != '007':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['008']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['008']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['008']['deviceId'] != '008':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['009']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['009']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['009']['deviceId'] != '009':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0010']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0010']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0010']['deviceId'] != '0010':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0015']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0015']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0015']['deviceId'] != '0015':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0016']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0016']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0016']['deviceId'] != '0016':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0017']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0017']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0017']['deviceId'] != '0017':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0018']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0018']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0018']['deviceId'] != '0018':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0019']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0019']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['0019']['deviceId'] != '0019':
+        error_list.append('Error :wrong storage pool identified')
 
     if responseMsg['errors']:
         error_list.append('Error :Unexpected Warning returned')
 
-    if responseMsg['warnings'][0]['message'] != 'REQUIRED: The size of Pool-3 storage pool must be between 1 and 299 devices. -- StoragePool : Pool-3 with 301 devices failed rule checking.':
+    if responseMsg['warnings'][0][
+        'message'] != 'REQUIRED: The size of Pool-3 storage pool must be between 0 and 299 devices. -- StoragePool : Pool-3 with 301 devices failed rule checking.':
         error_list.append('Error :Warning returned')
-
 
     assert not error_list
 
@@ -469,7 +589,8 @@ def test_validateScaleIO_StoragePool_ESS_msg_9():
     cleanupQ('test.ess.service.response')
     bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_9.json'
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_9.json'
 
     with open(filePath) as fixture:
         my_payload = fixture.read()
@@ -483,13 +604,12 @@ def test_validateScaleIO_StoragePool_ESS_msg_9():
 
     error_list = []
 
-
     if responseMsg['errors'][0]['message'] != 'No storage pool found with disk count < 300.':
         error_list.append('Error :Unexpected Error returned')
 
-    if responseMsg['warnings'][0]['message'] != 'REQUIRED: The size of Pool-1 storage pool must be between 1 and 299 devices. -- StoragePool : Pool-1 with 350 devices failed rule checking.':
+    if responseMsg['warnings'][0][
+        'message'] != 'REQUIRED: The size of Pool-1 storage pool must be between 0 and 299 devices. -- StoragePool : Pool-1 with 350 devices failed rule checking.':
         error_list.append('Error :Warning returned')
-
 
     assert not error_list
 
@@ -511,7 +631,8 @@ def test_validateScaleIO_StoragePool_ESS_msg_10():
     cleanupQ('test.ess.service.response')
     bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_10.json'
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_10.json'
 
     with open(filePath) as fixture:
         my_payload = fixture.read()
@@ -525,13 +646,12 @@ def test_validateScaleIO_StoragePool_ESS_msg_10():
 
     error_list = []
 
-
     if responseMsg['errors'][0]['message'] != 'No storage pool found containing all SSDs.':
         error_list.append('Error :Unexpected Error returned')
 
-    if responseMsg['warnings'][0]['message'] != 'REQUIRED: The size of Pool-1 storage pool must be between 1 and 299 devices. -- StoragePool : Pool-1 with 301 devices failed rule checking.':
+    if responseMsg['warnings'][0][
+        'message'] != 'REQUIRED: The size of Pool-1 storage pool must be between 0 and 299 devices. -- StoragePool : Pool-1 with 301 devices failed rule checking.':
         error_list.append('Error :Warning returned')
-
 
     assert not error_list
 
@@ -553,7 +673,8 @@ def test_validateScaleIO_StoragePool_ESS_msg_11():
     cleanupQ('test.ess.service.response')
     bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_11.json'
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_11.json'
 
     with open(filePath) as fixture:
         my_payload = fixture.read()
@@ -567,14 +688,12 @@ def test_validateScaleIO_StoragePool_ESS_msg_11():
 
     error_list = []
 
-
     if responseMsg['errors'][0]['message'] != 'No storage pool found containing all SSDs and disk count < 300.':
         error_list.append('Error :Unexpected Error returned')
 
-    if responseMsg['warnings'][0]['message'] != 'REQUIRED: The size of Pool-1 storage pool must be between 1 and 299 devices. -- StoragePool : Pool-1 with 301 devices failed rule checking.':
+    if responseMsg['warnings'][0][
+        'message'] != 'REQUIRED: The size of Pool-1 storage pool must be between 0 and 299 devices. -- StoragePool : Pool-1 with 301 devices failed rule checking.':
         error_list.append('Error :Warning returned')
-
-
 
     assert not error_list
 
@@ -596,7 +715,8 @@ def test_validateScaleIO_StoragePool_ESS_msg_12():
     cleanupQ('test.ess.service.response')
     bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
 
-    filePath = os.environ['AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_12.json'
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_12.json'
 
     with open(filePath) as fixture:
         my_payload = fixture.read()
@@ -610,14 +730,134 @@ def test_validateScaleIO_StoragePool_ESS_msg_12():
 
     error_list = []
 
-
     if responseMsg['errors'][0]['message'] != 'No Storage pools or new devices found in the request.':
         error_list.append('Error :Unexpected Error returned')
 
     if responseMsg['warnings']:
         error_list.append('Error :Warning returned')
 
+    assert not error_list
 
+    cleanupQ('test.ess.service.response')
+
+
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_validateScaleIO_StoragePool_ESS_msg_13():
+    '''
+    0 Storage pools;
+    2 New Disks
+    Expect: 2 Disks to be added to the pool;
+            0 Error message
+            0 Warning messages
+
+    :return:
+    '''
+    cleanupQ('test.ess.service.response')
+    bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
+
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_13.json'
+
+    with open(filePath) as fixture:
+        my_payload = fixture.read()
+
+    print("Send validate ScaleIO request message ...\n")
+    simulate_validateScaleIORequest_message(my_payload, my_routing_key);
+
+    print("Consume validate scaleIO response message ...\n")
+    responseMsg = consumeResponse()
+    print(responseMsg)
+
+    error_list = []
+
+    if responseMsg['deviceToStoragePoolMap']['004']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['004']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['004']['deviceId'] != '004':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['004']['deviceName'] != 'Device-4':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['deviceId'] != '005':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['deviceName'] != 'Device-5':
+        error_list.append('Error :wrong storage pool identified')
+
+    if responseMsg['errors']:
+        error_list.append('Error :Unexpected Error returned')
+
+    if responseMsg['warnings']:
+        error_list.append('Error :Warning returned')
+
+    assert not error_list
+
+    cleanupQ('test.ess.service.response')
+
+
+@pytest.mark.dne_paqx_parent_mvp
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_validateScaleIO_StoragePool_ESS_msg_14():
+    '''
+    0 Storage pools;
+    4 New Disks (1 is < 90Gb)
+    Expect: 3 Disks to be added to the pool;
+            0 Error message
+            1 Warning messages
+
+    :return:
+    '''
+    cleanupQ('test.ess.service.response')
+    bindQueue('exchange.dell.cpsd.service.ess.response', 'test.ess.service.response')
+
+    filePath = os.environ[
+                   'AF_TEST_SUITE_PATH'] + '/continuous-integration-deploy-suite/node-expansion-ci-cd/fixtures/ess_StoragePools/ess_scaleioInfo_14.json'
+
+    with open(filePath) as fixture:
+        my_payload = fixture.read()
+
+    print("Send validate ScaleIO request message ...\n")
+    simulate_validateScaleIORequest_message(my_payload, my_routing_key);
+
+    print("Consume validate scaleIO response message ...\n")
+    responseMsg = consumeResponse()
+    print(responseMsg)
+
+    error_list = []
+
+    if responseMsg['deviceToStoragePoolMap']['001']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['001']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['deviceId'] != '005':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['005']['deviceName'] != 'Device-5':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['storagePoolId'] != '74ff6005valid':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['storagePoolName'] != 'Pool-1':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['deviceId'] != '006':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['deviceName'] != 'Device-6':
+        error_list.append('Error :wrong storage pool identified')
+    if responseMsg['deviceToStoragePoolMap']['006']['serialNumber'] != 'SN-6':
+        error_list.append('Error :wrong storage pool identified')
+
+    if responseMsg['errors']:
+        error_list.append('Error :Unexpected Error returned')
+
+    if responseMsg['warnings'][0][
+        'message'] != 'Could not allocate storage pool to device : SN-4 with capacity less than 90 GB.':
+        error_list.append('Error : Invalid Warning returned')
 
     assert not error_list
 
@@ -627,7 +867,6 @@ def test_validateScaleIO_StoragePool_ESS_msg_12():
 #######################################################################################################################
 
 def simulate_validateScaleIORequest_message(my_payload, my_routing_key):
-
     print(" Publishing a scaleio request message .. ")
 
     print(my_payload)
@@ -638,7 +877,8 @@ def simulate_validateScaleIORequest_message(my_payload, my_routing_key):
                                          headers={
                                              '__TypeId__': 'com.dell.cpsd.service.engineering.standards.EssValidateStoragePoolRequestMessage'},
                                          payload=my_payload,
-                                         payload_type='json',ssl_enabled=cpsd.props.rmq_ssl_enabled)
+                                         payload_type='json', ssl_enabled=cpsd.props.rmq_ssl_enabled)
+
 
 ####################################################################################################
 def consumeResponse():
@@ -648,12 +888,14 @@ def consumeResponse():
 
     return_message = af_support_tools.rmq_consume_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
                                                           rmq_username=cpsd.props.rmq_username,
-                                                          rmq_password=cpsd.props.rmq_password,ssl_enabled=cpsd.props.rmq_ssl_enabled,
+                                                          rmq_password=cpsd.props.rmq_password,
+                                                          ssl_enabled=cpsd.props.rmq_ssl_enabled,
                                                           queue='test.ess.service.response')
 
     return_message = json.loads(return_message, encoding='utf-8')
 
     return return_message
+
 
 ####################################################################################################
 
@@ -681,7 +923,7 @@ def waitForMsg(queue):
     # This function keeps looping untill a message is in the specified queue. We do need it to timeout and throw an error
     # if a message never arrives. Once a message appears in the queue the function is complete and main continues.
 
-    print ('Waiting for message')
+    print('Waiting for message')
     # The length of the queue, it will start at 0 but as soon as we get a response it will increase
     q_len = 0
 

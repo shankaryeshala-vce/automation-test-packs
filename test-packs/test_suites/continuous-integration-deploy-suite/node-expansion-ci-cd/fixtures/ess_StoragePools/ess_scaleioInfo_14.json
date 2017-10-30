@@ -4,7 +4,24 @@
     "correlationId": "148a375c-64a8-4408-b8e9-7447905c0f20",
     "replyTo": "dne-paqx.b1d958050f7a"
   },
-  "storagePools": [],
+  "storagePools": [
+    {
+      "id": "74ff6005valid",
+      "name": "Pool-1",
+      "numberOfDevices": "150",
+      "type": "SSD",
+      "devices": [
+        {
+          "id": "007",
+          "name": "Device-7",
+          "deviceState": "",
+          "type": "SSD",
+          "serialNumber": "SN-7",
+          "capacity": "480103981056"
+        }
+      ]
+    }
+  ],
   "newDevices": [
     {
       "id": "001",
@@ -20,7 +37,7 @@
       "deviceState": "",
       "type": "SSD",
       "serialNumber": "SN-4",
-      "capacity": "480103981056"
+      "capacity": "95563022336"
     },
     {
       "id": "005",
@@ -28,7 +45,7 @@
       "deviceState": "",
       "type": "SSD",
       "serialNumber": "SN-5",
-      "capacity": "480103981056"
+      "capacity": "96636764160"
     },
     {
       "id": "006",
@@ -36,15 +53,7 @@
       "deviceState": "",
       "type": "SSD",
       "serialNumber": "SN-6",
-      "capacity": "480103981056"
-    },
-    {
-      "id": "007",
-      "name": "Device-7",
-      "deviceState": "",
-      "type": "SSD",
-      "serialNumber": "SN-7",
-      "capacity": "480103981056"
+      "capacity": "97710505984"
     }
   ]
 }
