@@ -180,6 +180,8 @@ def verifyRESTdownloadSingleFileRequest(filename, train, version):
     url = 'http://' + host + ':19080/rcm-fitness-api/api/download/firmware/'
     #payload = {'fileName': filename}
     payload = {'rcmUuid': rcmUUID, 'componentUuid': compUUID}
+    print("Payload:")
+    print(payload)
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     resp = requests.post(url, data=json.dumps(payload), headers=headers)
 
@@ -308,7 +310,10 @@ def verifyRESTdownloadSingleFileRequestSTATUS(filename, train, version):
     #url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/download/firmware/'
     url = 'http://' + host + ':19080/rcm-fitness-api/api/download/firmware/'
     #payload = {'fileName': filename}
+    print("Payload:")
+
     payload = {'rcmUuid': rcmUUID, 'componentUuid': compUUID}
+    print(payload)
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     resp = requests.post(url, data=json.dumps(payload), headers=headers)
 
@@ -357,14 +362,13 @@ def verifyRESTdownloadSingleFileRequestSTATUS(filename, train, version):
         assert len(statusResp["uuid"]) > 16, "No valid request UUID returned."
         assert statusResp["uuid"] in statusResp["link"]["href"], "Request UUID not found in returned HREF link."
         assert statusResp["link"]["method"] == "GET", "Unexpected method returned in response."
-        # assert "10000/rcm-fitness-paqx/rcm-fitness-api/api/download/firmware/status/" in statusResp["link"]["href"], "No URL included in response to query subsequent progress."
         assert "19080/rcm-fitness-api/api/download/firmware/status/" in statusResp["link"][
             "href"], "No URL included in response to query subsequent progress."
         assert statusResp["link"]["rel"] == "download-status"
         assert statusResp["fileRepresentation"][0]["downloadedSize"] != 0, "Unexpected download size returned."
         assert statusResp["fileRepresentation"][0]["size"] != 0, "Unexpected file size returned."
         assert statusResp["fileRepresentation"][0]["url"] is None, "Unexpected url returned."
-        assert statusResp["fileRepresentation"][0]["hashVal"] is None, "Unexpected hashval returned."
+        assert statusResp["fileRepresentation"][0]["hashVal"] is not None, "Unexpected hashval returned."
         assert statusResp["fileRepresentation"][0]["error"] is None, "Unexpected error returned."
         assert statusResp["error"] is None, "Unexpected error returned."
 
@@ -524,49 +528,49 @@ def verifyRESTrepositoryStatus(filepath, filename):
 def test_verifyRESTdownloadSingleFileRequest1():
     verifyRESTdownloadSingleFileRequest("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE", "3.2", "3.2.1")
 
-# @pytest.mark.daily_status
-# @pytest.mark.rcm_fitness_mvp_extended
-# @pytest.mark.rcm_fitness_mvp
-# def test_verifyRESTdownloadSingleFileRequestSTATUS1():
-#     verifyRESTdownloadSingleFileRequestSTATUS("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE", "3.2", "3.2.1")
-#
-# @pytest.mark.daily_status
-# @pytest.mark.rcm_fitness_mvp_extended
-# def test_verifyRESTrepositoryStatus1():
-#     verifyRESTrepositoryStatus("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/", "SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE")
+@pytest.mark.daily_status
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
+def test_verifyRESTdownloadSingleFileRequestSTATUS1():
+    verifyRESTdownloadSingleFileRequestSTATUS("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE", "3.2", "3.2.1")
+
+@pytest.mark.daily_status
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyRESTrepositoryStatus1():
+    verifyRESTrepositoryStatus("RCM/3.2.1/VxRack_1000_FLEX/Component/Controller_Firmware/", "SAS-RAID_Firmware_VH28K_WN64_25.4.0.0017_A06.EXE")
 
 
-# @pytest.mark.rcm_fitness_mvp_extended
-# def test_verifyRESTdownloadSingleFileRequest2():
-#     verifyRESTdownloadSingleFileRequest("RCM/3.2.3/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE", "3.2", "3.2.3")
-#
-# @pytest.mark.rcm_fitness_mvp_extended
-# def test_verifyRESTdownloadSingleFileRequestSTATUS2():
-#     verifyRESTdownloadSingleFileRequestSTATUS("RCM/3.2.3/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE", "3.2", "3.2.3")
-#
-# @pytest.mark.rcm_fitness_mvp_extended
-# def test_verifyRESTrepositoryStatus2():
-#     verifyRESTrepositoryStatus("RCM/3.2.3/VxRack_1000_FLEX/Component/Controller_Firmware/", "SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE")
-#
-# @pytest.mark.rcm_fitness_mvp_extended
-# @pytest.mark.rcm_fitness_mvp
-# def test_verifyRESTdownloadInvalidFileRequest3():
-#     verifyRESTdownloadInvalidFileRequest(tempRCMuuid[:8], tempCompUUID)
-#
-# @pytest.mark.rcm_fitness_mvp_extended
-# @pytest.mark.rcm_fitness_mvp
-# def test_verifyRESTdownloadInvalidFileRequest4():
-#     verifyRESTdownloadInvalidFileRequest(tempRCMuuid[:8], tempCompUUID[:8])
-#
-# @pytest.mark.rcm_fitness_mvp_extended
-# @pytest.mark.rcm_fitness_mvp
-# def test_verifyRESTdownloadInvalidFileRequest5():
-#     verifyRESTdownloadInvalidFileRequest(tempRCMuuid, tempCompUUID[:8])
-#
-# @pytest.mark.rcm_fitness_mvp_extended
-# @pytest.mark.rcm_fitness_mvp
-# def test_verifyRESTdownloadInvalidFileRequest6():
-#     verifyRESTdownloadInvalidFileRequest(tempRCMuuid, "")
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyRESTdownloadSingleFileRequest2():
+    verifyRESTdownloadSingleFileRequest("RCM/3.2.3/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE", "3.2", "3.2.3")
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyRESTdownloadSingleFileRequestSTATUS2():
+    verifyRESTdownloadSingleFileRequestSTATUS("RCM/3.2.3/VxRack_1000_FLEX/Component/Controller_Firmware/SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE", "3.2", "3.2.3")
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyRESTrepositoryStatus2():
+    verifyRESTrepositoryStatus("RCM/3.2.3/VxRack_1000_FLEX/Component/Controller_Firmware/", "SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE")
+
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
+def test_verifyRESTdownloadInvalidFileRequest3():
+    verifyRESTdownloadInvalidFileRequest(tempRCMuuid[:8], tempCompUUID)
+
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
+def test_verifyRESTdownloadInvalidFileRequest4():
+    verifyRESTdownloadInvalidFileRequest(tempRCMuuid[:8], tempCompUUID[:8])
+
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
+def test_verifyRESTdownloadInvalidFileRequest5():
+    verifyRESTdownloadInvalidFileRequest(tempRCMuuid, tempCompUUID[:8])
+
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
+def test_verifyRESTdownloadInvalidFileRequest6():
+    verifyRESTdownloadInvalidFileRequest(tempRCMuuid, "")
 
 # @pytest.mark.rcm_fitness_mvp_extended
 # @pytest.mark.rcm_fitness_mvp
@@ -578,7 +582,7 @@ def test_verifyRESTdownloadSingleFileRequest1():
 # def test_verifyRESTdownloadInvalidFileRequest8():
 #     verifyRESTdownloadInvalidFileRequest("", "")
 
-#
+
 # @pytest.mark.rcm_fitness_mvp_extended
 # @pytest.mark.rcm_fitness_mvp
 # def test_verifyRESTdownloadMultiFileRequest8():
