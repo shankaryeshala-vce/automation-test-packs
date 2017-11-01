@@ -1004,20 +1004,22 @@ def test_verifyCorrelationIDs():
     verifyCorrelationIDs()
 
 @pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp
 def test_verifyRESTupdateRequest():
     verifyRESTupdateRequest("out_restRequest.json")
 
 @pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp
 def test_verifyRESTupdateResponse():
     verifyRESTupdateResponse("out_restResponse.json")
 
 @pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_verifyInvalidRESTUpdateRequest1():
     verifyInvalidRESTUpdateRequest("out_restErrorBody_1.json", "/home/vce/firmware/BIOS_PFWCY_WN64_2.2.5.EXE", "BIOS", subCompUUID[:8])
 
 @pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
 def test_verifyInvalidRESTUpdateRequest2():
     verifyInvalidRESTUpdateRequest("out_restErrorBody_2.json", "/home/vce/firmware/BIOS_PFWCY_WN64_2.2.5",
                                    "BIOS", subCompUUID)
