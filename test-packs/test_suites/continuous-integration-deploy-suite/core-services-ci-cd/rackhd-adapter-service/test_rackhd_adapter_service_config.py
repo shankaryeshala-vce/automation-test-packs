@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # Author:
-# Revision:2.0
+# Revision:
 # Code Reviewed by:
 # Description: Testing the RackHD-Adapter Container.
 #
@@ -264,7 +264,8 @@ def test_rackHD_adapter_full_ListCapabilities():
     originalcorrelationID = 'capability-registry-list-rackhd-adapter-corID'
     the_payload = '{}'
 
-    af_support_tools.rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
+    af_support_tools.rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
+                                         rmq_username=cpsd.props.rmq_username, rmq_password=cpsd.props.rmq_password,
                                          exchange='exchange.dell.cpsd.hdp.capability.registry.request',
                                          routing_key='dell.cpsd.hdp.capability.registry.request',
                                          headers={
@@ -272,7 +273,6 @@ def test_rackHD_adapter_full_ListCapabilities():
                                          payload=the_payload,
                                          payload_type='json',
                                          correlation_id={originalcorrelationID}, ssl_enabled=cpsd.props.rmq_ssl_enabled)
-    rmq_publish_message(host=cpsd.props.base_hostname, port=cpsd.props.rmq_port,
 
     # Wait for and consume the Capability Response Message
     assert waitForMsg('test.capability.registry.response'), 'Error: No List Capability Responce message received'
@@ -282,7 +282,7 @@ def test_rackHD_adapter_full_ListCapabilities():
                                                           queue='test.capability.registry.response',
                                                           ssl_enabled=cpsd.props.rmq_ssl_enabled)
     time.sleep(5)
-
+    print (return_message)
     # Verify the RackHD Apapter Response
     identity = 'rackhd-adapter'
     capabilities1 = 'rackhd-consul-register'
@@ -298,7 +298,8 @@ def test_rackHD_adapter_full_ListCapabilities():
     capabilities11 = 'rackhd-set-node-obm-setting'
     capabilities12 = 'rackhd-configure-bmc-settings'
     capabilities13 = 'rackhd-set-idrac-credentials'
-    #capabilities14 = 'rackhd-node-inventory'
+    capabilities14 = 'rackhd-node-inventory'
+    capabilities15 = 'update-switch-firmware'
 
     error_list = []
 
@@ -330,8 +331,10 @@ def test_rackHD_adapter_full_ListCapabilities():
         error_list.append(capabilities12)
     if (capabilities13 not in return_message):
         error_list.append(capabilities13)
-    #if (capabilities14 not in return_message):
-    #    error_list.append(capabilities14)
+    if (capabilities14 not in return_message):
+        error_list.append(capabilities14)
+    if (capabilities15 not in return_message):
+        error_list.append(capabilities15)
 
     assert not error_list, ('Missing some rackHD capabilities')
 
