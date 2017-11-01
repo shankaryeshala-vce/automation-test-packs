@@ -95,11 +95,11 @@ def load_test_data():
                                                         property=payload_vcenter)
 
     getSystemDefinition()
-    # registerRackHD(message_rackHD, "out_registerRackHDResp.json")
-    # time.sleep(2)
-    # registerVcenter(message_vcenter, "out_registerVcenterResp.json")
+    registerRackHD(message_rackHD, "out_registerRackHDResp.json")
+    time.sleep(2)
+    registerVcenter(message_vcenter, "out_registerVcenterResp.json")
 
-    # time.sleep(150)
+    time.sleep(150)
 
 def ensurePathExists(dir):
     if not os.path.exists(dir):
