@@ -180,6 +180,8 @@ def verifyRESTdownloadSingleFileRequest(filename, train, version):
     url = 'http://' + host + ':19080/rcm-fitness-api/api/download/firmware/'
     #payload = {'fileName': filename}
     payload = {'rcmUuid': rcmUUID, 'componentUuid': compUUID}
+    print("Payload:")
+    print(payload)
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     resp = requests.post(url, data=json.dumps(payload), headers=headers)
 
@@ -232,7 +234,7 @@ def verifyRESTdownloadInvalidFileRequest(rcmUUID, compUUID):
 
     print("Returned status code: %d" % resp.status_code)
     statusResp = json.loads(resp.text)
-    assert resp.status_code == 500, "Request has not been acknowledged as expected."
+    assert resp.status_code == 400, "Request has not been acknowledged as expected."
 
     print(statusResp)
     if statusResp != "":
@@ -308,7 +310,10 @@ def verifyRESTdownloadSingleFileRequestSTATUS(filename, train, version):
     #url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/download/firmware/'
     url = 'http://' + host + ':19080/rcm-fitness-api/api/download/firmware/'
     #payload = {'fileName': filename}
+    print("Payload:")
+
     payload = {'rcmUuid': rcmUUID, 'componentUuid': compUUID}
+    print(payload)
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     resp = requests.post(url, data=json.dumps(payload), headers=headers)
 
@@ -357,14 +362,13 @@ def verifyRESTdownloadSingleFileRequestSTATUS(filename, train, version):
         assert len(statusResp["uuid"]) > 16, "No valid request UUID returned."
         assert statusResp["uuid"] in statusResp["link"]["href"], "Request UUID not found in returned HREF link."
         assert statusResp["link"]["method"] == "GET", "Unexpected method returned in response."
-        # assert "10000/rcm-fitness-paqx/rcm-fitness-api/api/download/firmware/status/" in statusResp["link"]["href"], "No URL included in response to query subsequent progress."
         assert "19080/rcm-fitness-api/api/download/firmware/status/" in statusResp["link"][
             "href"], "No URL included in response to query subsequent progress."
         assert statusResp["link"]["rel"] == "download-status"
         assert statusResp["fileRepresentation"][0]["downloadedSize"] != 0, "Unexpected download size returned."
         assert statusResp["fileRepresentation"][0]["size"] != 0, "Unexpected file size returned."
         assert statusResp["fileRepresentation"][0]["url"] is None, "Unexpected url returned."
-        assert statusResp["fileRepresentation"][0]["hashVal"] is None, "Unexpected hashval returned."
+        assert statusResp["fileRepresentation"][0]["hashVal"] is not None, "Unexpected hashval returned."
         assert statusResp["fileRepresentation"][0]["error"] is None, "Unexpected error returned."
         assert statusResp["error"] is None, "Unexpected error returned."
 
@@ -578,7 +582,7 @@ def test_verifyRESTdownloadInvalidFileRequest6():
 # def test_verifyRESTdownloadInvalidFileRequest8():
 #     verifyRESTdownloadInvalidFileRequest("", "")
 
-#
+
 # @pytest.mark.rcm_fitness_mvp_extended
 # @pytest.mark.rcm_fitness_mvp
 # def test_verifyRESTdownloadMultiFileRequest8():
