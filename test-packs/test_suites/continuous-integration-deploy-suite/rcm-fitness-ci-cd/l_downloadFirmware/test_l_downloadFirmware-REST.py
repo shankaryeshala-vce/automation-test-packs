@@ -553,22 +553,22 @@ def test_verifyRESTrepositoryStatus2():
     verifyRESTrepositoryStatus("RCM/3.2.3/VxRack_1000_FLEX/Component/Controller_Firmware/", "SAS-RAID_Firmware_2H45F_WN64_25.5.0.0018_A08.EXE")
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_verifyRESTdownloadInvalidFileRequest3():
     verifyRESTdownloadInvalidFileRequest(tempRCMuuid[:8], tempCompUUID)
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_verifyRESTdownloadInvalidFileRequest4():
     verifyRESTdownloadInvalidFileRequest(tempRCMuuid[:8], tempCompUUID[:8])
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_verifyRESTdownloadInvalidFileRequest5():
     verifyRESTdownloadInvalidFileRequest(tempRCMuuid, tempCompUUID[:8])
 
 @pytest.mark.rcm_fitness_mvp_extended
-@pytest.mark.rcm_fitness_mvp
+#@pytest.mark.rcm_fitness_mvp
 def test_verifyRESTdownloadInvalidFileRequest6():
     verifyRESTdownloadInvalidFileRequest(tempRCMuuid, "")
 
