@@ -36,7 +36,7 @@ def load_test_data():
     af_support_tools.set_config_file_property_by_data_file(data_file)
     # IDrac Server IP & Creds details
     global setup_config_file
-    setup_config_file = 'continuous-integration-deploy-suite/nsa_setup_config.ini'
+    setup_config_file = 'continuous-integration-deploy-suite/setup_config.ini'
     global setup_config_header
     setup_config_header = 'config_details'
     global switch_username
