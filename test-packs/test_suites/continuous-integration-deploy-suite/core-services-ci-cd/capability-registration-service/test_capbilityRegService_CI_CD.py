@@ -11,6 +11,7 @@ import af_support_tools
 import json
 import pytest
 import requests
+import time
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -97,6 +98,8 @@ def test_capabilityRegistry_servicerunning():
     my_return_status = my_return_status.strip()
     print('\nDocker Container is:', my_return_status, '\n')
     assert my_return_status == 'Up', (service_name + " not running")
+
+    time.sleep(20)
 
 
 @pytest.mark.daily_status
@@ -188,6 +191,7 @@ def test_capability_registry_RMQ_bindings_fru(exchange, queue):
     print(exchange, '\nis bound to\n', queue, '\n')
 
 
+@pytest.mark.skip(reason="ESTS-136102")
 @pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
@@ -224,6 +228,7 @@ def test_capabilityRegistry_log_files_exist():
     print('Valid log files exist')
 
 
+@pytest.mark.skip(reason="ESTS-136102")
 @pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended

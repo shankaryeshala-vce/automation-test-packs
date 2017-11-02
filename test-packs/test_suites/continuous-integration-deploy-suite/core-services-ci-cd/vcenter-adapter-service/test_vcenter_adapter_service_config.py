@@ -269,7 +269,7 @@ def test_vcenter_adapter_full_ListCapabilities():
                                                           rmq_password=cpsd.props.rmq_password,
                                                           queue='test.capability.registry.response',
                                                           ssl_enabled=cpsd.props.rmq_ssl_enabled)
-
+    print(return_message)
     time.sleep(5)
     # Verify the vcenter Apapter Response
     identity = 'vcenter-adapter'
@@ -291,8 +291,6 @@ def test_vcenter_adapter_full_ListCapabilities():
     capabilities16 = 'vcenter-rename-datastore'
     capabilities17 = 'vcenter-list-components'
     capabilities18 = 'esxi-credential-details'
-    capabilities19 = 'vcenter-migrate-host-networking'
-    capabilities20 = 'vcenter-add-host-virtual-nic-dvportgroup'
     capabilities21 = 'vcenter-update-software-acceptance'
     capabilities22 = 'vcenter-vm-powercommand'
     capabilities23 = 'vcenter-configure-vm-network'
@@ -339,10 +337,6 @@ def test_vcenter_adapter_full_ListCapabilities():
         error_list.append(capabilities17)
     if (capabilities18 not in return_message):
         error_list.append(capabilities18)
-    if (capabilities19 not in return_message):
-        error_list.append(capabilities19)
-    if (capabilities20 not in return_message):
-        error_list.append(capabilities20)
     if (capabilities21 not in return_message):
         error_list.append(capabilities21)
     if (capabilities22 not in return_message):
@@ -538,6 +532,7 @@ def test_vcenter_adapter_log_files_free_of_exceptions():
     assert not error_list, 'Exceptions in log files, Review the ' + errorLogFile + ' file'
 
     print('No ' + excep1, excep2, excep3, excep4 + ' exceptions in log files\n')
+
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
