@@ -99,7 +99,7 @@ def load_test_data():
     time.sleep(2)
     registerVcenter(message_vcenter, "out_registerVcenterResp.json")
 
-    time.sleep(150)
+    time.sleep(200)
 
 def ensurePathExists(dir):
     if not os.path.exists(dir):
