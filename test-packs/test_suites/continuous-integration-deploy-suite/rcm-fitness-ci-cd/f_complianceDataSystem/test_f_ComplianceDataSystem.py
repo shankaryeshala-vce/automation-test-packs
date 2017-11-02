@@ -491,6 +491,12 @@ def test_getComplianceDataSystem15():
     getComplianceDataSystemSubComps("VCENTER-WINDOWS", "ESXI", "lab.vce.com", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataSystemVCENTER.json", systemUUID)
 
+@pytest.mark.daily_status
+@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp_extended
+def test_getComplianceDataSystem15a():
+    getComplianceDataSystemSubComps("VCENTER-APPLIANCE", "SUB_ESXI", "ixgbe", path + "rcmSystemDefinition-VxRack.json",
+                                    path + "complianceDataSystemVCENTER.json", systemUUID)
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataSystem16():

@@ -531,32 +531,46 @@ def test_getComplianceDataDevice15():
     getComplianceDataDeviceSubComps("ESXI", "lab.vce.com", "VCENTER-WINDOWS", path + "rcmSystemDefinition-VxRack.json",
                                     path + "complianceDataDeviceVCENTER.json", systemUUID)
 
-
+@pytest.mark.daily_status
+@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice16():
-    getComplianceData_INVALID(compUUID[:8])
+    getComplianceDataDeviceSubComps("ESXI", "lab.vce.com", "VCENTER-APPLIANCE", path + "rcmSystemDefinition-VxRack.json",
+                                    path + "complianceDataDeviceVCENTER.json", systemUUID)
 
-
+@pytest.mark.daily_status
+@pytest.mark.rcm_fitness_mvp
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice17():
-    getComplianceData_INVALID("----")
+    getComplianceDataDeviceSubComps("SUB_ESXI", "ixgbe", "VCENTER-APPLIANCE", path + "rcmSystemDefinition-VxRack.json",
+                                    path + "complianceDataDeviceVCENTER.json", systemUUID)
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice18():
-    getComplianceData_INVALID("0-0-0-0")
+    getComplianceData_INVALID(compUUID[:8])
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice19():
-    getComplianceData_INVALID("<>")
+    getComplianceData_INVALID("----")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice20():
-    getComplianceData_INVALID("  ")
+    getComplianceData_INVALID("0-0-0-0")
 
 
 @pytest.mark.rcm_fitness_mvp_extended
 def test_getComplianceDataDevice21():
+    getComplianceData_INVALID("<>")
+
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_getComplianceDataDevice22():
+    getComplianceData_INVALID("  ")
+
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_getComplianceDataDevice23():
     getComplianceData_NULL()
