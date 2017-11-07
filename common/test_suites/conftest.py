@@ -47,4 +47,3 @@ def get_tls_certs():
                      verify='/usr/local/share/ca-certificates/cpsd.dell.ca.crt')
 
     assert r.status_code == 200, "Error---Rabbitmq credentials for test not created"
-
