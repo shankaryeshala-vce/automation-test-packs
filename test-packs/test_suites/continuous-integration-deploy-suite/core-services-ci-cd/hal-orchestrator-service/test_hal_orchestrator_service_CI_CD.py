@@ -13,6 +13,37 @@ import pytest
 import time
 from conftest import JsonMessage
 
+@pytest.fixture(scope="module")
+def test_SystemAdditionRequested(rabbitMq):
+    print('Sending RMQ System-Definition Message to configure system...')
+
+    rabbitMq.bind_queue_with_key(queue='test.system.list.request',
+                                 exchange='exchange.dell.cpsd.syds.system.definition.request',
+                                 routing_key='#')
+
+# Get the payload data from the config symphony-sds.ini file.
+    the_payload = af_support_tools.get_config_file_property(config_file=payload_file,
+                                                            heading='payload',
+                                                            property=payload_property_sys)
+
+    headers={'__TypeId__': 'com.dell.cpsd.syds.converged.system.addition.requested'}
+    message=JsonMessage(headers=headers, payload=the_payload)
+    rabbitMq.publish_message(exchange='exchange.dell.cpsd.syds.system.definition.request',
+                             routing_key='dell.cpsd.syds.converged.system.addition.requested',
+                             message=message)
+
+    time.sleep(1)
+
+@pytest.fixture(scope="module")
+def getSystemDefinitionListMessage(rabbitMq):
+    rabbitMq.bind_queue_with_key(queue='test.system.list.found',
+                                 exchange='exchange.dell.cpsd.syds.system.definition.response',
+                                 routing_key='#')
+
+    the_payload = af_support_tools.get_config_file_property(config_file=payload_file,
+                                                            heading='payload',
+                                                            property=payload_property_req)
+
 @pytest.fixture(scope="module", autouse=True)
 def load_test_data():
     # Update config ini files at runtime
@@ -37,26 +68,14 @@ def load_test_data():
     payload_property_req_config = 'sys_request_payload_with_config'
     global payload_property_hal
     payload_property_hal = 'ccv_payload'
-    global ipaddress
 
-    ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-    global cli_username
-    cli_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
-    global cli_password
-    cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='password')
-
-    global rmq_username
-    rmq_username = 'guest'
-    global rmq_password
-    rmq_password = 'guest'
-    global port
-    port = 5672
 
 #######################################################################################################################
 @pytest.mark.core_services_mvp
 @pytest.mark.rcm_fitness_mvp
 @pytest.mark.core_services_mvp_extended
 @pytest.mark.rcm_fitness_cd_mvp_extended
+@pytest.mark.usefixtures("load_test_data", "test_SystemAdditionRequested", "getSystemDefinitionListMessage")
 def test_HAL_CollectComponentVersion(rabbitMq):
     #af_support_tools.mark_defect(defect_id='', user_id='', comments='', date_marked='')
     print("test start")
