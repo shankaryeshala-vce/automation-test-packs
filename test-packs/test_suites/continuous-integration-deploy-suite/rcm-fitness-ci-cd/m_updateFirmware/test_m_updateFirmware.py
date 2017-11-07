@@ -99,6 +99,8 @@ def load_test_data():
     time.sleep(2)
     registerVcenter(message_vcenter, "out_registerVcenterResp.json")
 
+    time.sleep(200)
+
 def ensurePathExists(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
@@ -845,6 +847,59 @@ def verifyRESTupdateRequest(filename):
                 return
     assert False, ("Initial REST update request not complete.")
 
+def verifyInvalidRESTUpdateRequest(filename, invalidPath, invalidSubComp, invalidSubCompUUID):
+
+    resetTestQueues('testUpdateFWRequest', 'testUpdateFWResponse', 'testUpdateFWCredsRequest', 'testUpdateFWCredsResp', 'testSystemList', 'testSystemFound')
+    print("Queues reset.")
+
+    mode = 'on'
+    # url = 'http://' + host + ':10000/rcm-fitness-paqx/rcm-fitness-api/api/install/firmware/'
+    url = 'http://' + host + ':19080/rcm-fitness-api/api/install/firmware/'
+
+    payload = {'filePath': invalidPath, 'subComponentType': invalidSubComp, 'deviceId': invalidSubCompUUID}
+    headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+    resp = requests.post(url, data=json.dumps(payload), headers=headers)
+    # data = json.dumps(payload)
+
+    print("Returned status code: %d" % resp.status_code)
+    data = json.loads(resp.text)
+    assert resp.status_code == 200, "Request has not been acknowledged as expected."
+
+    with open(filename, 'a') as outfile:
+        json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
+
+    print(data)
+    if data != "":
+        # if data["state"] == "ACKNOWLEDGED":
+        #     print("In here....")
+        #     statusURL = data["link"]["href"]
+        #     statusData = requests.get(statusURL)
+        #     statusResp = json.loads(statusData.text)
+        if data["state"] != "ERROR":
+            print("In here still....")
+            statusURL = data["link"]["href"]
+            statusData = requests.get(statusURL)
+            data = json.loads(statusData.text)
+        if data["state"] == "ERROR":
+            print("Now here....")
+            restResponse(data)
+            if "RHDA1007E" in data["error"]:
+                assert "RHDA1007E" in data["errorList"][0], "Expected Error Code not included in error list."
+                assert "RHDA1007E" in data["error"], "Expected Error Code not included in response."
+            if "RHDA1001E" in data["error"]:
+                assert "RHDA1001E" in data["errorList"][0], "Expected Error Code not included in error list."
+                assert "RHDA1001E" in data["error"], "Expected Error Code not included in response."
+                assert "CRHD1002E:  HTTP Status error response from RackHd with Message: Status Code: 404" in data["errorList"][1], "Expected Error Code not included in error list."
+            statusURL = data["link"]["href"]
+            statusData = requests.get(statusURL)
+            statusRespRepeat = json.loads(statusData.text)
+            if statusRespRepeat["state"] == "ERROR":
+                restResponse(statusRespRepeat)
+                assert "RHDA1001E" or "RHDA1007E" in statusRespRepeat["error"], "Expected Error Code not included in response."
+                return
+
+    assert False, ("Initial REST update request not complete.")
+
 def verifyRESTupdateResponse(filename):
     url = progURL
     print(restCorrID)
@@ -944,20 +999,43 @@ def test_verifyCredentialRequest():
 def test_verifyCredentialResponse():
     verifyCredentialResponse(path + "out_updateRequest.json", path +  "out_requestCreds.json", path + "out_responseCreds.json", "RACKHD")
 
-
 @pytest.mark.rcm_fitness_mvp_extended
 def test_verifyCorrelationIDs():
     verifyCorrelationIDs()
 
 @pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp
 def test_verifyRESTupdateRequest():
     verifyRESTupdateRequest("out_restRequest.json")
 
 @pytest.mark.rcm_fitness_mvp_extended
-#@pytest.mark.rcm_fitness_mvp
+@pytest.mark.rcm_fitness_mvp
 def test_verifyRESTupdateResponse():
     verifyRESTupdateResponse("out_restResponse.json")
+
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
+def test_verifyInvalidRESTUpdateRequest1():
+    verifyInvalidRESTUpdateRequest("out_restErrorBody_1.json", "/home/vce/firmware/BIOS_PFWCY_WN64_2.2.5.EXE", "BIOS", subCompUUID[:8])
+
+@pytest.mark.rcm_fitness_mvp_extended
+@pytest.mark.rcm_fitness_mvp
+def test_verifyInvalidRESTUpdateRequest2():
+    verifyInvalidRESTUpdateRequest("out_restErrorBody_2.json", "/home/vce/firmware/BIOS_PFWCY_WN64_2.2.5",
+                                   "BIOS", subCompUUID)
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyInvalidRESTUpdateRequest3():
+    verifyInvalidRESTUpdateRequest("out_restErrorBody_3.json", "/home/vce/firmware/BIOS_PFWCY_WN64_2.2.5",
+                                   "BIOS", subCompUUID[:8])
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyInvalidRESTUpdateRequest4():
+    verifyInvalidRESTUpdateRequest("out_restErrorBody_4.json", "////", "BIOS", subCompUUID[8:])
+
+@pytest.mark.rcm_fitness_mvp_extended
+def test_verifyInvalidRESTUpdateRequest5():
+    verifyInvalidRESTUpdateRequest("out_restErrorBody_5.json", "", "BIOS", "")
 
 #@pytest.mark.rcm_fitness_mvp_extended
 #@pytest.mark.rcm_fitness_mvp

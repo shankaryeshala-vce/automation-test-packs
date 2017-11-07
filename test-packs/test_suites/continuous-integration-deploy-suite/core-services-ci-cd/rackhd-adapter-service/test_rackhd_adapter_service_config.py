@@ -282,23 +282,24 @@ def test_rackHD_adapter_full_ListCapabilities():
                                                           queue='test.capability.registry.response',
                                                           ssl_enabled=cpsd.props.rmq_ssl_enabled)
     time.sleep(5)
-
+    print (return_message)
     # Verify the RackHD Apapter Response
     identity = 'rackhd-adapter'
     capabilities1 = 'rackhd-consul-register'
-    capabilities2 = 'rackhd-list-nodes'
-    capabilities3 = 'rackhd-upgrade-firmware-dellr730-server'
-    capabilities4 = 'rackhd-upgrade-firmware-dell-idrac'
-    capabilities5 = 'node-discovered-event'
-    capabilities6 = 'rackhd-install-esxi'
-    capabilities7 = 'rackhd-configure-raid-controller'
-    capabilities8 = 'rackhd-list-node-catalogs'
-    capabilities9 = 'rackhd-configure-idrac-network'
-    capabilities10 = 'rackhd-configure-boot-device-idrac'
-    capabilities11 = 'rackhd-set-node-obm-setting'
-    capabilities12 = 'rackhd-configure-bmc-settings'
-    capabilities13 = 'rackhd-set-idrac-credentials'
-    #capabilities14 = 'rackhd-node-inventory'
+    # capabilities2 = 'rackhd-list-nodes'
+    # capabilities3 = 'rackhd-upgrade-firmware-dellr730-server'
+    # capabilities4 = 'rackhd-upgrade-firmware-dell-idrac'
+    # capabilities5 = 'node-discovered-event'
+    # capabilities6 = 'rackhd-install-esxi'
+    # capabilities7 = 'rackhd-configure-raid-controller'
+    # capabilities8 = 'rackhd-list-node-catalogs'
+    # capabilities9 = 'rackhd-configure-idrac-network'
+    # capabilities10 = 'rackhd-configure-boot-device-idrac'
+    # capabilities11 = 'rackhd-set-node-obm-setting'
+    # capabilities12 = 'rackhd-configure-bmc-settings'
+    # capabilities13 = 'rackhd-set-idrac-credentials'
+    # capabilities14 = 'rackhd-node-inventory'
+    # capabilities15 = 'update-switch-firmware'
 
     error_list = []
 
@@ -306,32 +307,34 @@ def test_rackHD_adapter_full_ListCapabilities():
         error_list.append(identity)
     if (capabilities1 not in return_message):
         error_list.append(capabilities1)
-    if (capabilities2 not in return_message):
-        error_list.append(capabilities2)
-    if (capabilities3 not in return_message):
-        error_list.append(capabilities3)
-    if (capabilities4 not in return_message):
-        error_list.append(capabilities4)
-    if (capabilities5 not in return_message):
-        error_list.append(capabilities5)
-    if (capabilities6 not in return_message):
-        error_list.append(capabilities6)
-    if (capabilities7 not in return_message):
-        error_list.append(capabilities7)
-    if (capabilities8 not in return_message):
-        error_list.append(capabilities8)
-    if (capabilities9 not in return_message):
-        error_list.append(capabilities9)
-    if (capabilities10 not in return_message):
-        error_list.append(capabilities10)
-    if (capabilities11 not in return_message):
-        error_list.append(capabilities11)
-    if (capabilities12 not in return_message):
-        error_list.append(capabilities12)
-    if (capabilities13 not in return_message):
-        error_list.append(capabilities13)
-    #if (capabilities14 not in return_message):
-    #    error_list.append(capabilities14)
+    # if (capabilities2 not in return_message):
+    #     error_list.append(capabilities2)
+    # if (capabilities3 not in return_message):
+    #     error_list.append(capabilities3)
+    # if (capabilities4 not in return_message):
+    #     error_list.append(capabilities4)
+    # if (capabilities5 not in return_message):
+    #     error_list.append(capabilities5)
+    # if (capabilities6 not in return_message):
+    #     error_list.append(capabilities6)
+    # if (capabilities7 not in return_message):
+    #     error_list.append(capabilities7)
+    # if (capabilities8 not in return_message):
+    #     error_list.append(capabilities8)
+    # if (capabilities9 not in return_message):
+    #     error_list.append(capabilities9)
+    # if (capabilities10 not in return_message):
+    #     error_list.append(capabilities10)
+    # if (capabilities11 not in return_message):
+    #     error_list.append(capabilities11)
+    # if (capabilities12 not in return_message):
+    #     error_list.append(capabilities12)
+    # if (capabilities13 not in return_message):
+    #     error_list.append(capabilities13)
+    # if (capabilities14 not in return_message):
+    #     error_list.append(capabilities14)
+    # if (capabilities15 not in return_message):
+    #     error_list.append(capabilities15)
 
     assert not error_list, ('Missing some rackHD capabilities')
 

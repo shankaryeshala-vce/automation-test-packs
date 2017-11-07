@@ -56,10 +56,10 @@ def test_dne_services_up(service_name, setup):
     assert not err
 
 
-#"symphony-node-discovery-paqx", This has been removed as there is a defect open for it
+#"symphony-rackhd-adapter-service" This has been removed as there is a defect open for it
 @pytest.mark.parametrize('service_name',["symphony-engineering-standards-service", "symphony-dne-paqx",
-                          "symphony-vcenter-adapter-service",
-                          "cpsd-scaleio-adapter-service", "symphony-rackhd-adapter-service"])
+                          "symphony-vcenter-adapter-service","cpsd-scaleio-adapter-service",
+                                         "symphony-node-discovery-paqx"])
 @pytest.mark.daily_status
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended

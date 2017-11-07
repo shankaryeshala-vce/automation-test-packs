@@ -1,0 +1,67 @@
+{
+  "messageProperties": {
+    "timestamp": "2017-08-29T15:19:41.954Z",
+    "correlationId": "148a375c-64a8-4408-b8e9-7447905c0f20",
+    "replyTo": "dne-paqx.b1d958050f7a"
+  },
+  "storagePools": [
+    {
+      "id": "74ff6005valid",
+      "name": "Pool-1",
+      "numberOfDevices": "298",
+      "type": "SSD",
+      "devices": [
+        {
+          "id": "001",
+          "name": "Device-1",
+          "deviceState": "",
+          "type": "SSD",
+          "serialNumber": "SN-1",
+          "capacity": "480103981056"
+        }
+      ]
+    }
+  ],
+  "newDevices": [
+    {
+      "id": "003",
+      "name": "Device-3",
+      "deviceState": "",
+      "type": "SSD",
+      "serialNumber": "SN-3",
+      "capacity": "480103981056"
+    },
+    {
+      "id": "004",
+      "name": "Device-4",
+      "deviceState": "",
+      "type": "SSD",
+      "serialNumber": "SN-4",
+      "capacity": "480103981056"
+    },
+    {
+      "id": "005",
+      "name": "Device-5",
+      "deviceState": "",
+      "type": "SSD",
+      "serialNumber": "SN-5",
+      "capacity": "480103981056"
+    },
+    {
+      "id": "006",
+      "name": "Device-6",
+      "deviceState": "",
+      "type": "SSD",
+      "serialNumber": "SN-6",
+      "capacity": "480103981056"
+    },
+    {
+      "id": "007",
+      "name": "Device-7",
+      "deviceState": "",
+      "type": "SSD",
+      "serialNumber": "SN-7",
+      "capacity": "480103981056"
+    }
+  ]
+}

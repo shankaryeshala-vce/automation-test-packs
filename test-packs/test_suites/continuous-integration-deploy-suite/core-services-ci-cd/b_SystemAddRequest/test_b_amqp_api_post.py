@@ -1,10 +1,4 @@
-
-#!/usr/bin/python
-# Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
-# Dell EMC Confidential/Proprietary Information
-# Author - Toqeer Akhtar
-
-
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved
 import af_support_tools
 import pytest
 import os
@@ -97,7 +91,7 @@ def test_api_addsystem():
 
         err.append("Error---All Components are not added successfully")
     assert not err
-    
+
 @pytest.mark.tls_enabled
 def test_sds_consul():
     """

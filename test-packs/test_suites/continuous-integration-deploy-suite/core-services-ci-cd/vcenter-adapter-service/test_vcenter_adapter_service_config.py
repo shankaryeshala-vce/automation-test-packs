@@ -269,7 +269,7 @@ def test_vcenter_adapter_full_ListCapabilities():
                                                           rmq_password=cpsd.props.rmq_password,
                                                           queue='test.capability.registry.response',
                                                           ssl_enabled=cpsd.props.rmq_ssl_enabled)
-
+    print(return_message)
     time.sleep(5)
     # Verify the vcenter Apapter Response
     identity = 'vcenter-adapter'
@@ -289,7 +289,13 @@ def test_vcenter_adapter_full_ListCapabilities():
     capabilities14 = 'vcenter-enablePCIpassthroughHost'
     capabilities15 = 'vcenter-addhostdvswitch'
     capabilities16 = 'vcenter-rename-datastore'
-    capabilities17= 'vcenter-list-components'
+    capabilities17 = 'vcenter-list-components'
+    capabilities18 = 'esxi-credential-details'
+    capabilities21 = 'vcenter-update-software-acceptance'
+    capabilities22 = 'vcenter-vm-powercommand'
+    capabilities23 = 'vcenter-configure-vm-network'
+    capabilities24 = 'vcenter-execute-remote-ssh-commands'
+
 
     error_list = []
 
@@ -329,6 +335,17 @@ def test_vcenter_adapter_full_ListCapabilities():
         error_list.append(capabilities16)
     if (capabilities17 not in return_message):
         error_list.append(capabilities17)
+    if (capabilities18 not in return_message):
+        error_list.append(capabilities18)
+    if (capabilities21 not in return_message):
+        error_list.append(capabilities21)
+    if (capabilities22 not in return_message):
+        error_list.append(capabilities22)
+    if (capabilities23 not in return_message):
+        error_list.append(capabilities23)
+    if (capabilities24 not in return_message):
+        error_list.append(capabilities24)
+
 
     assert not error_list, ('Missing some vcenter-adapter capabilities')
 
@@ -515,6 +532,7 @@ def test_vcenter_adapter_log_files_free_of_exceptions():
     assert not error_list, 'Exceptions in log files, Review the ' + errorLogFile + ' file'
 
     print('No ' + excep1, excep2, excep3, excep4 + ' exceptions in log files\n')
+
 
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended

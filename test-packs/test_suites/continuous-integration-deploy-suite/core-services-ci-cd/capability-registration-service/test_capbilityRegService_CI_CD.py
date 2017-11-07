@@ -11,6 +11,7 @@ import af_support_tools
 import json
 import pytest
 import requests
+import time
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -55,6 +56,24 @@ def load_test_data():
 # These are the main tests.
 #####################################################################
 
+
+@pytest.mark.daily_status
+@pytest.mark.core_services_mvp
+@pytest.mark.core_services_mvp_extended
+@pytest.mark.dne_paqx_parent
+@pytest.mark.dne_paqx_parent_mvp_extended
+def test_enable_rabbitmq_management_plugin():
+    """ A function to enable the rabbitmq_management plugin
+    It won't cause any errrors if it is already enabled"""
+    command = 'docker exec -d amqp rabbitmq-plugins enable rabbitmq_management'
+    af_support_tools.send_ssh_command(
+        host=ipaddress,
+        username=cli_username,
+        password=cli_password,
+        command=command,
+        return_output=False)
+
+
 @pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
@@ -79,6 +98,8 @@ def test_capabilityRegistry_servicerunning():
     my_return_status = my_return_status.strip()
     print('\nDocker Container is:', my_return_status, '\n')
     assert my_return_status == 'Up', (service_name + " not running")
+
+    time.sleep(20)
 
 
 @pytest.mark.daily_status
@@ -170,7 +191,7 @@ def test_capability_registry_RMQ_bindings_fru(exchange, queue):
     print(exchange, '\nis bound to\n', queue, '\n')
 
 
-@pytest.mark.skip(reason="Test will be enabled when CI pipeline will install the rpms from master. Tha fix is already pushed into the master")
+@pytest.mark.skip(reason="ESTS-136102")
 @pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
@@ -206,7 +227,8 @@ def test_capabilityRegistry_log_files_exist():
 
     print('Valid log files exist')
 
-@pytest.mark.skip(reason="Test will be enabled when CI pipeline will install the rpms from master. Tha fix is already pushed into the master")
+
+@pytest.mark.skip(reason="ESTS-136102")
 @pytest.mark.daily_status
 @pytest.mark.core_services_mvp
 @pytest.mark.core_services_mvp_extended
